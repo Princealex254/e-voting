@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter Registration - Prince Alex Digital E-voting system</title>
+    <style>
+        /* Prince Alex Digital Brand Colors */
+        :root {
+            --pad-primary: #0b6efd;
+            --pad-accent: #10b981;
+            --pad-dark: #0f172a;
+            --pad-light: #f8fafc;
+            --pad-text: #374151;
+            --pad-text-light: #6b7280;
+            --pad-border: #e5e7eb;
+            --pad-success: #10b981;
+            --pad-warning: #f59e0b;
+            --pad-error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Inter, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, var(--pad-light) 0%, #e0f2fe 100%);
+            color: var(--pad-text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .pad-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .pad-header {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            margin-bottom: 2rem;
+        }
+
+        .pad-header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .pad-back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--pad-primary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+            background: transparent;
+            border: 1px solid transparent;
+        }
+
+        .pad-back-btn:hover {
+            background: var(--pad-light);
+            border-color: var(--pad-primary);
+        }
+
+        .pad-back-icon {
+            font-size: 1.25rem;
+        }
+
+        .pad-header-center {
+            text-align: center;
+            flex: 1;
+        }
+
+        .pad-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--pad-dark);
+            margin-bottom: 1rem;
+        }
+
+        .pad-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--pad-primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .pad-logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+        }
+
+        .pad-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-subtitle {
+            color: var(--pad-text-light);
+            margin-bottom: 2rem;
+        }
+
+        .pad-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--pad-border);
+        }
+
+        .pad-form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .pad-label {
+            display: block;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--pad-border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .pad-input:focus {
+            outline: none;
+            border-color: var(--pad-primary);
+            box-shadow: 0 0 0 3px rgba(11, 110, 253, 0.1);
+        }
+
+        .pad-input.error {
+            border-color: var(--pad-error);
+        }
+
+        .pad-input.success {
+            border-color: var(--pad-success);
+        }
+
+        .pad-error-message {
+            color: var(--pad-error);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .pad-success-message {
+            color: var(--pad-success);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .pad-btn {
+            display: inline-block;
+            padding: 0.875rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            width: 100%;
+        }
+
+        .pad-btn-primary {
+            background: var(--pad-primary);
+            color: white;
+        }
+
+        .pad-btn-primary:hover:not(:disabled) {
+            background: #0a5fd4;
+            transform: translateY(-1px);
+        }
+
+        .pad-btn-primary:disabled {
+            background: var(--pad-text-light);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .pad-btn-secondary {
+            background: var(--pad-accent);
+            color: white;
+        }
+
+        .pad-btn-secondary:hover:not(:disabled) {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .pad-btn-secondary:disabled {
+            background: var(--pad-text-light);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .pad-link {
+            color: var(--pad-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .pad-link:hover {
+            text-decoration: underline;
+        }
+
+        .pad-text-center {
+            text-align: center;
+        }
+
+        .pad-mt-2 {
+            margin-top: 1rem;
+        }
+
+        .pad-mb-2 {
+            margin-bottom: 1rem;
+        }
+
+        .pad-photo-upload {
+            border: 2px dashed var(--pad-border);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pad-photo-upload:hover {
+            border-color: var(--pad-primary);
+            background: rgba(11, 110, 253, 0.05);
+        }
+
+        .pad-photo-upload.has-photo {
+            border-color: var(--pad-success);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .pad-photo-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 1rem;
+            display: block;
+        }
+
+        .pad-otp-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .pad-otp-modal.show {
+            display: flex;
+        }
+
+        .pad-otp-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .pad-otp-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            margin-bottom: 1rem;
+        }
+
+        .pad-otp-code {
+            background: var(--pad-light);
+            border: 2px solid var(--pad-primary);
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--pad-primary);
+            margin: 1rem 0;
+            letter-spacing: 0.2em;
+        }
+
+        /* Email Verification Modal */
+        .pad-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .pad-modal.show {
+            display: flex;
+        }
+
+        .pad-modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .pad-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--pad-border);
+        }
+
+        .pad-modal-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+        }
+
+        .pad-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--pad-text-light);
+            cursor: pointer;
+            padding: 0;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .pad-modal-close:hover {
+            background: var(--pad-light);
+            color: var(--pad-dark);
+        }
+
+        .pad-modal-body {
+            padding: 2rem;
+        }
+
+        .pad-btn-full {
+            width: 100%;
+        }
+
+        /* Input Group with Icons */
+        .pad-input-group {
+            position: relative;
+        }
+
+        .pad-input-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.25rem;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+
+        .pad-input-icon.success {
+            opacity: 1;
+            color: var(--pad-success);
+        }
+
+        .pad-input-icon.error {
+            opacity: 1;
+            color: var(--pad-danger);
+        }
+
+        .pad-input-icon.loading {
+            opacity: 1;
+            color: var(--pad-primary);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: translateY(-50%) rotate(0deg); }
+            to { transform: translateY(-50%) rotate(360deg); }
+        }
+
+        /* Progress Indicator */
+        .pad-progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--pad-light);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .pad-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--pad-primary), var(--pad-success));
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .pad-progress-text {
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--pad-text-light);
+            margin-top: 0.5rem;
+        }
+
+
+        /* Countdown Timer */
+        .pad-countdown {
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--pad-text-light);
+            margin: 1rem 0;
+        }
+
+        .pad-countdown.warning {
+            color: #f59e0b;
+        }
+
+        .pad-countdown.expired {
+            color: #ef4444;
+        }
+
+        .pad-otp-note {
+            color: var(--pad-text-light);
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pad-progress {
+            background: var(--pad-border);
+            border-radius: 8px;
+            height: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .pad-progress-bar {
+            background: var(--pad-primary);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .pad-step {
+            display: none;
+        }
+
+        .pad-step.active {
+            display: block;
+        }
+
+        .pad-step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .pad-step-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--pad-border);
+            margin: 0 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .pad-step-dot.active {
+            background: var(--pad-primary);
+        }
+
+        .pad-step-dot.completed {
+            background: var(--pad-success);
+        }
+
+        .pad-loading {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pad-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #0b6efd;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .pad-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .pad-error-message {
+            background-color: #fee2e2;
+            color: #dc2626;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            border: 1px solid #fecaca;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .pad-alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .pad-alert.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--pad-success);
+            color: #065f46;
+        }
+
+        .pad-alert.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--pad-error);
+            color: #991b1b;
+        }
+
+        .pad-alert.show {
+            display: block;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 640px) {
+            .pad-container {
+                padding: 1rem;
+            }
+            
+            .pad-card {
+                padding: 1.5rem;
+            }
+            
+            .pad-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Footer Styles */
+        .pad-footer {
+            background: var(--pad-dark);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .pad-footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .pad-footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .pad-footer-link {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .pad-footer-link:hover {
+            color: white;
+        }
+
+        .pad-footer-credit {
+            border-top: 1px solid #374151;
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+
+        .pad-footer-credit p {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        .pad-footer-credit a {
+            color: var(--pad-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .pad-footer-credit a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .pad-footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .pad-footer-links {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="pad-container">
+        <header class="pad-header">
+            <div class="pad-header-content">
+                <a href="index.html" class="pad-back-btn">
+                    <span class="pad-back-icon">←</span>
+                    <span>Back Home</span>
+                </a>
+                <div class="pad-header-center">
+                    <a href="index.html" class="pad-logo">
+                        <div class="pad-logo-icon">PAD</div>
+                        <div class="pad-logo-text">Prince Alex Digital</div>
+                    </a>
+                </div>
+                <div style="width: 100px;"></div> <!-- Spacer for alignment -->
+            </div>
+        </header>
+
+            <div class="pad-title-section">
+                <h1 class="pad-title">Voter Registration</h1>
+                <p class="pad-subtitle">Join your organization's secure voting system</p>
+                
+                <div id="organizationInfo" style="display: none; background: var(--pad-light); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <div style="font-weight: 600; color: var(--pad-primary);">Organization: <span id="organizationName"></span></div>
+                </div>
+            </div>
+
+            <div class="pad-alert" id="alertMessage"></div>
+
+        <div class="pad-card">
+            <div class="pad-progress-bar">
+                <div class="pad-progress-fill" id="progressFill" style="width: 33.33%"></div>
+            </div>
+            <div class="pad-progress-text" id="progressText">Step 1 of 3: Organization Code</div>
+            
+            <div class="pad-step-indicator">
+                <div class="pad-step-dot active" id="step1"></div>
+                <div class="pad-step-dot" id="step2"></div>
+                <div class="pad-step-dot" id="step3"></div>
+            </div>
+
+            <!-- Step 1: Organization Code Validation -->
+            <div class="pad-step active" id="step1-content">
+                <h2 class="pad-mb-2">Organization Code</h2>
+                <p class="pad-text-center pad-mb-2">Enter your organization code to begin registration</p>
+                
+                <div id="organizationInfo" style="display: none; background: rgba(11, 110, 253, 0.1); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid var(--pad-primary);">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 1.25rem;">🏢</span>
+                        <div>
+                            <div style="font-weight: 600; color: var(--pad-primary);" id="organizationName"></div>
+                            <div style="font-size: 0.875rem; color: var(--pad-text-light);">Organization verified successfully</div>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="orgCodeForm">
+                    <div class="pad-form-group">
+                        <label class="pad-label" for="orgCode">Organization Code *</label>
+                        <div class="pad-input-group">
+                            <input type="text" id="orgCode" name="orgCode" class="pad-input" placeholder="Enter organization code" required onblur="validateOrgCodeOnBlur()">
+                            <div class="pad-input-icon" id="orgCodeIcon"></div>
+                        </div>
+                        <div class="pad-error-message" id="orgCodeError"></div>
+                        <div class="pad-success-message" id="orgCodeSuccess"></div>
+                    </div>
+
+                    <button type="button" class="pad-btn pad-btn-primary" onclick="validateOrgCode()" id="validateBtn">
+                        Validate Code
+                    </button>
+                </form>
+            </div>
+
+            <!-- Step 2: Personal Information (Hidden initially) -->
+            <div class="pad-step" id="step2-content" style="display: none;">
+                <h2 class="pad-mb-2">Personal Information</h2>
+                <form id="registrationForm">
+                    <div class="pad-form-group">
+                        <label class="pad-label" for="fullName">Full Name *</label>
+                        <input type="text" id="fullName" name="fullName" class="pad-input" required>
+                        <div class="pad-error-message" id="fullNameError"></div>
+                    </div>
+
+                    <div class="pad-form-group">
+                        <label class="pad-label" for="identity">Identity Number *</label>
+                        <input type="text" id="identity" name="identity" class="pad-input" placeholder="e.g., M/123456" required>
+                        <div class="pad-error-message" id="identityError"></div>
+                        <div class="pad-success-message" id="identitySuccess"></div>
+                    </div>
+
+                    <div class="pad-form-group">
+                        <label class="pad-label" for="phone">Phone Number *</label>
+                        <input type="tel" id="phone" name="phone" class="pad-input" placeholder="+254712345678" required>
+                        <div class="pad-error-message" id="phoneError"></div>
+                    </div>
+
+                    <div class="pad-form-group">
+                        <label class="pad-label" for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" class="pad-input" required onblur="validateEmailOnBlur()">
+                        <div class="pad-error-message" id="emailError"></div>
+                        <div class="pad-success-message" id="emailSuccess"></div>
+                    </div>
+
+
+                    <div class="pad-form-group">
+                        <label class="pad-label">Profile Photo (Optional)</label>
+                        <div class="pad-photo-upload" id="photoUpload">
+                            <div id="photoPlaceholder">
+                                <div style="font-size: 2rem; margin-bottom: 0.5rem;">📷</div>
+                                <div>Click to upload photo</div>
+                                <div style="font-size: 0.875rem; color: var(--pad-text-light); margin-top: 0.25rem;">JPG, PNG up to 2MB</div>
+                            </div>
+                            <img id="photoPreview" class="pad-photo-preview" style="display: none;">
+                        </div>
+                        <input type="file" id="photoInput" accept="image/*" style="display: none;">
+                        <div class="pad-error-message" id="photoError"></div>
+                    </div>
+
+                    <button type="button" class="pad-btn pad-btn-primary" onclick="nextStep()">
+                        Continue
+                    </button>
+                </form>
+            </div>
+
+            <!-- Step 3: Complete Registration -->
+            <div class="pad-step" id="step3-content">
+                <h2 class="pad-mb-2">Registration Complete!</h2>
+                <p class="pad-text-center pad-mb-2">Your account has been created successfully. You can now participate in voting.</p>
+                
+                <div class="pad-form-group">
+                    <label class="pad-label">Your Voter ID</label>
+                    <input type="text" id="voterId" class="pad-input" readonly>
+                </div>
+
+                <div class="pad-text-center pad-mt-2">
+                    <button type="button" class="pad-btn pad-btn-primary" onclick="goToLogin()">
+                        Go to Login
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="pad-text-center pad-mt-2">
+            <p>Already have an account? <a href="login.html" class="pad-link">Sign in here</a></p>
+        </div>
+    </div>
+
+    <!-- Email Verification Modal -->
+    <div class="pad-modal" id="emailVerificationModal">
+        <div class="pad-modal-content">
+            <div class="pad-modal-header">
+                <h3>Email Verification</h3>
+                <button type="button" class="pad-modal-close" onclick="closeEmailVerificationModal()">&times;</button>
+            </div>
+            <div class="pad-modal-body">
+                <p class="pad-text-center pad-mb-2">We've sent a verification code to your email address</p>
+                <p class="pad-text-center pad-mb-2" style="color: var(--pad-text-light); font-size: 0.875rem;">
+                    Check your inbox and enter the 6-digit code below
+                </p>
+                
+                <div class="pad-countdown" id="countdown">Code expires in 05:00</div>
+                
+                <div class="pad-form-group">
+                    <label class="pad-label" for="otpCode">Verification Code</label>
+                    <input type="text" id="otpCode" name="otpCode" class="pad-input" placeholder="Enter 6-digit code" maxlength="6">
+                    <div class="pad-error-message" id="otpError"></div>
+                </div>
+
+                <button type="button" class="pad-btn pad-btn-primary pad-btn-full" onclick="verifyOTP()" id="verifyBtn">
+                    Verify Code
+                </button>
+
+                <div class="pad-text-center pad-mt-2">
+                    <button type="button" class="pad-link" onclick="resendOTP()" id="resendBtn" disabled>
+                        Resend Code (60s)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase functions
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGErPBeQ1Fdx9EHPXOHepoEoOx7P2f57o",
+            authDomain: "princealextravel.firebaseapp.com",
+            projectId: "princealextravel",
+            storageBucket: "princealextravel.firebasestorage.app",
+            messagingSenderId: "947577729462",
+            appId: "1:947577729462:web:dd4b4c7cb4a984c5e3d117"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Make Firebase available globally
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDB = db;
+        
+        // Make Firebase functions globally available
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.sendEmailVerification = sendEmailVerification;
+        window.doc = doc;
+        window.setDoc = setDoc;
+        window.getDoc = getDoc;
+        window.updateDoc = updateDoc;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.serverTimestamp = serverTimestamp;
+        window.query = query;
+        window.where = where;
+        window.getDocs = getDocs;
+    </script>
+
+    <script>
+        let currentStep = 1;
+        let registrationData = {};
+        let generatedOTP = '';
+        let organizationData = null;
+        let isVerifying = false;
+        let countdownTimer = null;
+        let resendCooldown = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            checkOrganizationCode(); // Check for URL parameters
+        });
+
+        function checkOrganizationCode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const orgCode = urlParams.get('org');
+            
+            if (orgCode) {
+                // If organization code is in URL, populate the field and validate
+                document.getElementById('orgCode').value = orgCode;
+                validateOrgCode();
+            }
+            // Organization code input is already in HTML, no need to add it dynamically
+        }
+
+        async function validateOrganizationCode(orgCode) {
+            try {
+                // Query organizations collection by code field
+                const orgQuery = query(
+                    window.collection(window.firebaseDB, 'organizations'),
+                    where('code', '==', orgCode)
+                );
+                const orgSnapshot = await getDocs(orgQuery);
+                
+                if (!orgSnapshot.empty) {
+                    const orgDoc = orgSnapshot.docs[0];
+                    organizationData = { id: orgDoc.id, ...orgDoc.data() };
+                    document.getElementById('organizationName').textContent = organizationData.name;
+                    document.getElementById('organizationInfo').style.display = 'block';
+                    showAlert('Organization code validated successfully!', 'success');
+                } else {
+                    showAlert('Invalid organization code. Please check with your administrator.', 'error');
+                }
+            } catch (error) {
+                console.error('Error validating organization code:', error);
+                showAlert('Error validating organization code. Please try again.', 'error');
+            }
+        }
+
+
+        async function validateOrgCode() {
+            const orgCode = document.getElementById('orgCode').value;
+            if (!orgCode) {
+                showError('orgCodeError', 'Please enter organization code');
+                return;
+            }
+            
+            try {
+                // Query organizations collection by code field
+                const orgQuery = query(
+                    window.collection(window.firebaseDB, 'organizations'),
+                    where('code', '==', orgCode)
+                );
+                const orgSnapshot = await getDocs(orgQuery);
+                
+                if (!orgSnapshot.empty) {
+                    const orgDoc = orgSnapshot.docs[0];
+                    organizationData = { id: orgDoc.id, ...orgDoc.data() };
+                    
+                    // Show success message and organization info
+                    showSuccess('orgCodeError', 'Organization code validated successfully!');
+                    document.getElementById('organizationName').textContent = organizationData.name;
+                    document.getElementById('organizationInfo').style.display = 'block';
+                    
+                    // Show the registration form after successful validation
+                    setTimeout(() => {
+                        document.getElementById('step1-content').style.display = 'none';
+                        document.getElementById('step2-content').style.display = 'block';
+                        document.getElementById('step1').classList.remove('active');
+                        document.getElementById('step2').classList.add('active');
+                        currentStep = 2;
+                    }, 1000);
+                } else {
+                    showError('orgCodeError', 'Invalid organization code. Please check with your administrator.');
+                }
+            } catch (error) {
+                console.error('Error validating organization code:', error);
+                showError('orgCodeError', 'Error validating organization code. Please try again.');
+            }
+        }
+
+        function setupEventListeners() {
+            // Photo upload
+            document.getElementById('photoUpload').addEventListener('click', function() {
+                document.getElementById('photoInput').click();
+            });
+
+            document.getElementById('photoInput').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    if (file.size > 2 * 1024 * 1024) {
+                        showError('photoError', 'File size must be less than 2MB');
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const preview = document.getElementById('photoPreview');
+                        const placeholder = document.getElementById('photoPlaceholder');
+                        const upload = document.getElementById('photoUpload');
+                        
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                        placeholder.style.display = 'none';
+                        upload.classList.add('has-photo');
+                        
+                        registrationData.photo = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Form validation
+            document.getElementById('identity').addEventListener('blur', function() {
+                validateIdentity();
+            });
+
+            document.getElementById('phone').addEventListener('blur', function() {
+                validatePhone();
+            });
+
+            document.getElementById('email').addEventListener('blur', function() {
+                validateEmail();
+            });
+        }
+
+        function validateIdentity() {
+            const identity = document.getElementById('identity').value;
+            const errorEl = document.getElementById('identityError');
+            const successEl = document.getElementById('identitySuccess');
+            
+            if (!identity) {
+                showError('identityError', 'Identity number is required');
+                return false;
+            }
+
+            // Check if identity already exists
+            const voters = JSON.parse(localStorage.getItem('pad_voters') || '[]');
+            const existingVoter = voters.find(v => v.identity === identity);
+            
+            if (existingVoter) {
+                showError('identityError', 'This identity number is already registered');
+                return false;
+            }
+
+            showSuccess('identitySuccess', 'Identity number is available');
+            hideError('identityError');
+            return true;
+        }
+
+        function validatePhone() {
+            const phone = document.getElementById('phone').value;
+            const errorEl = document.getElementById('phoneError');
+            
+            if (!phone) {
+                showError('phoneError', 'Phone number is required');
+                return false;
+            }
+
+            const phoneRegex = /^\+?[1-9]\d{1,14}$/;
+            if (!phoneRegex.test(phone)) {
+                showError('phoneError', 'Please enter a valid phone number');
+                return false;
+            }
+
+            hideError('phoneError');
+            return true;
+        }
+
+        function validateEmail() {
+            const email = document.getElementById('email').value;
+            const errorEl = document.getElementById('emailError');
+            
+            if (!email) {
+                showError('emailError', 'Email address is required');
+                return false;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showError('emailError', 'Please enter a valid email address');
+                return false;
+            }
+
+            hideError('emailError');
+            return true;
+        }
+
+        async function nextStep() {
+            if (currentStep === 2) {
+                // Validate step 2 (Personal Information)
+                const fullName = document.getElementById('fullName').value;
+                const identity = document.getElementById('identity').value;
+                const phone = document.getElementById('phone').value;
+                const email = document.getElementById('email').value;
+
+                if (!fullName || !identity || !phone || !email) {
+                    showAlert('Please fill in all required fields', 'error');
+                    return;
+                }
+
+                if (!validateIdentity() || !validatePhone() || !validateEmail()) {
+                    showAlert('Please fix the validation errors', 'error');
+                    return;
+                }
+
+                // Pre-check for existing email/ID
+                try {
+                    showAlert('Checking for existing accounts...', 'info');
+                    
+                    const [emailQuery, identityQuery] = await Promise.all([
+                        getDocs(query(collection(window.firebaseDB, 'voters'), where('email', '==', email))),
+                        getDocs(query(collection(window.firebaseDB, 'voters'), where('identity', '==', identity)))
+                    ]);
+
+                    if (!emailQuery.empty) {
+                        showAlert('An account with this email already exists. Please use a different email or try logging in.', 'error');
+                        return;
+                    }
+
+                    if (!identityQuery.empty) {
+                        showAlert('An account with this identity number already exists. Please use a different identity number or try logging in.', 'error');
+                        return;
+                    }
+
+                    // Save step 2 data
+                    registrationData = {
+                        fullName,
+                        identity,
+                        phone,
+                        email,
+                        photo: registrationData.photo || null
+                    };
+
+                    // Show email verification modal
+                    sendOTP();
+                    showEmailVerificationModal();
+                    
+                } catch (error) {
+                    console.error('Error checking existing accounts:', error);
+                    showAlert('Error checking existing accounts. Please try again.', 'error');
+                }
+            }
+        }
+
+        // Generate random 6 digit OTP
+        function generateOtp() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+
+        async function sendOTP() {
+            try {
+                // Check if email already exists in voters collection
+                const votersQuery = query(
+                    window.collection(window.firebaseDB, 'voters'),
+                    where('email', '==', registrationData.email)
+                );
+                const votersSnapshot = await getDocs(votersQuery);
+                
+                if (!votersSnapshot.empty) {
+                    showAlert('An account with this email already exists. Please use a different email or try logging in.', 'error');
+                    return;
+                }
+                
+                // Generate OTP in frontend
+                const otp = generateOtp();
+                const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes from now
+                
+                // Save OTP to Firestore
+                await setDoc(doc(window.firebaseDB, 'otp_verification', registrationData.email), {
+                    otp,
+                    expiresAt,
+                    used: false,
+                    voterName: registrationData.fullName,
+                    orgId: organizationData.id,
+                    type: 'registration_verification',
+                    createdAt: serverTimestamp()
+                });
+
+                // Send email via Trigger Email Extension
+                await window.addDoc(window.collection(window.firebaseDB, 'mail'), {
+                    to: registrationData.email,
+                    message: {
+                        subject: "Your Registration Code - Prince Alex Digital E-voting system 📧",
+                        text: `Hello ${registrationData.fullName},\n\nYour registration verification code is: ${otp}\n\nThis code will expire in 5 minutes.\n\nIf you didn't request this code, please ignore this email.\n\nThank you for registering with Prince Alex Digital E-voting system.`,
+                        html: `
+                            <!DOCTYPE html>
+                            <html>
+                            <head>
+                                <meta charset="utf-8">
+                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                <title>Registration Code - Prince Alex Digital</title>
+                                <style>
+                                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+                                    .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc; }
+                                    .header { background: linear-gradient(135deg, #0b6efd 0%, #10b981 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                                    .content { background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+                                    .code-box { background: #f1f5f9; border: 2px dashed #0b6efd; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px; }
+                                    .code { font-size: 32px; font-weight: bold; color: #0b6efd; letter-spacing: 5px; font-family: 'Courier New', monospace; }
+                                    .warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 4px; }
+                                    .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
+                                    .logo { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+                                </style>
+                            </head>
+                            <body>
+                                <div class="container">
+                                    <div class="header">
+                                        <div class="logo">Prince Alex Digital</div>
+                                        <h1>Registration Verification</h1>
+                                    </div>
+                                    <div class="content">
+                                        <h2>Hello ${registrationData.fullName}!</h2>
+                                        <p>Thank you for registering with Prince Alex Digital E-voting system for ${organizationData.name}.</p>
+                                        
+                                        <div class="code-box">
+                                            <p style="margin: 0 0 10px 0; color: #6b7280;">Your verification code is:</p>
+                                            <div class="code">${otp}</div>
+                                        </div>
+                                        
+                                        <div class="warning">
+                                            <strong>⚠️ Important:</strong> This code will expire in 5 minutes for security reasons. If you didn't request this code, please ignore this email.
+                                        </div>
+                                        
+                                        <p>Enter this code in the registration form to complete your account setup.</p>
+                                        
+                                        <p>Once verified, you'll be able to participate in voting for your organization.</p>
+                                        
+                                        <div class="footer">
+                                            <p>Thank you for choosing Prince Alex Digital E-voting system</p>
+                                            <p>This is an automated message. Please do not reply to this email.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </body>
+                            </html>
+                        `
+                    }
+                });
+
+                showAlert('Verification code sent to your email!', 'success');
+                
+            } catch (error) {
+                console.error('Error sending OTP email:', error);
+                showAlert('Error sending verification code. Please try again.', 'error');
+            }
+        }
+
+
+        // Helper to avoid leaving button stuck
+        function failVerification(message) {
+            showError('otpError', message);
+            const verifyBtn = document.getElementById('verifyBtn');
+            verifyBtn.disabled = false;
+            verifyBtn.innerHTML = 'Verify Code';
+            isVerifying = false;
+        }
+
+        async function verifyOTP() {
+            if (isVerifying) return;
+            isVerifying = true;
+
+            const otp = document.getElementById('otpCode').value.trim();
+            const email = registrationData.email;
+            const verifyBtn = document.getElementById('verifyBtn');
+
+            // Early validation before setting loading state
+            if (!otp) {
+                showError('otpError', 'Please enter the verification code');
+                isVerifying = false;
+                return;
+            }
+
+            // Quick client-side validation
+            if (!/^\d{6}$/.test(otp)) {
+                showError('otpError', 'Please enter a valid 6-digit code');
+                isVerifying = false;
+                return;
+            }
+
+            // Show loading state
+            verifyBtn.disabled = true;
+            verifyBtn.innerHTML = '<span class="pad-spinner"></span> Verifying...';
+            hideError('otpError');
+
+            try {
+                const otpDocRef = doc(window.firebaseDB, 'otp_verification', email);
+                const otpDoc = await getDoc(otpDocRef);
+
+                if (!otpDoc.exists()) {
+                    return failVerification("No OTP found. Please request again.");
+                }
+
+                const otpData = otpDoc.data();
+                console.log("OTP data retrieved:", otpData);
+
+                // ✅ Handle Firestore Timestamp correctly
+                let expiryTime;
+                if (otpData.expiresAt?.toMillis) {
+                    expiryTime = otpData.expiresAt.toMillis();
+                } else {
+                    expiryTime = otpData.expiresAt; // in case it was stored as number
+                }
+
+                if (Date.now() > expiryTime) {
+                    return failVerification("OTP has expired. Please request a new one.");
+                }
+
+                if (otpData.used) {
+                    return failVerification("This code has already been used. Please request a new one.");
+                }
+
+                if (otp !== otpData.otp) {
+                    return failVerification("Invalid OTP. Please try again.");
+                }
+
+                // Mark OTP as used
+                await updateDoc(otpDocRef, { used: true });
+
+                // ✅ OTP verified → save registration details
+                await completeRegistration();
+
+            } catch (error) {
+                console.error("Error verifying OTP:", error);
+                showError('otpError', "An error occurred. Please try again.");
+            } finally {
+                // Always reset button
+                verifyBtn.disabled = false;
+                verifyBtn.innerHTML = 'Verify Code';
+                isVerifying = false;
+            }
+        }
+
+        function resendOTP() {
+            sendOTP();
+            document.getElementById('otpCode').value = '';
+            hideError('otpError');
+        }
+
+        function showEmailVerificationModal() {
+            document.getElementById('emailVerificationModal').classList.add('show');
+            startCountdown();
+        }
+
+        function closeEmailVerificationModal() {
+            document.getElementById('emailVerificationModal').classList.remove('show');
+            clearCountdown();
+        }
+
+        function startCountdown() {
+            let timeLeft = 300; // 5 minutes in seconds
+            const countdownEl = document.getElementById('countdown');
+            const resendBtn = document.getElementById('resendBtn');
+            
+            countdownTimer = setInterval(() => {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                countdownEl.textContent = `Code expires in ${timeString}`;
+                
+                if (timeLeft <= 60) {
+                    countdownEl.className = 'pad-countdown warning';
+                }
+                
+                if (timeLeft <= 0) {
+                    countdownEl.textContent = 'Code has expired';
+                    countdownEl.className = 'pad-countdown expired';
+                    clearInterval(countdownTimer);
+                    resendBtn.disabled = false;
+                    resendBtn.textContent = 'Resend Code';
+                }
+                
+                timeLeft--;
+            }, 1000);
+
+            // Start resend cooldown
+            startResendCooldown();
+        }
+
+        function startResendCooldown() {
+            let cooldown = 60; // 60 seconds
+            const resendBtn = document.getElementById('resendBtn');
+            resendBtn.disabled = true;
+            
+            resendCooldown = setInterval(() => {
+                resendBtn.textContent = `Resend Code (${cooldown}s)`;
+                cooldown--;
+                
+                if (cooldown <= 0) {
+                    resendBtn.disabled = false;
+                    resendBtn.textContent = 'Resend Code';
+                    clearInterval(resendCooldown);
+                }
+            }, 1000);
+        }
+
+        function clearCountdown() {
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
+            if (resendCooldown) {
+                clearInterval(resendCooldown);
+                resendCooldown = null;
+            }
+        }
+
+        function updateProgress(step) {
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            const progress = (step / 3) * 100;
+            progressFill.style.width = `${progress}%`;
+            
+            const stepNames = [
+                'Step 1 of 3: Organization Code',
+                'Step 2 of 3: Personal Information', 
+                'Step 3 of 3: Registration Complete'
+            ];
+            
+            progressText.textContent = stepNames[step - 1] || '';
+        }
+
+        // Real-time validation functions
+        async function validateOrgCodeOnBlur() {
+            const orgCode = document.getElementById('orgCode').value.trim();
+            const icon = document.getElementById('orgCodeIcon');
+            const validateBtn = document.getElementById('validateBtn');
+            
+            if (!orgCode) {
+                hideError('orgCodeError');
+                hideSuccess('orgCodeSuccess');
+                icon.className = 'pad-input-icon';
+                return;
+            }
+
+            // Show loading state
+            icon.className = 'pad-input-icon loading';
+            icon.innerHTML = '⟳';
+            validateBtn.disabled = true;
+
+            try {
+                const orgQuery = query(
+                    window.collection(window.firebaseDB, 'organizations'),
+                    where('code', '==', orgCode)
+                );
+                const orgSnapshot = await getDocs(orgQuery);
+                
+                if (!orgSnapshot.empty) {
+                    const orgDoc = orgSnapshot.docs[0];
+                    organizationData = { id: orgDoc.id, ...orgDoc.data() };
+                    
+                    // Show success
+                    icon.className = 'pad-input-icon success';
+                    icon.innerHTML = '✓';
+                    showSuccess('orgCodeSuccess', 'Organization found!');
+                    hideError('orgCodeError');
+                    validateBtn.disabled = false;
+                    validateBtn.innerHTML = 'Continue';
+                } else {
+                    // Show error
+                    icon.className = 'pad-input-icon error';
+                    icon.innerHTML = '✗';
+                    showError('orgCodeError', 'Organization not found');
+                    hideSuccess('orgCodeSuccess');
+                    validateBtn.disabled = false;
+                    validateBtn.innerHTML = 'Validate Code';
+                }
+            } catch (error) {
+                console.error('Error validating organization code:', error);
+                icon.className = 'pad-input-icon error';
+                icon.innerHTML = '✗';
+                showError('orgCodeError', 'Error validating code');
+                hideSuccess('orgCodeSuccess');
+                validateBtn.disabled = false;
+                validateBtn.innerHTML = 'Validate Code';
+            }
+        }
+
+        function validateEmailOnBlur() {
+            const email = document.getElementById('email').value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (!email) {
+                hideError('emailError');
+                hideSuccess('emailSuccess');
+                return;
+            }
+
+            if (emailRegex.test(email)) {
+                showSuccess('emailSuccess', 'Email format looks good');
+                hideError('emailError');
+            } else {
+                showError('emailError', 'Please enter a valid email address');
+                hideSuccess('emailSuccess');
+            }
+        }
+
+
+        function hideSuccess(elementId) {
+            const successElement = document.getElementById(elementId);
+            if (successElement) {
+                successElement.style.display = 'none';
+            }
+        }
+
+        async function completeRegistration() {
+            try {
+                console.log('Starting completeRegistration...');
+                console.log('Registration data:', registrationData);
+                console.log('Organization data:', organizationData);
+                
+                // Generate a unique voter ID
+                const voterId = 'voter_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                console.log('Generated voter ID:', voterId);
+                
+                // Prepare voter data
+                const voterData = {
+                    name: registrationData.fullName,
+                    identity: registrationData.identity,
+                    phone: registrationData.phone,
+                    email: registrationData.email,
+                    photo: registrationData.photo || null,
+                    verified: true,
+                    organizationId: organizationData.id,
+                    organizationName: organizationData.name,
+                    createdAt: serverTimestamp(),
+                    lastLogin: null,
+                    status: 'active',
+                    voterId: voterId
+                };
+
+                console.log('Saving voter data to Firestore...');
+                // Save voter data to Firestore
+                await setDoc(doc(window.firebaseDB, 'voters', voterId), voterData);
+                console.log('Voter data saved successfully');
+
+                console.log('Adding audit log...');
+                // Add audit log
+                await window.addDoc(window.collection(window.firebaseDB, 'auditLogs'), {
+                    event: 'voter_registered',
+                    details: `Voter ${registrationData.fullName} registered for ${organizationData.name}`,
+                    voterId: voterId,
+                    organizationId: organizationData.id,
+                    timestamp: serverTimestamp(),
+                    metadata: {
+                        voterName: registrationData.fullName,
+                        organizationName: organizationData.name
+                    }
+                });
+                console.log('Audit log added successfully');
+
+                console.log('Closing modal and updating UI...');
+                // Close modal and move to step 3 (Registration Complete)
+                closeEmailVerificationModal();
+                currentStep = 3;
+                updateStepDisplay();
+                document.getElementById('voterId').value = voterId;
+                
+                showAlert('Registration completed successfully!', 'success');
+                console.log('Registration completed successfully');
+                
+            } catch (error) {
+                console.error('Registration error:', error);
+                let errorMessage = 'Registration failed. Please try again.';
+                
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = 'This email is already registered. Please use a different email or try logging in.';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = 'Password is too weak. Please use a stronger password.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = 'Invalid email address. Please check your email.';
+                }
+                
+                showAlert(errorMessage, 'error');
+            }
+        }
+
+        function goToLogin() {
+            window.location.href = 'login.html';
+        }
+
+        function updateStepDisplay() {
+            // Update progress indicator
+            updateProgress(currentStep);
+            
+            // Update step indicators
+            for (let i = 1; i <= 3; i++) {
+                const dot = document.getElementById(`step${i}`);
+                const content = document.getElementById(`step${i}-content`);
+                
+                if (i < currentStep) {
+                    dot.classList.add('completed');
+                    dot.classList.remove('active');
+                } else if (i === currentStep) {
+                    dot.classList.add('active');
+                    dot.classList.remove('completed');
+                } else {
+                    dot.classList.remove('active', 'completed');
+                }
+                
+                if (i === currentStep) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            }
+        }
+
+        function showError(elementId, message) {
+            console.log('showError called with:', elementId, message);
+            const errorEl = document.getElementById(elementId);
+            console.log('Error element found:', errorEl);
+            if (errorEl) {
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+                
+                // Handle special cases where the input ID doesn't follow the pattern
+                let inputId;
+                if (elementId === 'otpError') {
+                    inputId = 'otpCode';
+                } else {
+                    inputId = elementId.replace('Error', '');
+                }
+                
+                const inputEl = document.getElementById(inputId);
+                if (inputEl) {
+                    inputEl.classList.add('error');
+                }
+            } else {
+                console.error('Error element not found:', elementId);
+            }
+        }
+
+        function showSuccess(elementId, message) {
+            const successElement = document.getElementById(elementId.replace('Error', 'Success'));
+            if (successElement) {
+                successElement.textContent = message;
+                successElement.style.display = 'block';
+                successElement.style.color = 'var(--pad-success)';
+            }
+        }
+
+        function hideError(elementId) {
+            const errorEl = document.getElementById(elementId);
+            if (errorEl) {
+                errorEl.style.display = 'none';
+            }
+            
+            // Try to remove error class from the input field
+            // Handle special cases where the input ID doesn't follow the pattern
+            let inputId;
+            if (elementId === 'otpError') {
+                inputId = 'otpCode';
+            } else {
+                inputId = elementId.replace('Error', '');
+            }
+            
+            const inputEl = document.getElementById(inputId);
+            if (inputEl) {
+                inputEl.classList.remove('error');
+            }
+        }
+
+        function showAlert(message, type) {
+            console.log('showAlert called with:', message, type);
+            const alertEl = document.getElementById('alertMessage');
+            console.log('Alert element found:', alertEl);
+            if (alertEl) {
+                alertEl.textContent = message;
+                alertEl.className = `pad-alert ${type} show`;
+                
+                setTimeout(() => {
+                    alertEl.classList.remove('show');
+                }, 5000);
+            } else {
+                console.error('Alert element not found');
+            }
+        }
+    </script>
+
+    <footer class="pad-footer">
+        <div class="pad-container">
+            <div class="pad-footer-content">
+                <div>
+                    <p>&copy; 2025 Prince Alex Digital. All rights reserved.</p>
+                </div>
+                <div class="pad-footer-links">
+                    <a href="index.html#contact" class="pad-footer-link">Contact Us</a>
+                    <a href="index.html#features" class="pad-footer-link">Features</a>
+                    <a href="tel:+254717384875" class="pad-footer-link">Call Now</a>
+                </div>
+            </div>
+            <div class="pad-footer-credit">
+                <p>Designed by <a href="https://www.princealex.pro" target="_blank" rel="noopener">Prince Alex Digital</a></p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

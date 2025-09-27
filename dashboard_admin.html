@@ -1,0 +1,4482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Prince Alex Digital E-voting system</title>
+    <style>
+        /* Prince Alex Digital Brand Colors */
+        :root {
+            --pad-primary: #0b6efd;
+            --pad-accent: #10b981;
+            --pad-dark: #0f172a;
+            --pad-light: #f8fafc;
+            --pad-text: #374151;
+            --pad-text-light: #6b7280;
+            --pad-border: #e5e7eb;
+            --pad-success: #10b981;
+            --pad-warning: #f59e0b;
+            --pad-error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Inter, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--pad-light);
+            color: var(--pad-text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .pad-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .pad-header {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .pad-header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .pad-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--pad-dark);
+        }
+
+        .pad-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--pad-primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .pad-logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+        }
+
+        .pad-nav {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .pad-nav-link {
+            color: var(--pad-text);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .pad-nav-link:hover {
+            background: var(--pad-light);
+            color: var(--pad-primary);
+        }
+
+        .pad-nav-link.active {
+            background: var(--pad-primary);
+            color: white;
+        }
+
+        .pad-user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .pad-user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--pad-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .pad-user-details {
+            text-align: right;
+        }
+
+        .pad-user-name {
+            font-weight: 600;
+            color: var(--pad-dark);
+        }
+
+        .pad-user-role {
+            font-size: 0.875rem;
+            color: var(--pad-text-light);
+        }
+
+        .pad-logout {
+            background: var(--pad-error);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .pad-logout:hover {
+            background: #dc2626;
+        }
+
+        .pad-main {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+            padding: 2rem 0;
+            min-height: calc(100vh - 100px);
+        }
+
+        .pad-sidebar {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+        }
+
+        .pad-sidebar-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            margin-bottom: 1rem;
+        }
+
+        .pad-sidebar-nav {
+            list-style: none;
+        }
+
+        .pad-sidebar-nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-sidebar-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--pad-text);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .pad-sidebar-link:hover {
+            background: var(--pad-light);
+            color: var(--pad-primary);
+        }
+
+        .pad-sidebar-link.active {
+            background: var(--pad-primary);
+            color: white;
+        }
+
+        .pad-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .pad-content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .pad-content-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .pad-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--pad-border);
+            border-radius: 8px;
+            background: white;
+            font-size: 0.875rem;
+            color: var(--pad-text);
+            min-width: 200px;
+        }
+
+        .pad-select:focus {
+            outline: none;
+            border-color: var(--pad-primary);
+            box-shadow: 0 0 0 3px rgba(11, 110, 253, 0.1);
+        }
+
+        .pad-content-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+        }
+
+        .pad-btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .pad-btn-primary {
+            background: var(--pad-primary);
+            color: white;
+        }
+
+        .pad-btn-primary:hover:not(:disabled) {
+            background: #0a5fd4;
+            transform: translateY(-1px);
+        }
+
+        .pad-btn-secondary {
+            background: var(--pad-accent);
+            color: white;
+        }
+
+        .pad-btn-secondary:hover:not(:disabled) {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .pad-btn-outline {
+            background: transparent;
+            color: var(--pad-primary);
+            border: 2px solid var(--pad-primary);
+        }
+
+        .pad-btn-outline:hover:not(:disabled) {
+            background: var(--pad-primary);
+            color: white;
+        }
+
+        .pad-btn-danger {
+            background: var(--pad-error);
+            color: white;
+        }
+
+        .pad-btn-danger:hover:not(:disabled) {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        .pad-btn:disabled {
+            background: var(--pad-text-light);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .pad-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .pad-stat-card {
+            background: var(--pad-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .pad-stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--pad-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-stat-label {
+            color: var(--pad-text-light);
+            font-size: 0.875rem;
+        }
+
+        .pad-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .pad-table-container {
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid var(--pad-border);
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .pad-table-container .pad-table {
+            margin-top: 0;
+        }
+
+        .pad-table-container .pad-table thead {
+            position: sticky;
+            top: 0;
+            background: var(--pad-light);
+            z-index: 10;
+        }
+
+        .pad-table-container .pad-table thead th {
+            background: var(--pad-light);
+            border-bottom: 2px solid var(--pad-border);
+        }
+
+        /* Mobile responsiveness for audit table */
+        @media (max-width: 768px) {
+            .pad-table-container {
+                max-height: 400px;
+                font-size: 0.875rem;
+            }
+            
+            .pad-table th,
+            .pad-table td {
+                padding: 0.75rem 0.5rem;
+            }
+            
+            .pad-table th:nth-child(3),
+            .pad-table td:nth-child(3) {
+                max-width: 200px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+
+        .pad-table th,
+        .pad-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--pad-border);
+        }
+
+        .pad-table th {
+            background: var(--pad-light);
+            font-weight: 600;
+            color: var(--pad-dark);
+        }
+
+        .pad-table tr:hover {
+            background: var(--pad-light);
+        }
+
+        .pad-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .pad-status.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--pad-success);
+        }
+
+        .pad-status.draft {
+            background: rgba(107, 114, 128, 0.1);
+            color: var(--pad-text-light);
+        }
+
+        .pad-status.closed {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--pad-error);
+        }
+
+        .pad-code {
+            background-color: var(--pad-bg-light);
+            color: var(--pad-primary);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .pad-organization-name {
+            color: var(--pad-primary);
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .pad-btn-success {
+            background-color: var(--pad-success);
+            color: white;
+            border: 1px solid var(--pad-success);
+        }
+
+        .pad-btn-success:hover {
+            background-color: #059669;
+            border-color: #059669;
+        }
+
+        .pad-btn-warning {
+            background-color: #f59e0b;
+            color: white;
+            border: 1px solid #f59e0b;
+        }
+
+        .pad-btn-warning:hover {
+            background-color: #d97706;
+            border-color: #d97706;
+        }
+
+        .pad-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .pad-form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .pad-label {
+            display: block;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--pad-border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .pad-input:focus {
+            outline: none;
+            border-color: var(--pad-primary);
+            box-shadow: 0 0 0 3px rgba(11, 110, 253, 0.1);
+        }
+
+        .pad-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .pad-checkbox-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .pad-checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pad-checkbox {
+            width: 16px;
+            height: 16px;
+        }
+
+        .pad-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .pad-modal.show {
+            display: flex;
+        }
+
+        .pad-modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .pad-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .pad-modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+        }
+
+        .pad-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--pad-text-light);
+        }
+
+        .pad-alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .pad-alert.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--pad-success);
+            color: #065f46;
+        }
+
+        .pad-alert.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--pad-error);
+            color: #991b1b;
+        }
+
+        .pad-alert.show {
+            display: block;
+        }
+
+        .pad-empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--pad-text-light);
+        }
+
+        .pad-empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .pad-empty-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-empty-description {
+            margin-bottom: 1.5rem;
+        }
+
+        .pad-section {
+            display: none;
+        }
+
+        .pad-section.active {
+            display: block;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .pad-main {
+                grid-template-columns: 1fr;
+            }
+            
+            .pad-sidebar {
+                order: 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .pad-header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .pad-nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .pad-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .pad-table {
+                font-size: 0.875rem;
+            }
+
+            .pad-table th,
+            .pad-table td {
+                padding: 0.5rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .pad-container {
+                padding: 0 0.5rem;
+            }
+
+            .pad-content {
+                padding: 1rem;
+            }
+
+            .pad-stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        /* Login Page Styles */
+        .pad-login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0b6efd 0%, #10b981 100%);
+            padding: 2rem 1rem;
+        }
+
+        .pad-login-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .pad-login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .pad-login-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .pad-login-logo-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--pad-primary);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .pad-login-logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+        }
+
+        .pad-login-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-login-subtitle {
+            color: var(--pad-text-light);
+            font-size: 0.9rem;
+        }
+
+        .pad-login-form {
+            margin-bottom: 1.5rem;
+        }
+
+        .pad-login-form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .pad-login-label {
+            display: block;
+            font-weight: 500;
+            color: var(--pad-text);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-login-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--pad-border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .pad-login-input:focus {
+            outline: none;
+            border-color: var(--pad-primary);
+        }
+
+        .pad-login-input-group {
+            position: relative;
+        }
+
+        .pad-login-input-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--pad-text-light);
+        }
+
+        .pad-login-btn {
+            width: 100%;
+            padding: 0.875rem 2rem;
+            background: var(--pad-primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .pad-login-btn:hover:not(:disabled) {
+            background: #0a5ed4;
+        }
+
+        .pad-login-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .pad-login-error {
+            color: var(--pad-error);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .pad-login-success {
+            color: var(--pad-success);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .pad-login-loading {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pad-login-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .pad-login-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--pad-border);
+        }
+
+        .pad-login-link {
+            color: var(--pad-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .pad-login-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Hide dashboard content initially */
+        .pad-dashboard-content {
+            display: none;
+        }
+
+        .pad-dashboard-content.show {
+            display: block;
+        }
+
+        /* Footer Styles */
+        .pad-footer {
+            background: var(--pad-dark);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .pad-footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .pad-footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .pad-footer-link {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .pad-footer-link:hover {
+            color: white;
+        }
+
+        .pad-footer-credit {
+            border-top: 1px solid #374151;
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+
+        .pad-footer-credit p {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        .pad-footer-credit a {
+            color: var(--pad-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .pad-footer-credit a:hover {
+            text-decoration: underline;
+        }
+
+        /* Messages Table Styles */
+        .pad-unread-message {
+            background-color: #fef3c7;
+            font-weight: 600;
+        }
+
+        .pad-message-preview {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .pad-status-unread {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .pad-status-read {
+            background-color: #10b981;
+            color: white;
+        }
+
+        /* Poll Results Modal Styles */
+        .pad-results-content {
+            padding: 1rem 0;
+        }
+
+        .pad-results-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: var(--pad-light);
+            border-radius: 8px;
+        }
+
+        .pad-results-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .pad-results-label {
+            font-size: 0.875rem;
+            color: var(--pad-text-light);
+            font-weight: 500;
+        }
+
+        .pad-results-value {
+            font-size: 1rem;
+            color: var(--pad-dark);
+            font-weight: 600;
+        }
+
+        .pad-results-chart {
+            margin-bottom: 2rem;
+        }
+
+        .pad-results-chart h4 {
+            margin-bottom: 1rem;
+            color: var(--pad-dark);
+        }
+
+        .pad-result-item {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--pad-border);
+        }
+
+        .pad-result-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-result-rank {
+            background: var(--pad-primary);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .pad-result-option {
+            flex: 1;
+            font-weight: 600;
+            color: var(--pad-dark);
+        }
+
+        .pad-result-stats {
+            color: var(--pad-text-light);
+            font-size: 0.875rem;
+        }
+
+        .pad-result-bar {
+            height: 8px;
+            background: var(--pad-border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .pad-result-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--pad-primary), var(--pad-accent));
+            transition: width 0.3s ease;
+        }
+
+        .pad-votes-details {
+            margin-top: 2rem;
+        }
+
+        .pad-votes-details h4 {
+            margin-bottom: 1rem;
+            color: var(--pad-dark);
+        }
+
+        .pad-votes-table {
+            overflow-x: auto;
+        }
+
+        .pad-modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--pad-border);
+        }
+
+        /* Results Overview Styles */
+        .pad-results-overview {
+            padding: 1rem 0;
+        }
+
+        .pad-results-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .pad-results-stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--pad-border);
+        }
+
+        .pad-results-stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--pad-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-results-stat-label {
+            color: var(--pad-text-light);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .pad-results-polls h3 {
+            margin-bottom: 1.5rem;
+            color: var(--pad-dark);
+        }
+
+        .pad-results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .pad-results-poll-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--pad-border);
+        }
+
+        .pad-results-poll-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .pad-results-poll-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin: 0;
+            flex: 1;
+            margin-right: 1rem;
+        }
+
+        .pad-results-poll-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .pad-results-poll-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            color: var(--pad-text-light);
+        }
+
+        .pad-results-poll-org {
+            font-weight: 500;
+        }
+
+        .pad-results-poll-votes {
+            font-weight: 600;
+            color: var(--pad-primary);
+        }
+
+        .pad-results-poll-chart {
+            margin-bottom: 1rem;
+        }
+
+        .pad-results-poll-item {
+            margin-bottom: 0.75rem;
+        }
+
+        .pad-results-poll-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .pad-results-poll-rank {
+            background: var(--pad-primary);
+            color: white;
+            padding: 0.125rem 0.375rem;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            min-width: 1.5rem;
+            text-align: center;
+        }
+
+        .pad-results-poll-option-text {
+            flex: 1;
+            font-weight: 500;
+            color: var(--pad-dark);
+        }
+
+        .pad-results-poll-stats {
+            font-size: 0.75rem;
+            color: var(--pad-text-light);
+            font-weight: 600;
+        }
+
+        .pad-results-poll-bar {
+            height: 6px;
+            background: var(--pad-border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .pad-results-poll-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--pad-primary), var(--pad-accent));
+            transition: width 0.3s ease;
+        }
+
+        .pad-results-poll-more {
+            font-size: 0.75rem;
+            color: var(--pad-text-light);
+            text-align: center;
+            font-style: italic;
+        }
+
+        .pad-results-poll-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        @media (max-width: 768px) {
+            .pad-footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .pad-footer-links {
+                gap: 1rem;
+            }
+        }
+
+        /* Full Screen Display Styles */
+        .pad-fullscreen-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .pad-fullscreen-controls .pad-form-select {
+            min-width: 250px;
+        }
+
+        .pad-fullscreen-preview {
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        .pad-fullscreen-preview-header h3 {
+            color: var(--pad-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-fullscreen-preview-header p {
+            color: var(--pad-text);
+            margin-bottom: 1.5rem;
+        }
+
+        .pad-fullscreen-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            color: var(--pad-text);
+        }
+
+        .pad-fullscreen-placeholder-icon {
+            font-size: 3rem;
+            opacity: 0.5;
+        }
+
+        .pad-fullscreen-display {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .pad-fullscreen-display.active {
+            display: flex;
+        }
+
+        .pad-fullscreen-header {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            right: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .pad-fullscreen-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            line-height: 1.2;
+        }
+
+        .pad-fullscreen-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .pad-fullscreen-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .pad-fullscreen-content {
+            max-width: 1200px;
+            width: 90%;
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        .pad-fullscreen-poll-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            line-height: 1.2;
+        }
+
+        .pad-fullscreen-poll-description {
+            font-size: 1.25rem;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+        }
+
+        .pad-fullscreen-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .pad-fullscreen-stat {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1.5rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pad-fullscreen-stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .pad-fullscreen-stat-label {
+            font-size: 1rem;
+            color: #e5e7eb;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .pad-fullscreen-results {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2rem;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pad-fullscreen-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .pad-fullscreen-option {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: left;
+            transition: all 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .pad-fullscreen-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .pad-fullscreen-option:hover {
+            background: rgba(0, 0, 0, 0.5);
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .pad-fullscreen-option-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .pad-fullscreen-option-rank {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 0.5rem 0.75rem;
+            border-radius: 50%;
+            min-width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+        }
+
+        .pad-fullscreen-option-text {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        .pad-fullscreen-option-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pad-fullscreen-option-votes {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #34d399;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .pad-fullscreen-option-percentage {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .pad-fullscreen-progress {
+            width: 100%;
+            height: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 1rem;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pad-fullscreen-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #34d399, #6ee7b7);
+            border-radius: 6px;
+            transition: width 0.8s ease;
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+        }
+
+        .pad-fullscreen-timer {
+            position: absolute;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .pad-fullscreen-timer-label {
+            font-size: 0.9rem;
+            color: #e5e7eb;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .pad-fullscreen-timer-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .pad-fullscreen-refresh {
+            position: absolute;
+            bottom: 2rem;
+            left: 2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .pad-fullscreen-refresh:hover {
+            background: rgba(0, 0, 0, 0.7);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .pad-fullscreen-title {
+                font-size: 1.5rem;
+            }
+            
+            .pad-fullscreen-poll-title {
+                font-size: 1.8rem;
+            }
+            
+            .pad-fullscreen-content {
+                margin-top: 5rem;
+            }
+            
+            .pad-fullscreen-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            
+            .pad-fullscreen-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .pad-fullscreen-header {
+                top: 0.5rem;
+                left: 0.5rem;
+                right: 0.5rem;
+            }
+            
+            .pad-fullscreen-timer,
+            .pad-fullscreen-refresh {
+                position: static;
+                margin: 1rem;
+            }
+            
+            .pad-fullscreen-option-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .pad-fullscreen-option-rank {
+                font-size: 1rem;
+                min-width: 2rem;
+                height: 2rem;
+            }
+            
+            .pad-fullscreen-option-text {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Admin Login Section -->
+    <div id="adminLoginSection" class="pad-login-container">
+        <div class="pad-login-card">
+            <div class="pad-login-header">
+                <div class="pad-login-logo">
+                    <div class="pad-login-logo-icon">PAD</div>
+                    <div class="pad-login-logo-text">Prince Alex Digital</div>
+                </div>
+                <h1 class="pad-login-title">Admin Login</h1>
+                <p class="pad-login-subtitle">Access the admin dashboard</p>
+            </div>
+
+            <form id="adminLoginForm" class="pad-login-form">
+                <div class="pad-login-form-group">
+                    <label class="pad-login-label" for="adminEmail">Email Address</label>
+                    <input type="email" id="adminEmail" name="adminEmail" class="pad-login-input" placeholder="Enter your admin email" required>
+                    <div class="pad-login-error" id="adminEmailError"></div>
+                </div>
+
+                <div class="pad-login-form-group">
+                    <label class="pad-login-label" for="adminPassword">Password</label>
+                    <div class="pad-login-input-group">
+                        <input type="password" id="adminPassword" name="adminPassword" class="pad-login-input" placeholder="Enter your password" required>
+                        <span class="pad-login-input-icon" onclick="toggleAdminPassword()">👁️</span>
+                    </div>
+                    <div class="pad-login-error" id="adminPasswordError"></div>
+                </div>
+
+                <button type="button" class="pad-login-btn" onclick="handleAdminLogin()" id="adminLoginBtn">
+                    <span id="adminLoginText">Login</span>
+                    <span id="adminLoginLoading" class="pad-login-loading">
+                        <div class="pad-login-spinner"></div>
+                        <span>Logging in...</span>
+                    </span>
+                </button>
+                <div class="pad-login-error" id="adminLoginError"></div>
+                <div class="pad-login-success" id="adminLoginSuccess"></div>
+            </form>
+
+            <div class="pad-login-footer">
+                <p>Need help? <a href="mailto:support@princealex.com" class="pad-login-link">Contact Support</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard Content -->
+    <div id="adminDashboardContent" class="pad-dashboard-content">
+    <header class="pad-header">
+        <div class="pad-container">
+            <div class="pad-header-content">
+                <a href="dashboard_admin.html" class="pad-logo">
+                    <div class="pad-logo-icon">PAD</div>
+                    <div class="pad-logo-text">Prince Alex Digital</div>
+                </a>
+                <nav class="pad-nav">
+                    <a href="#" class="pad-nav-link" onclick="showSection('overview')">Overview</a>
+                    <a href="#" class="pad-nav-link" onclick="showSection('polls')">Polls</a>
+                    <a href="#" class="pad-nav-link" onclick="showSection('voters')">Voters</a>
+                    <a href="#" class="pad-nav-link" onclick="showSection('results')">Results</a>
+                    <a href="#" class="pad-nav-link" onclick="showSection('audit')">Audit</a>
+                </nav>
+                <div class="pad-user-info">
+                    <div class="pad-user-avatar" id="userAvatar">A</div>
+                    <div class="pad-user-details">
+                        <div class="pad-user-name" id="userName">Admin</div>
+                        <div class="pad-user-role">Administrator</div>
+                    </div>
+                    <button class="pad-logout" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="pad-main">
+        <aside class="pad-sidebar">
+            <h3 class="pad-sidebar-title">Quick Actions</h3>
+            <ul class="pad-sidebar-nav">
+                <li><a href="#" class="pad-sidebar-link" onclick="showSection('overview')">📊 Overview</a></li>
+                <li><a href="#" class="pad-sidebar-link" onclick="showSection('polls')">🗳️ Manage Polls</a></li>
+                <li><a href="#" class="pad-sidebar-link" onclick="showSection('voters')">👥 Manage Voters</a></li>
+                <li><a href="#" class="pad-sidebar-link" onclick="showSection('results')">📈 View Results</a></li>
+                <li><a href="#" class="pad-sidebar-link" onclick="showSection('audit')">📋 Audit Logs</a></li>
+                <li><a href="#" class="pad-sidebar-link" onclick="showSection('organizations')">🏢 Manage Organizations</a></li>
+                <li><a href="#" class="pad-sidebar-link" onclick="showSection('messages')">📧 Contact Messages</a></li>
+                <li><a href="#" class="pad-sidebar-link" onclick="showFullScreenDisplay()">🖥️ Full Screen Display</a></li>
+            </ul>
+        </aside>
+
+        <div class="pad-content">
+            <div class="pad-alert" id="alertMessage"></div>
+
+            <!-- Overview Section -->
+            <div class="pad-section active" id="overview-section">
+                <div class="pad-content-header">
+                    <h2 class="pad-content-title">Dashboard Overview</h2>
+                </div>
+
+                <div class="pad-stats-grid">
+                    <div class="pad-stat-card">
+                        <div class="pad-stat-number" id="totalPolls">0</div>
+                        <div class="pad-stat-label">Total Polls</div>
+                    </div>
+                    <div class="pad-stat-card">
+                        <div class="pad-stat-number" id="activePolls">0</div>
+                        <div class="pad-stat-label">Active Polls</div>
+                    </div>
+                    <div class="pad-stat-card">
+                        <div class="pad-stat-number" id="totalVoters">0</div>
+                        <div class="pad-stat-label">Registered Voters</div>
+                    </div>
+                    <div class="pad-stat-card">
+                        <div class="pad-stat-number" id="totalVotes">0</div>
+                        <div class="pad-stat-label">Total Votes</div>
+                    </div>
+                </div>
+
+                <div class="pad-content-header">
+                    <h3 class="pad-content-title">Recent Activity</h3>
+                </div>
+
+                <div id="recentActivity">
+                    <!-- Recent activity will be populated here -->
+                </div>
+            </div>
+
+            <!-- Polls Section -->
+            <div class="pad-section" id="polls-section">
+                <div class="pad-content-header">
+                    <h2 class="pad-content-title">Manage Polls</h2>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <select id="pollOrganizationFilter" class="pad-input" style="width: 200px;" onchange="filterPollsByOrganization()">
+                            <option value="">All Organizations</option>
+                        </select>
+                        <button class="pad-btn pad-btn-primary" onclick="showCreatePollModal()">Create New Poll</button>
+                    </div>
+                </div>
+
+                <div id="pollsTable">
+                    <!-- Polls table will be populated here -->
+                </div>
+            </div>
+
+            <!-- Voters Section -->
+            <div class="pad-section" id="voters-section">
+                <div class="pad-content-header">
+                    <h2 class="pad-content-title">Manage Voters</h2>
+                    <div class="pad-content-actions">
+                        <select id="voterOrganizationFilter" class="pad-select" onchange="filterVotersByOrganization()">
+                            <option value="">All Organizations</option>
+                        </select>
+                        <button class="pad-btn pad-btn-primary" onclick="showAddVoterModal()">Add Voter</button>
+                    </div>
+                </div>
+
+                <div id="votersTable">
+                    <!-- Voters table will be populated here -->
+                </div>
+            </div>
+
+            <div class="pad-section" id="organizations-section">
+                <div class="pad-content-header">
+                    <h2 class="pad-content-title">Manage Organizations</h2>
+                    <button class="pad-btn pad-btn-primary" onclick="showCreateOrganizationModal()">Create Organization</button>
+                </div>
+
+                <div id="organizationsTable">
+                    <!-- Organizations table will be populated here -->
+                </div>
+            </div>
+
+            <!-- Messages Section -->
+            <div class="pad-section" id="messages-section">
+                <div class="pad-content-header">
+                    <h2 class="pad-content-title">Contact Messages</h2>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <select id="messageStatusFilter" class="pad-input" style="width: 150px;" onchange="filterMessages()">
+                            <option value="">All Messages</option>
+                            <option value="unread">Unread</option>
+                            <option value="read">Read</option>
+                        </select>
+                        <button class="pad-btn pad-btn-secondary" onclick="markAllAsRead()">Mark All as Read</button>
+                        <button class="pad-btn pad-btn-secondary" onclick="exportMessages()">Export Messages</button>
+                    </div>
+                </div>
+
+                <div id="messagesTable">
+                    <!-- Messages table will be populated here -->
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="pad-section" id="results-section">
+                <div class="pad-content-header">
+                    <h2 class="pad-content-title">Poll Results</h2>
+                    <div class="pad-content-actions">
+                        <select id="resultsOrganizationFilter" class="pad-select" onchange="filterResultsByOrganization()">
+                            <option value="">All Organizations</option>
+                        </select>
+                        <button class="pad-btn pad-btn-secondary" onclick="exportResults()">Export Results</button>
+                    </div>
+                </div>
+
+                <div id="resultsContent">
+                    <!-- Results will be populated here -->
+                </div>
+            </div>
+
+            <!-- Audit Section -->
+            <div class="pad-section" id="audit-section">
+                <div class="pad-content-header">
+                    <h2 class="pad-content-title">Audit Logs</h2>
+                    <button class="pad-btn pad-btn-secondary" onclick="exportAuditLogs()">Export Logs</button>
+                </div>
+
+                <div id="auditTable">
+                    <!-- Audit logs will be populated here -->
+                </div>
+            </div>
+
+            <!-- Full Screen Display Section -->
+            <div class="pad-section" id="fullscreen-section">
+                <div class="pad-content-header">
+                    <h2 class="pad-content-title">Full Screen Voting Display</h2>
+                    <div class="pad-fullscreen-controls">
+                        <select id="fullscreenPollSelect" class="pad-form-select" onchange="updateFullScreenDisplay()">
+                            <option value="">Select a poll to display</option>
+                        </select>
+                        <button class="pad-btn pad-btn-primary" onclick="openFullScreen()" id="openFullScreenBtn">
+                            🖥️ Open Full Screen
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pad-fullscreen-preview" id="fullscreenPreview">
+                    <div class="pad-fullscreen-preview-header">
+                        <h3>Live Voting Display Preview</h3>
+                        <p>Select a poll above to see the full-screen display preview</p>
+                    </div>
+                    <div class="pad-fullscreen-preview-content" id="fullscreenPreviewContent">
+                        <div class="pad-fullscreen-placeholder">
+                            <div class="pad-fullscreen-placeholder-icon">📺</div>
+                            <p>No poll selected</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Full Screen Display -->
+    <div class="pad-fullscreen-display" id="fullscreenDisplay">
+        <div class="pad-fullscreen-header">
+            <h1 class="pad-fullscreen-title">Prince Alex Digital E-voting system</h1>
+            <button class="pad-fullscreen-close" onclick="closeFullScreen()">&times;</button>
+        </div>
+        
+        <div class="pad-fullscreen-content" id="fullscreenContent">
+            <div class="pad-fullscreen-placeholder">
+                <div class="pad-fullscreen-placeholder-icon">📺</div>
+                <p>No poll selected for display</p>
+            </div>
+        </div>
+        
+        <button class="pad-fullscreen-refresh" onclick="refreshFullScreenData()">🔄 Refresh Data</button>
+        
+        <div class="pad-fullscreen-timer" id="fullscreenTimer">
+            <div class="pad-fullscreen-timer-label">Time Remaining</div>
+            <div class="pad-fullscreen-timer-value" id="timerValue">--:--</div>
+        </div>
+    </div>
+
+    <!-- Create Organization Modal -->
+    <div class="pad-modal" id="createOrganizationModal">
+        <div class="pad-modal-content">
+            <div class="pad-modal-header">
+                <h3 class="pad-modal-title">Create New Organization</h3>
+                <button class="pad-modal-close" onclick="closeModal('createOrganizationModal')">&times;</button>
+            </div>
+            <form id="createOrganizationForm">
+                <div class="pad-form-group">
+                    <label class="pad-label" for="orgName">Organization Name *</label>
+                    <input type="text" id="orgName" name="orgName" class="pad-input" placeholder="Enter organization name" required>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label" for="orgDescription">Description (Optional)</label>
+                    <textarea id="orgDescription" name="orgDescription" class="pad-input" placeholder="Enter organization description" rows="3"></textarea>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label" for="orgCode">Organization Code</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="orgCode" name="orgCode" class="pad-input" placeholder="Auto-generated code" readonly>
+                        <button type="button" class="pad-btn pad-btn-outline" onclick="generateOrgCode()">Generate New</button>
+                    </div>
+                    <small style="color: var(--pad-text-light); font-size: 0.875rem;">Share this code with voters to allow them to register for this organization</small>
+                </div>
+
+                <div class="pad-form-group">
+                    <button type="button" class="pad-btn pad-btn-primary" onclick="createOrganization()">Create Organization</button>
+                    <button type="button" class="pad-btn pad-btn-outline" onclick="closeModal('createOrganizationModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Voter Modal -->
+    <div class="pad-modal" id="addVoterModal">
+        <div class="pad-modal-content">
+            <div class="pad-modal-header">
+                <h3 class="pad-modal-title">Add New Voter</h3>
+                <button class="pad-modal-close" onclick="closeModal('addVoterModal')">&times;</button>
+            </div>
+            <form id="addVoterForm">
+                <div class="pad-form-group">
+                    <label class="pad-label" for="voterName">Full Name *</label>
+                    <input type="text" id="voterName" name="voterName" class="pad-input" placeholder="Enter voter's full name" required>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label" for="voterEmail">Email Address *</label>
+                    <input type="email" id="voterEmail" name="voterEmail" class="pad-input" placeholder="Enter voter's email address" required>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label" for="voterIdentity">Identity Number *</label>
+                    <input type="text" id="voterIdentity" name="voterIdentity" class="pad-input" placeholder="Enter unique identity number" required>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label" for="voterPhone">Phone Number *</label>
+                    <input type="tel" id="voterPhone" name="voterPhone" class="pad-input" placeholder="Enter phone number" required>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label" for="voterOrganization">Organization *</label>
+                    <select id="voterOrganization" name="voterOrganization" class="pad-input" required>
+                        <option value="">Select Organization</option>
+                    </select>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label" for="voterPhoto">Photo (Optional)</label>
+                    <input type="file" id="voterPhoto" name="voterPhoto" class="pad-input" accept="image/*">
+                    <small style="color: var(--pad-text-light); font-size: 0.875rem;">Upload a profile photo for the voter</small>
+                </div>
+
+                <div class="pad-form-group">
+                    <button type="button" class="pad-btn pad-btn-primary" onclick="addVoter()">Add Voter</button>
+                    <button type="button" class="pad-btn pad-btn-outline" onclick="closeModal('addVoterModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Voter Modal -->
+    <div class="pad-modal" id="editVoterModal">
+        <div class="pad-modal-content">
+            <div class="pad-modal-header">
+                <h3 class="pad-modal-title">Edit Voter</h3>
+                <button class="pad-modal-close" onclick="closeModal('editVoterModal')">&times;</button>
+            </div>
+            <form id="editVoterForm">
+                <input type="hidden" id="editVoterId" name="editVoterId">
+                <div class="pad-form-group">
+                    <label class="pad-label" for="editVoterName">Full Name *</label>
+                    <input type="text" id="editVoterName" name="editVoterName" class="pad-input" placeholder="Enter voter's full name" required>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label" for="editVoterEmail">Email Address *</label>
+                    <input type="email" id="editVoterEmail" name="editVoterEmail" class="pad-input" placeholder="Enter voter's email address" required>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label" for="editVoterIdentity">Identity Number *</label>
+                    <input type="text" id="editVoterIdentity" name="editVoterIdentity" class="pad-input" placeholder="Enter voter's identity number" required>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label" for="editVoterPhone">Phone Number *</label>
+                    <input type="tel" id="editVoterPhone" name="editVoterPhone" class="pad-input" placeholder="Enter voter's phone number" required>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label" for="editVoterOrganization">Organization *</label>
+                    <select id="editVoterOrganization" name="editVoterOrganization" class="pad-input" required>
+                        <option value="">Select Organization</option>
+                    </select>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label" for="editVoterStatus">Status</label>
+                    <select id="editVoterStatus" name="editVoterStatus" class="pad-input">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label" for="editVoterPhoto">Profile Photo</label>
+                    <input type="file" id="editVoterPhoto" name="editVoterPhoto" class="pad-input" accept="image/*">
+                    <small style="color: var(--pad-text-light); font-size: 0.875rem;">Upload a new profile photo for the voter</small>
+                </div>
+
+                <div class="pad-form-group">
+                    <button type="button" class="pad-btn pad-btn-primary" onclick="updateVoter()">Update Voter</button>
+                    <button type="button" class="pad-btn pad-btn-outline" onclick="closeModal('editVoterModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Organization Modal -->
+    <div class="pad-modal" id="editOrganizationModal">
+        <div class="pad-modal-content">
+            <div class="pad-modal-header">
+                <h3 class="pad-modal-title">Edit Organization</h3>
+                <button class="pad-modal-close" onclick="closeModal('editOrganizationModal')">&times;</button>
+            </div>
+            <form id="editOrganizationForm">
+                <input type="hidden" id="editOrgId" name="editOrgId">
+                
+                <div class="pad-form-group">
+                    <label class="pad-label" for="editOrgName">Organization Name *</label>
+                    <input type="text" id="editOrgName" name="editOrgName" class="pad-input" placeholder="Enter organization name" required>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label" for="editOrgDescription">Description (Optional)</label>
+                    <textarea id="editOrgDescription" name="editOrgDescription" class="pad-input" placeholder="Enter organization description" rows="3"></textarea>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label" for="editOrgCode">Organization Code</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="editOrgCode" name="editOrgCode" class="pad-input" placeholder="Organization code" readonly>
+                        <button type="button" class="pad-btn pad-btn-outline" onclick="generateEditOrgCode()">Generate New</button>
+                    </div>
+                    <small style="color: var(--pad-text-light); font-size: 0.875rem;">Share this code with voters to allow them to register for this organization</small>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label" for="editOrgStatus">Status</label>
+                    <select id="editOrgStatus" name="editOrgStatus" class="pad-input">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="suspended">Suspended</option>
+                    </select>
+                </div>
+
+                <div class="pad-form-group">
+                    <button type="button" class="pad-btn pad-btn-primary" onclick="updateOrganization()">Update Organization</button>
+                    <button type="button" class="pad-btn pad-btn-outline" onclick="closeModal('editOrganizationModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Create Poll Modal -->
+    <div class="pad-modal" id="createPollModal">
+        <div class="pad-modal-content">
+            <div class="pad-modal-header">
+                <h3 class="pad-modal-title">Create New Poll</h3>
+                <button class="pad-modal-close" onclick="closeModal('createPollModal')">&times;</button>
+            </div>
+            <form id="createPollForm">
+                <div class="pad-form-group">
+                    <label class="pad-label" for="pollTitle">Poll Title *</label>
+                    <input type="text" id="pollTitle" name="pollTitle" class="pad-input" required>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label" for="pollDescription">Description *</label>
+                    <textarea id="pollDescription" name="pollDescription" class="pad-input pad-textarea" required></textarea>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label" for="organizationSelect">Organization *</label>
+                    <select id="organizationSelect" name="organizationSelect" class="pad-input" required>
+                        <option value="">Select Organization</option>
+                    </select>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label">Poll Type *</label>
+                    <div class="pad-checkbox-group">
+                        <label class="pad-checkbox-item">
+                            <input type="radio" name="pollType" value="single" checked class="pad-checkbox">
+                            Single Choice
+                        </label>
+                        <label class="pad-checkbox-item">
+                            <input type="radio" name="pollType" value="multi" class="pad-checkbox">
+                            Multiple Choice
+                        </label>
+                        <label class="pad-checkbox-item">
+                            <input type="radio" name="pollType" value="ranked" class="pad-checkbox">
+                            Ranked Choice
+                        </label>
+                    </div>
+                </div>
+
+                <div class="pad-form-group" id="maxSelectionsGroup" style="display: none;">
+                    <label class="pad-label" for="maxSelections">Max Selections</label>
+                    <input type="number" id="maxSelections" name="maxSelections" class="pad-input" min="1" value="2">
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label" for="pollOptions">Options (one per line) *</label>
+                    <textarea id="pollOptions" name="pollOptions" class="pad-input pad-textarea" placeholder="Option 1&#10;Option 2&#10;Option 3" required></textarea>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label" for="startDate">Start Date & Time *</label>
+                    <input type="datetime-local" id="startDate" name="startDate" class="pad-input" required>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label" for="endDate">End Date & Time *</label>
+                    <input type="datetime-local" id="endDate" name="endDate" class="pad-input" required>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-label">Eligibility</label>
+                    <div class="pad-checkbox-group">
+                        <label class="pad-checkbox-item">
+                            <input type="radio" name="eligibility" value="open" checked class="pad-checkbox">
+                            Open to all voters
+                        </label>
+                        <label class="pad-checkbox-item">
+                            <input type="radio" name="eligibility" value="whitelist" class="pad-checkbox">
+                            Specific voters only
+                        </label>
+                    </div>
+                </div>
+
+                <div class="pad-form-group">
+                    <label class="pad-checkbox-item">
+                        <input type="checkbox" id="anonymous" name="anonymous" class="pad-checkbox" checked>
+                        Anonymous voting
+                    </label>
+                </div>
+
+                <div class="pad-form-group">
+                    <button type="button" class="pad-btn pad-btn-primary" onclick="createPoll()">Create Poll</button>
+                    <button type="button" class="pad-btn pad-btn-outline" onclick="closeModal('createPollModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase functions
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, where, getDocs, orderBy, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGErPBeQ1Fdx9EHPXOHepoEoOx7P2f57o",
+            authDomain: "princealextravel.firebaseapp.com",
+            projectId: "princealextravel",
+            storageBucket: "princealextravel.firebasestorage.app",
+            messagingSenderId: "947577729462",
+            appId: "1:947577729462:web:dd4b4c7cb4a984c5e3d117"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Make Firebase available globally
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDB = db;
+        
+        // Make Firebase functions available globally
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.signOut = signOut;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.doc = doc;
+        window.getDoc = getDoc;
+        window.setDoc = setDoc;
+        window.collection = collection;
+        window.query = query;
+        window.where = where;
+        window.getDocs = getDocs;
+        window.orderBy = orderBy;
+        window.onSnapshot = onSnapshot;
+        window.addDoc = addDoc;
+        window.updateDoc = updateDoc;
+        window.deleteDoc = deleteDoc;
+        window.serverTimestamp = serverTimestamp;
+    </script>
+
+    <script>
+        let currentUser = null;
+        let polls = [];
+        let voters = [];
+        let votes = [];
+        let auditLogs = [];
+        let organizations = [];
+        let messages = [];
+        let currentSection = 'overview';
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+        });
+
+        async function checkAuth() {
+            window.onAuthStateChanged(window.firebaseAuth, async (user) => {
+                if (!user) {
+                    showLoginSection();
+                    return;
+                }
+
+                try {
+                    // Simple authentication - no Firestore checks needed
+                    currentUser = { 
+                        uid: user.uid, 
+                        email: user.email,
+                        name: user.displayName || user.email.split('@')[0]
+                    };
+
+                    // Update user info in header
+                    document.getElementById('userName').textContent = currentUser.name;
+                    document.getElementById('userAvatar').textContent = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
+
+                    // Show dashboard and load data
+                    showDashboardSection();
+                    await loadData();
+                    updateUI();
+                    showSection('overview');
+                    startRealTimeUpdates();
+                } catch (error) {
+                    console.error('Error checking auth:', error);
+                    showLoginSection();
+                }
+            });
+        }
+
+        async function loadData() {
+            try {
+                // Load all polls
+                const pollsSnapshot = await window.getDocs(window.collection(window.firebaseDB, 'polls'));
+                polls = pollsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                // Load all voters
+                const votersSnapshot = await window.getDocs(window.collection(window.firebaseDB, 'voters'));
+                voters = votersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                // Load all votes
+                const votesSnapshot = await window.getDocs(window.collection(window.firebaseDB, 'votes'));
+                votes = votesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                // Load audit logs
+                const auditQuery = window.query(window.collection(window.firebaseDB, 'auditLogs'), window.orderBy('timestamp', 'desc'));
+                const auditSnapshot = await window.getDocs(auditQuery);
+                auditLogs = auditSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                // Load organizations
+                const orgsSnapshot = await window.getDocs(window.collection(window.firebaseDB, 'organizations'));
+                organizations = orgsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                // Load contact messages
+                const messagesQuery = window.query(window.collection(window.firebaseDB, 'contactMessages'), window.orderBy('createdAt', 'desc'));
+                const messagesSnapshot = await window.getDocs(messagesQuery);
+                messages = messagesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showAlert('Error loading data. Please refresh the page.', 'error');
+            }
+        }
+
+        // Helper function to convert Firestore timestamp to readable date
+        function formatTimestamp(timestamp) {
+            try {
+                if (!timestamp) return 'No date';
+                
+                // If it's a Firestore timestamp object
+                if (timestamp.toDate && typeof timestamp.toDate === 'function') {
+                    return timestamp.toDate().toLocaleString();
+                }
+                
+                // If it's already a Date object or valid date string
+                if (timestamp instanceof Date) {
+                    return timestamp.toLocaleString();
+                }
+                
+                // If it's a timestamp number
+                if (typeof timestamp === 'number') {
+                    return new Date(timestamp).toLocaleString();
+                }
+                
+                // If it's a string that can be parsed
+                const date = new Date(timestamp);
+                if (!isNaN(date.getTime())) {
+                    return date.toLocaleString();
+                }
+                
+                return 'Invalid date';
+            } catch (error) {
+                console.error('Error formatting timestamp:', error, timestamp);
+                return 'Invalid date';
+            }
+        }
+
+        function updateUI() {
+            updateOverview();
+            populatePollOrganizationFilter();
+            populateResultsOrganizationFilter();
+            populateVoterOrganizationFilter();
+            updatePollsTable();
+            updateVotersTable();
+            updateOrganizationsTable();
+            updateMessagesTable();
+            updateResults();
+            updateAuditTable();
+            populateFullScreenPollSelect();
+        }
+
+        function showSection(section) {
+            // Update navigation
+            document.querySelectorAll('.pad-nav-link').forEach(link => link.classList.remove('active'));
+            document.querySelectorAll('.pad-sidebar-link').forEach(link => link.classList.remove('active'));
+            
+            // Update sections
+            document.querySelectorAll('.pad-section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(section + '-section').classList.add('active');
+            
+            currentSection = section;
+        }
+
+        function updateOverview() {
+            const now = new Date();
+            const totalPolls = polls.length;
+            const activePolls = polls.filter(poll => {
+                const start = new Date(poll.startAt);
+                const end = new Date(poll.endAt);
+                return start <= now && now <= end && poll.status === 'active';
+            }).length;
+            const totalVoters = voters.length;
+            const totalVotes = votes.length;
+
+            document.getElementById('totalPolls').textContent = totalPolls;
+            document.getElementById('activePolls').textContent = activePolls;
+            document.getElementById('totalVoters').textContent = totalVoters;
+            document.getElementById('totalVotes').textContent = totalVotes;
+
+            // Recent activity
+            const recentActivity = auditLogs.slice(-10).reverse();
+            const activityHtml = recentActivity.map(log => `
+                <div style="padding: 1rem; border-bottom: 1px solid var(--pad-border);">
+                    <div style="font-weight: 600; color: var(--pad-dark);">${log.details}</div>
+                    <div style="font-size: 0.875rem; color: var(--pad-text-light);">${formatTimestamp(log.timestamp)}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('recentActivity').innerHTML = activityHtml || '<div class="pad-empty-state">No recent activity</div>';
+        }
+
+        function updatePollsTable() {
+            // Get filtered polls based on organization filter
+            const selectedOrgId = document.getElementById('pollOrganizationFilter').value;
+            const filteredPolls = selectedOrgId ? polls.filter(poll => poll.organizationId === selectedOrgId) : polls;
+            
+            const pollsHtml = filteredPolls.length === 0 ? `
+                <div class="pad-empty-state">
+                    <div class="pad-empty-icon">🗳️</div>
+                    <div class="pad-empty-title">${selectedOrgId ? 'No polls found for selected organization' : 'No polls created'}</div>
+                    <div class="pad-empty-description">${selectedOrgId ? 'Try selecting a different organization or create a new poll.' : 'Create your first poll to get started.'}</div>
+                </div>
+            ` : `
+                <table class="pad-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Organization</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Votes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filteredPolls.map(poll => {
+                            const pollVotes = votes.filter(vote => vote.pollId === poll.id);
+                            const now = new Date();
+                            const start = new Date(poll.startAt);
+                            const end = new Date(poll.endAt);
+                            
+                            // Get organization name
+                            const organization = organizations.find(org => org.id === poll.organizationId);
+                            const orgName = organization ? organization.name : 'Unknown Organization';
+                            
+                            let status = 'draft';
+                            let statusText = 'Draft';
+                            
+                            if (poll.status === 'active') {
+                                if (start <= now && now <= end) {
+                                    status = 'active';
+                                    statusText = 'Active';
+                                } else if (start > now) {
+                                    status = 'draft';
+                                    statusText = 'Upcoming';
+                                } else {
+                                    status = 'closed';
+                                    statusText = 'Closed';
+                                }
+                            } else if (poll.status === 'closed') {
+                                status = 'closed';
+                                statusText = 'Closed';
+                            }
+
+                            return `
+                                <tr>
+                                    <td>${poll.title}</td>
+                                    <td><span class="pad-organization-name">${orgName}</span></td>
+                                    <td>${poll.type === 'single' ? 'Single' : poll.type === 'multi' ? 'Multiple' : 'Ranked'}</td>
+                                    <td><span class="pad-status ${status}">${statusText}</span></td>
+                                    <td>${new Date(poll.startAt).toLocaleDateString()}</td>
+                                    <td>${new Date(poll.endAt).toLocaleDateString()}</td>
+                                    <td>${pollVotes.length}</td>
+                                    <td class="pad-actions">
+                                        <button class="pad-btn pad-btn-outline" onclick="editPoll('${poll.id}')">Edit</button>
+                                        <button class="pad-btn pad-btn-secondary" onclick="viewPollResults('${poll.id}')">Results</button>
+                                        ${status === 'draft' ? `<button class="pad-btn pad-btn-success" onclick="activatePoll('${poll.id}')">Activate</button>` : ''}
+                                        ${status === 'active' ? `<button class="pad-btn pad-btn-warning" onclick="closePoll('${poll.id}')">Close</button>` : ''}
+                                        ${status === 'closed' ? `<button class="pad-btn pad-btn-primary" onclick="reopenPoll('${poll.id}')">Reopen</button>` : ''}
+                                        <button class="pad-btn pad-btn-danger" onclick="deletePoll('${poll.id}')">Delete</button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('pollsTable').innerHTML = pollsHtml;
+        }
+
+        function updateVotersTable() {
+            // Get selected organization filter
+            const selectedOrgId = document.getElementById('voterOrganizationFilter').value;
+            
+            // Filter voters by organization if selected
+            const filteredVoters = selectedOrgId ? 
+                voters.filter(voter => voter.organizationId === selectedOrgId) : 
+                voters;
+
+            const votersHtml = filteredVoters.length === 0 ? `
+                <div class="pad-empty-state">
+                    <div class="pad-empty-icon">👥</div>
+                    <div class="pad-empty-title">No voters found</div>
+                    <div class="pad-empty-description">${selectedOrgId ? 'No voters found for the selected organization.' : 'Voters will appear here once they register.'}</div>
+                </div>
+            ` : `
+                <table class="pad-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Identity</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Organization</th>
+                            <th>Status</th>
+                            <th>Registered</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filteredVoters.map(voter => {
+                            // Get organization name
+                            const organization = organizations.find(org => org.id === voter.organizationId);
+                            const orgName = organization ? organization.name : 'Unknown Organization';
+                            
+                            return `
+                                <tr>
+                                    <td>${voter.name}</td>
+                                    <td>${voter.identity}</td>
+                                    <td>${voter.email}</td>
+                                    <td>${voter.phone}</td>
+                                    <td><span class="pad-organization-name">${orgName}</span></td>
+                                    <td><span class="pad-status ${voter.verified ? 'active' : 'draft'}">${voter.verified ? 'Verified' : 'Pending'}</span></td>
+                                    <td>${formatTimestamp(voter.createdAt)}</td>
+                                    <td class="pad-actions">
+                                        <button class="pad-btn pad-btn-outline" onclick="editVoter('${voter.id}')">Edit</button>
+                                        <button class="pad-btn pad-btn-danger" onclick="deleteVoter('${voter.id}')">Delete</button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('votersTable').innerHTML = votersHtml;
+        }
+
+        function updateOrganizationsTable() {
+            const orgsHtml = organizations.length === 0 ? `
+                <div class="pad-empty-state">
+                    <div class="pad-empty-icon">🏢</div>
+                    <div class="pad-empty-title">No organizations created</div>
+                    <div class="pad-empty-description">Create an organization to get started</div>
+                </div>
+            ` : `
+                <table class="pad-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Code</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${organizations.map(org => `
+                            <tr>
+                                <td>${org.name}</td>
+                                <td><code class="pad-code">${org.code}</code></td>
+                                <td>${org.description || 'No description'}</td>
+                                <td><span class="pad-status pad-status-${org.status || 'active'}">${org.status || 'Active'}</span></td>
+                                <td>${formatTimestamp(org.createdAt)}</td>
+                                <td>
+                                    <button class="pad-btn pad-btn-sm pad-btn-primary" onclick="editOrganization('${org.id}')">Edit</button>
+                                    <button class="pad-btn pad-btn-sm pad-btn-outline" onclick="deleteOrganization('${org.id}')">Delete</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('organizationsTable').innerHTML = orgsHtml;
+        }
+
+        function updateMessagesTable() {
+            const filteredMessages = getFilteredMessages();
+            
+            const messagesHtml = filteredMessages.length === 0 ? `
+                <div class="pad-empty-state">
+                    <div class="pad-empty-icon">📧</div>
+                    <div class="pad-empty-title">No messages found</div>
+                    <div class="pad-empty-description">Contact messages from the website will appear here</div>
+                </div>
+            ` : `
+                <table class="pad-table">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Organization</th>
+                            <th>Subject</th>
+                            <th>Message</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filteredMessages.map(message => `
+                            <tr class="${message.read ? '' : 'pad-unread-message'}">
+                                <td>
+                                    <span class="pad-status pad-status-${message.read ? 'read' : 'unread'}">
+                                        ${message.read ? 'Read' : 'Unread'}
+                                    </span>
+                                </td>
+                                <td>${message.name}</td>
+                                <td><a href="mailto:${message.email}" class="pad-link">${message.email}</a></td>
+                                <td>${message.phone || 'N/A'}</td>
+                                <td>${message.organization || 'N/A'}</td>
+                                <td>${message.subject}</td>
+                                <td>
+                                    <div class="pad-message-preview" title="${message.message}">
+                                        ${message.message.length > 50 ? message.message.substring(0, 50) + '...' : message.message}
+                                    </div>
+                                </td>
+                                <td>${formatTimestamp(message.createdAt)}</td>
+                                <td>
+                                    <button class="pad-btn pad-btn-sm pad-btn-primary" onclick="viewMessage('${message.id}')">
+                                        ${message.read ? 'View' : 'Mark as Read'}
+                                    </button>
+                                    <button class="pad-btn pad-btn-sm pad-btn-outline" onclick="replyToMessage('${message.id}')">Reply</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('messagesTable').innerHTML = messagesHtml;
+        }
+
+        function getFilteredMessages() {
+            const statusFilter = document.getElementById('messageStatusFilter')?.value || '';
+            
+            if (statusFilter === 'unread') {
+                return messages.filter(message => !message.read);
+            } else if (statusFilter === 'read') {
+                return messages.filter(message => message.read);
+            }
+            
+            return messages;
+        }
+
+        function filterMessages() {
+            updateMessagesTable();
+        }
+
+        async function viewMessage(messageId) {
+            const message = messages.find(m => m.id === messageId);
+            if (!message) return;
+
+            // Mark as read if not already read
+            if (!message.read) {
+                try {
+                    await window.updateDoc(window.doc(window.firebaseDB, 'contactMessages', messageId), {
+                        read: true,
+                        readAt: window.serverTimestamp(),
+                        readBy: currentUser.uid
+                    });
+                    
+                    // Update local data
+                    message.read = true;
+                    message.readAt = new Date();
+                    message.readBy = currentUser.uid;
+                    
+                    updateMessagesTable();
+                } catch (error) {
+                    console.error('Error marking message as read:', error);
+                }
+            }
+
+            // Show message details in a modal or alert
+            const messageDetails = `
+                <strong>From:</strong> ${message.name} (${message.email})<br>
+                <strong>Phone:</strong> ${message.phone || 'N/A'}<br>
+                <strong>Organization:</strong> ${message.organization || 'N/A'}<br>
+                <strong>Subject:</strong> ${message.subject}<br>
+                <strong>Date:</strong> ${formatTimestamp(message.createdAt)}<br><br>
+                <strong>Message:</strong><br>
+                ${message.message}
+            `;
+            
+            showAlert(messageDetails, 'info');
+        }
+
+        function replyToMessage(messageId) {
+            const message = messages.find(m => m.id === messageId);
+            if (!message) return;
+
+            // Open email client with pre-filled details
+            const subject = `Re: ${message.subject}`;
+            const body = `\n\n--- Original Message ---\nFrom: ${message.name} (${message.email})\nSubject: ${message.subject}\nDate: ${formatTimestamp(message.createdAt)}\n\n${message.message}`;
+            
+            const mailtoLink = `mailto:${message.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(mailtoLink);
+        }
+
+        async function markAllAsRead() {
+            const unreadMessages = messages.filter(m => !m.read);
+            
+            if (unreadMessages.length === 0) {
+                showAlert('No unread messages to mark as read', 'info');
+                return;
+            }
+
+            try {
+                const batch = unreadMessages.map(message => 
+                    window.updateDoc(window.doc(window.firebaseDB, 'contactMessages', message.id), {
+                        read: true,
+                        readAt: window.serverTimestamp(),
+                        readBy: currentUser.uid
+                    })
+                );
+
+                await Promise.all(batch);
+                
+                // Update local data
+                unreadMessages.forEach(message => {
+                    message.read = true;
+                    message.readAt = new Date();
+                    message.readBy = currentUser.uid;
+                });
+                
+                updateMessagesTable();
+                showAlert(`${unreadMessages.length} messages marked as read`, 'success');
+            } catch (error) {
+                console.error('Error marking messages as read:', error);
+                showAlert('Error marking messages as read. Please try again.', 'error');
+            }
+        }
+
+        function exportMessages() {
+            const csvContent = [
+                ['Name', 'Email', 'Phone', 'Organization', 'Subject', 'Message', 'Date', 'Status'],
+                ...messages.map(message => [
+                    message.name,
+                    message.email,
+                    message.phone || 'N/A',
+                    message.organization || 'N/A',
+                    message.subject,
+                    message.message.replace(/\n/g, ' '),
+                    formatTimestamp(message.createdAt),
+                    message.read ? 'Read' : 'Unread'
+                ])
+            ].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `contact-messages-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function updateResults() {
+            // Get selected organization filter
+            const selectedOrgId = document.getElementById('resultsOrganizationFilter').value;
+            
+            // Filter polls by organization if selected
+            const filteredPolls = selectedOrgId ? 
+                polls.filter(poll => poll.organizationId === selectedOrgId) : 
+                polls;
+
+            const resultsHtml = filteredPolls.length === 0 ? `
+                <div class="pad-empty-state">
+                    <div class="pad-empty-icon">📈</div>
+                    <div class="pad-empty-title">No Polls Available</div>
+                    <div class="pad-empty-description">Create polls to see results here.</div>
+                </div>
+            ` : `
+                <div class="pad-results-overview">
+                    <div class="pad-results-summary">
+                        <div class="pad-results-stat-card">
+                            <div class="pad-results-stat-number">${filteredPolls.length}</div>
+                            <div class="pad-results-stat-label">Total Polls</div>
+                        </div>
+                        <div class="pad-results-stat-card">
+                            <div class="pad-results-stat-number">${votes.length}</div>
+                            <div class="pad-results-stat-label">Total Votes</div>
+                        </div>
+                        <div class="pad-results-stat-card">
+                            <div class="pad-results-stat-number">${filteredPolls.filter(p => p.status === 'active').length}</div>
+                            <div class="pad-results-stat-label">Active Polls</div>
+                        </div>
+                        <div class="pad-results-stat-card">
+                            <div class="pad-results-stat-number">${filteredPolls.filter(p => p.status === 'closed').length}</div>
+                            <div class="pad-results-stat-label">Closed Polls</div>
+                        </div>
+                    </div>
+
+                    <div class="pad-results-polls">
+                        <h3>Poll Results Overview</h3>
+                        <div class="pad-results-grid">
+                            ${filteredPolls.map(poll => {
+                                const pollVotes = votes.filter(vote => vote.pollId === poll.id);
+                                const organization = organizations.find(org => org.id === poll.organizationId);
+                                const orgName = organization ? organization.name : 'Unknown Organization';
+                                
+                                // Calculate results
+                                const results = poll.options.map(option => {
+                                    // Handle both string and object options
+                                    const optionText = typeof option === 'string' ? option : (option.text || option.name || option);
+                                    
+                                    const optionVotes = pollVotes.filter(vote => {
+                                        if (poll.type === 'single') {
+                                            return vote.choices && vote.choices.includes(optionText);
+                                        } else if (poll.type === 'multi') {
+                                            return vote.choices && vote.choices.includes(optionText);
+                                        } else {
+                                            return vote.choices && vote.choices[0] === optionText;
+                                        }
+                                    }).length;
+                                    
+                                    return {
+                                        option: optionText,
+                                        votes: optionVotes,
+                                        percentage: pollVotes.length > 0 ? Math.round((optionVotes / pollVotes.length) * 100) : 0
+                                    };
+                                }).sort((a, b) => b.votes - a.votes);
+
+                                const now = new Date();
+                                const start = new Date(poll.startAt);
+                                const end = new Date(poll.endAt);
+                                
+                                let status = 'draft';
+                                let statusText = 'Draft';
+                                
+                                if (poll.status === 'active') {
+                                    if (start <= now && now <= end) {
+                                        status = 'active';
+                                        statusText = 'Active';
+                                    } else if (start > now) {
+                                        status = 'draft';
+                                        statusText = 'Upcoming';
+                                    } else {
+                                        status = 'closed';
+                                        statusText = 'Closed';
+                                    }
+                                } else if (poll.status === 'closed') {
+                                    status = 'closed';
+                                    statusText = 'Closed';
+                                }
+
+                                return `
+                                    <div class="pad-results-poll-card">
+                                        <div class="pad-results-poll-header">
+                                            <h4 class="pad-results-poll-title">${poll.title}</h4>
+                                            <span class="pad-results-poll-status pad-status-${status}">${statusText}</span>
+                                        </div>
+                                        <div class="pad-results-poll-info">
+                                            <div class="pad-results-poll-org">${orgName}</div>
+                                            <div class="pad-results-poll-votes">${pollVotes.length} votes</div>
+                                        </div>
+                                        <div class="pad-results-poll-chart">
+                                            ${results.slice(0, 3).map((result, index) => `
+                                                <div class="pad-results-poll-item">
+                                                    <div class="pad-results-poll-option">
+                                                        <span class="pad-results-poll-rank">#${index + 1}</span>
+                                                        <span class="pad-results-poll-option-text">${result.option}</span>
+                                                        <span class="pad-results-poll-stats">${result.votes} (${result.percentage}%)</span>
+                                                    </div>
+                                                    <div class="pad-results-poll-bar">
+                                                        <div class="pad-results-poll-fill" style="width: ${result.percentage}%"></div>
+                                                    </div>
+                                                </div>
+                                            `).join('')}
+                                            ${results.length > 3 ? `<div class="pad-results-poll-more">+${results.length - 3} more options</div>` : ''}
+                                        </div>
+                                        <div class="pad-results-poll-actions">
+                                            <button class="pad-btn pad-btn-sm pad-btn-primary" onclick="viewPollResults('${poll.id}')">View Details</button>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('resultsContent').innerHTML = resultsHtml;
+        }
+
+        function updateAuditTable() {
+            const auditHtml = auditLogs.length === 0 ? `
+                <div class="pad-empty-state">
+                    <div class="pad-empty-icon">📋</div>
+                    <div class="pad-empty-title">No audit logs</div>
+                    <div class="pad-empty-description">Audit logs will appear here as activities occur.</div>
+                </div>
+            ` : `
+                <div class="pad-table-container">
+                    <table class="pad-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Event</th>
+                                <th>Details</th>
+                                <th>User</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${auditLogs.slice().reverse().map(log => {
+                                // Get user display name - prefer email, fallback to userId, then System
+                                let userDisplay = 'System';
+                                if (log.userEmail) {
+                                    userDisplay = log.userEmail;
+                                } else if (log.userId) {
+                                    // If it's a UUID (long string), show a shortened version
+                                    if (log.userId.length > 20) {
+                                        userDisplay = `User (${log.userId.substring(0, 8)}...)`;
+                                    } else {
+                                        userDisplay = log.userId;
+                                    }
+                                }
+                                
+                                return `
+                                    <tr>
+                                        <td>${formatTimestamp(log.timestamp)}</td>
+                                        <td>${(log.event || log.action || 'unknown').replace('_', ' ').toUpperCase()}</td>
+                                        <td>${log.details}</td>
+                                        <td>${userDisplay}</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            document.getElementById('auditTable').innerHTML = auditHtml;
+        }
+
+        function showAddVoterModal() {
+            document.getElementById('addVoterModal').classList.add('show');
+            
+            // Populate organization dropdown
+            populateVoterOrganizationDropdown();
+            
+            // Clear form
+            document.getElementById('addVoterForm').reset();
+        }
+
+        function editVoter(voterId) {
+            // Find the voter
+            const voter = voters.find(v => v.id === voterId);
+            if (!voter) {
+                showAlert('Voter not found', 'error');
+                return;
+            }
+
+            try {
+                // Populate the edit form
+                document.getElementById('editVoterId').value = voter.id;
+                document.getElementById('editVoterName').value = voter.name || '';
+                document.getElementById('editVoterEmail').value = voter.email || '';
+                document.getElementById('editVoterIdentity').value = voter.identity || '';
+                document.getElementById('editVoterPhone').value = voter.phone || '';
+                document.getElementById('editVoterStatus').value = voter.status || 'active';
+
+                // Populate organization dropdown
+                populateEditVoterOrganizationDropdown();
+                document.getElementById('editVoterOrganization').value = voter.organizationId || '';
+
+                // Show modal
+                document.getElementById('editVoterModal').classList.add('show');
+            } catch (error) {
+                console.error('Error in editVoter function:', error);
+                showAlert('Error opening edit form. Please try again.', 'error');
+            }
+        }
+
+        function populateEditVoterOrganizationDropdown() {
+            const select = document.getElementById('editVoterOrganization');
+            select.innerHTML = '<option value="">Select Organization</option>';
+            
+            organizations.forEach(org => {
+                const option = document.createElement('option');
+                option.value = org.id;
+                option.textContent = org.name;
+                select.appendChild(option);
+            });
+        }
+
+        function populateVoterOrganizationFilter() {
+            const select = document.getElementById('voterOrganizationFilter');
+            select.innerHTML = '<option value="">All Organizations</option>';
+            
+            organizations.forEach(org => {
+                const option = document.createElement('option');
+                option.value = org.id;
+                option.textContent = org.name;
+                select.appendChild(option);
+            });
+        }
+
+        function filterVotersByOrganization() {
+            updateVotersTable();
+        }
+
+        function showCreateOrganizationModal() {
+            document.getElementById('createOrganizationModal').classList.add('show');
+            
+            // Generate initial organization code
+            generateOrgCode();
+            
+            // Clear form
+            document.getElementById('createOrganizationForm').reset();
+        }
+
+        function showCreatePollModal() {
+            // Reset modal state for creating new poll
+            document.getElementById('createPollModal').removeAttribute('data-edit-id');
+            document.querySelector('#createPollModal .pad-modal-title').textContent = 'Create New Poll';
+            document.querySelector('#createPollModal button[onclick="createPoll()"]').textContent = 'Create Poll';
+            
+            // Clear form
+            document.getElementById('createPollForm').reset();
+            
+            // Populate organization dropdown
+            populateOrganizationDropdown();
+            
+            // Set default start time to now
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('startDate').value = now.toISOString().slice(0, 16);
+            
+            // Set default end time to 24 hours from now
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('endDate').value = tomorrow.toISOString().slice(0, 16);
+            
+            // Show modal
+            document.getElementById('createPollModal').classList.add('show');
+        }
+
+        function populateOrganizationDropdown() {
+            const select = document.getElementById('organizationSelect');
+            select.innerHTML = '<option value="">Select Organization</option>';
+            
+            organizations.forEach(org => {
+                const option = document.createElement('option');
+                option.value = org.id;
+                option.textContent = org.name;
+                select.appendChild(option);
+            });
+        }
+
+        function populatePollOrganizationFilter() {
+            const select = document.getElementById('pollOrganizationFilter');
+            select.innerHTML = '<option value="">All Organizations</option>';
+            
+            organizations.forEach(org => {
+                const option = document.createElement('option');
+                option.value = org.id;
+                option.textContent = org.name;
+                select.appendChild(option);
+            });
+        }
+
+        function filterPollsByOrganization() {
+            updatePollsTable();
+        }
+
+        function populateResultsOrganizationFilter() {
+            const select = document.getElementById('resultsOrganizationFilter');
+            select.innerHTML = '<option value="">All Organizations</option>';
+            
+            organizations.forEach(org => {
+                const option = document.createElement('option');
+                option.value = org.id;
+                option.textContent = org.name;
+                select.appendChild(option);
+            });
+        }
+
+        function filterResultsByOrganization() {
+            updateResults();
+        }
+
+        function viewPollResults(pollId) {
+            // Find the poll
+            const poll = polls.find(p => p.id === pollId);
+            if (!poll) {
+                showAlert('Poll not found', 'error');
+                return;
+            }
+
+            // Get votes for this poll
+            const pollVotes = votes.filter(vote => vote.pollId === pollId);
+            
+            // Get organization name
+            const organization = organizations.find(org => org.id === poll.organizationId);
+            const orgName = organization ? organization.name : 'Unknown Organization';
+
+            // Calculate results
+            const results = poll.options.map(option => {
+                // Handle both string and object options
+                const optionText = typeof option === 'string' ? option : (option.text || option.name || option);
+                
+                const optionVotes = pollVotes.filter(vote => {
+                    if (poll.type === 'single') {
+                        return vote.choices && vote.choices.includes(optionText);
+                    } else if (poll.type === 'multi') {
+                        return vote.choices && vote.choices.includes(optionText);
+                    } else {
+                        // For ranked choice, count first choice
+                        return vote.choices && vote.choices[0] === optionText;
+                    }
+                }).length;
+                
+                return {
+                    option: optionText,
+                    votes: optionVotes,
+                    percentage: pollVotes.length > 0 ? Math.round((optionVotes / pollVotes.length) * 100) : 0
+                };
+            }).sort((a, b) => b.votes - a.votes);
+
+            // Create results modal
+            const resultsModal = document.createElement('div');
+            resultsModal.className = 'pad-modal show';
+            resultsModal.innerHTML = `
+                <div class="pad-modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+                    <div class="pad-modal-header">
+                        <h3 class="pad-modal-title">Poll Results: ${poll.title}</h3>
+                        <button class="pad-modal-close" onclick="closeResultsModal()">&times;</button>
+                    </div>
+                    
+                    <div class="pad-results-content">
+                        <div class="pad-results-info">
+                            <div class="pad-results-stat">
+                                <span class="pad-results-label">Organization:</span>
+                                <span class="pad-results-value">${orgName}</span>
+                            </div>
+                            <div class="pad-results-stat">
+                                <span class="pad-results-label">Total Votes:</span>
+                                <span class="pad-results-value">${pollVotes.length}</span>
+                            </div>
+                            <div class="pad-results-stat">
+                                <span class="pad-results-label">Poll Type:</span>
+                                <span class="pad-results-value">${poll.type === 'single' ? 'Single Choice' : poll.type === 'multi' ? 'Multiple Choice' : 'Ranked Choice'}</span>
+                            </div>
+                            <div class="pad-results-stat">
+                                <span class="pad-results-label">Status:</span>
+                                <span class="pad-results-value">${poll.status === 'active' ? 'Active' : poll.status === 'closed' ? 'Closed' : 'Draft'}</span>
+                            </div>
+                        </div>
+
+                        <div class="pad-results-chart">
+                            <h4>Results by Option</h4>
+                            ${results.map((result, index) => `
+                                <div class="pad-result-item">
+                                    <div class="pad-result-header">
+                                        <span class="pad-result-rank">#${index + 1}</span>
+                                        <span class="pad-result-option">${result.option}</span>
+                                        <span class="pad-result-stats">${result.votes} votes (${result.percentage}%)</span>
+                                    </div>
+                                    <div class="pad-result-bar">
+                                        <div class="pad-result-fill" style="width: ${result.percentage}%"></div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        ${pollVotes.length > 0 ? `
+                            <div class="pad-votes-details">
+                                <h4>Vote Details</h4>
+                                <div class="pad-votes-table">
+                                    <table class="pad-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Voter ID</th>
+                                                <th>Choices</th>
+                                                <th>Vote Time</th>
+                                                <th>Receipt</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${pollVotes.map(vote => `
+                                                <tr>
+                                                    <td>${vote.voterId}</td>
+                                                    <td>${vote.choices ? vote.choices.join(', ') : 'N/A'}</td>
+                                                    <td>${formatTimestamp(vote.timestamp)}</td>
+                                                    <td><code class="pad-code">${vote.receiptHash || 'N/A'}</code></td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="pad-modal-actions">
+                        <button class="pad-btn pad-btn-secondary" onclick="exportPollResults('${pollId}')">Export Results</button>
+                        <button class="pad-btn pad-btn-outline" onclick="closeResultsModal()">Close</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(resultsModal);
+        }
+
+        function closeResultsModal() {
+            const modal = document.querySelector('.pad-modal.show');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        function exportPollResults(pollId) {
+            const poll = polls.find(p => p.id === pollId);
+            if (!poll) return;
+
+            const pollVotes = votes.filter(vote => vote.pollId === pollId);
+            const organization = organizations.find(org => org.id === poll.organizationId);
+            const orgName = organization ? organization.name : 'Unknown Organization';
+
+            const results = poll.options.map(option => {
+                // Handle both string and object options
+                const optionText = typeof option === 'string' ? option : (option.text || option.name || option);
+                
+                const optionVotes = pollVotes.filter(vote => {
+                    if (poll.type === 'single') {
+                        return vote.choices && vote.choices.includes(optionText);
+                    } else if (poll.type === 'multi') {
+                        return vote.choices && vote.choices.includes(optionText);
+                    } else {
+                        return vote.choices && vote.choices[0] === optionText;
+                    }
+                }).length;
+                
+                return {
+                    option: optionText,
+                    votes: optionVotes,
+                    percentage: pollVotes.length > 0 ? Math.round((optionVotes / pollVotes.length) * 100) : 0
+                };
+            }).sort((a, b) => b.votes - a.votes);
+
+            // Create CSV content
+            const csvContent = [
+                ['Poll Results Export'],
+                ['Poll Title', poll.title],
+                ['Organization', orgName],
+                ['Poll Type', poll.type],
+                ['Total Votes', pollVotes.length],
+                ['Export Date', new Date().toLocaleString()],
+                [''],
+                ['Results by Option'],
+                ['Rank', 'Option', 'Votes', 'Percentage'],
+                ...results.map((result, index) => [
+                    index + 1,
+                    result.option,
+                    result.votes,
+                    result.percentage + '%'
+                ]),
+                [''],
+                ['Vote Details'],
+                ['Voter ID', 'Choices', 'Vote Time', 'Receipt Hash'],
+                ...pollVotes.map(vote => [
+                    vote.voterId,
+                    vote.choices ? vote.choices.join(', ') : 'N/A',
+                    formatTimestamp(vote.timestamp),
+                    vote.receiptHash || 'N/A'
+                ])
+            ].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `poll-results-${poll.title.replace(/[^a-zA-Z0-9]/g, '-')}-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function populateVoterOrganizationDropdown() {
+            const select = document.getElementById('voterOrganization');
+            select.innerHTML = '<option value="">Select Organization</option>';
+            
+            organizations.forEach(org => {
+                const option = document.createElement('option');
+                option.value = org.id;
+                option.textContent = `${org.name} (${org.code})`;
+                select.appendChild(option);
+            });
+        }
+
+        async function createPoll() {
+            const title = document.getElementById('pollTitle').value;
+            const description = document.getElementById('pollDescription').value;
+            const type = document.querySelector('input[name="pollType"]:checked').value;
+            const maxSelections = document.getElementById('maxSelections').value;
+            const options = document.getElementById('pollOptions').value.split('\n').filter(opt => opt.trim());
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const eligibility = document.querySelector('input[name="eligibility"]:checked').value;
+            const anonymous = document.getElementById('anonymous').checked;
+            const organizationId = document.getElementById('organizationSelect').value;
+
+            if (!title || !description || options.length < 2 || !organizationId) {
+                showAlert('Please fill in all required fields and add at least 2 options', 'error');
+                return;
+            }
+
+            try {
+                const pollData = {
+                    title,
+                    description,
+                    options: options.map((opt, index) => ({
+                        id: `opt${index + 1}`,
+                        text: opt.trim(),
+                        photo: null,
+                        bio: ''
+                    })),
+                    type,
+                    maxSelections: type === 'multi' ? parseInt(maxSelections) : 1,
+                    startAt: new Date(startDate).toISOString(),
+                    endAt: new Date(endDate).toISOString(),
+                    eligibility: { type: eligibility },
+                    anonymous,
+                    organizationId,
+                    createdBy: currentUser.uid,
+                    createdAt: window.serverTimestamp(),
+                    status: 'draft'
+                };
+
+                // Check if we're editing an existing poll
+                const editId = document.getElementById('createPollModal').getAttribute('data-edit-id');
+                
+                if (editId) {
+                    // Update existing poll
+                    await window.updateDoc(window.doc(window.firebaseDB, 'polls', editId), {
+                        ...pollData,
+                        updatedAt: window.serverTimestamp(),
+                        updatedBy: currentUser.uid
+                    });
+
+                    // Add audit log
+                    await window.addDoc(window.collection(window.firebaseDB, 'auditLogs'), {
+                        event: 'poll_updated',
+                        details: `Poll "${title}" updated`,
+                        userId: currentUser.uid,
+                        organizationId,
+                        pollId: editId,
+                        timestamp: window.serverTimestamp(),
+                        metadata: {
+                            pollTitle: title,
+                            organizationId
+                        }
+                    });
+
+                    showAlert('Poll updated successfully!', 'success');
+                } else {
+                    // Create new poll
+                    const pollRef = await window.addDoc(window.collection(window.firebaseDB, 'polls'), pollData);
+
+                    // Add audit log
+                    await window.addDoc(window.collection(window.firebaseDB, 'auditLogs'), {
+                        event: 'poll_created',
+                        details: `Poll "${title}" created`,
+                        userId: currentUser.uid,
+                        organizationId,
+                        pollId: pollRef.id,
+                        timestamp: window.serverTimestamp(),
+                        metadata: {
+                            pollTitle: title,
+                            organizationId
+                        }
+                    });
+
+                    showAlert('Poll created successfully!', 'success');
+                }
+
+                // Reset modal state
+                document.getElementById('createPollModal').removeAttribute('data-edit-id');
+                document.querySelector('#createPollModal .pad-modal-title').textContent = 'Create New Poll';
+                document.querySelector('#createPollModal button[onclick="createPoll()"]').textContent = 'Create Poll';
+
+                closeModal('createPollModal');
+                await loadData();
+                updateUI();
+            } catch (error) {
+                console.error('Error saving poll:', error);
+                showAlert('Error saving poll. Please try again.', 'error');
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        function editPoll(pollId) {
+            console.log('Edit poll called with ID:', pollId);
+            console.log('Available polls:', polls);
+            
+            const poll = polls.find(p => p.id === pollId);
+            if (!poll) {
+                console.error('Poll not found with ID:', pollId);
+                showAlert('Poll not found', 'error');
+                return;
+            }
+            
+            console.log('Found poll:', poll);
+
+            try {
+                // Populate create poll form with existing data
+                document.getElementById('pollTitle').value = poll.title || '';
+                document.getElementById('pollDescription').value = poll.description || '';
+                
+                // Set poll type
+                const typeRadio = document.querySelector(`input[name="pollType"][value="${poll.type}"]`);
+                if (typeRadio) {
+                    typeRadio.checked = true;
+                } else {
+                    console.warn('Poll type radio not found for:', poll.type);
+                }
+                
+                // Set organization
+                document.getElementById('organizationSelect').value = poll.organizationId || '';
+                
+                // Set poll options
+                const optionsText = poll.options ? poll.options.map(opt => opt.text).join('\n') : '';
+                document.getElementById('pollOptions').value = optionsText;
+                
+                // Set dates
+                if (poll.startAt) {
+                    document.getElementById('startDate').value = new Date(poll.startAt).toISOString().slice(0, 16);
+                }
+                if (poll.endAt) {
+                    document.getElementById('endDate').value = new Date(poll.endAt).toISOString().slice(0, 16);
+                }
+                
+                // Set max selections for multi-choice
+                if (poll.maxSelections) {
+                    document.getElementById('maxSelections').value = poll.maxSelections;
+                }
+                
+                // Set anonymous flag (corrected ID)
+                document.getElementById('anonymous').checked = poll.anonymous || false;
+                
+                // Set eligibility
+                const eligibilityRadio = document.querySelector(`input[name="eligibility"][value="${poll.eligibility?.type || 'open'}"]`);
+                if (eligibilityRadio) {
+                    eligibilityRadio.checked = true;
+                } else {
+                    console.warn('Eligibility radio not found for:', poll.eligibility?.type || 'open');
+                }
+                
+                console.log('Form populated successfully');
+            } catch (error) {
+                console.error('Error populating form:', error);
+                showAlert('Error loading poll data. Please try again.', 'error');
+                return;
+            }
+            
+            // Store the poll ID for updating
+            document.getElementById('createPollModal').setAttribute('data-edit-id', pollId);
+            
+            // Change modal title and button
+            document.querySelector('#createPollModal .pad-modal-title').textContent = 'Edit Poll';
+            document.querySelector('#createPollModal button[onclick="createPoll()"]').textContent = 'Update Poll';
+            
+            // Show modal
+            document.getElementById('createPollModal').classList.add('show');
+        }
+
+
+        async function activatePoll(pollId) {
+            try {
+                // Update poll status to active in Firestore
+                await window.updateDoc(window.doc(window.firebaseDB, 'polls', pollId), {
+                    status: 'active',
+                    updatedAt: window.serverTimestamp(),
+                    updatedBy: currentUser.uid
+                });
+
+                // Add audit log
+                const poll = polls.find(p => p.id === pollId);
+                await window.addDoc(window.collection(window.firebaseDB, 'auditLogs'), {
+                    action: 'poll_activated',
+                    details: `Poll activated: ${poll.title}`,
+                    timestamp: window.serverTimestamp(),
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email
+                });
+
+                // Refresh data and UI
+                await loadData();
+                updateUI();
+                showAlert('Poll activated successfully!', 'success');
+            } catch (error) {
+                console.error('Error activating poll:', error);
+                showAlert('Error activating poll. Please try again.', 'error');
+            }
+        }
+
+        async function closePoll(pollId) {
+            try {
+                // Update poll status to closed in Firestore
+                await window.updateDoc(window.doc(window.firebaseDB, 'polls', pollId), {
+                    status: 'closed',
+                    updatedAt: window.serverTimestamp(),
+                    updatedBy: currentUser.uid
+                });
+
+                // Add audit log
+                const poll = polls.find(p => p.id === pollId);
+                await window.addDoc(window.collection(window.firebaseDB, 'auditLogs'), {
+                    action: 'poll_closed',
+                    details: `Poll closed: ${poll.title}`,
+                    timestamp: window.serverTimestamp(),
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email
+                });
+
+                // Refresh data and UI
+                await loadData();
+                updateUI();
+                showAlert('Poll closed successfully!', 'success');
+            } catch (error) {
+                console.error('Error closing poll:', error);
+                showAlert('Error closing poll. Please try again.', 'error');
+            }
+        }
+
+        async function reopenPoll(pollId) {
+            try {
+                // Update poll status to active in Firestore
+                await window.updateDoc(window.doc(window.firebaseDB, 'polls', pollId), {
+                    status: 'active',
+                    updatedAt: window.serverTimestamp(),
+                    updatedBy: currentUser.uid
+                });
+
+                // Add audit log
+                const poll = polls.find(p => p.id === pollId);
+                await window.addDoc(window.collection(window.firebaseDB, 'auditLogs'), {
+                    action: 'poll_reopened',
+                    details: `Poll reopened: ${poll.title}`,
+                    timestamp: window.serverTimestamp(),
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email
+                });
+
+                // Refresh data and UI
+                await loadData();
+                updateUI();
+                showAlert('Poll reopened successfully!', 'success');
+            } catch (error) {
+                console.error('Error reopening poll:', error);
+                showAlert('Error reopening poll. Please try again.', 'error');
+            }
+        }
+
+        function deletePoll(pollId) {
+            if (confirm('Are you sure you want to delete this poll?')) {
+                polls = polls.filter(poll => poll.id !== pollId);
+                localStorage.setItem('pad_polls', JSON.stringify(polls));
+
+                // Add audit log
+                auditLogs.push({
+                    id: 'audit_' + Date.now(),
+                    timestamp: new Date().toISOString(),
+                    event: 'poll_deleted',
+                    details: `Poll deleted`,
+                    userId: currentUser.id,
+                    pollId
+                });
+                localStorage.setItem('pad_audit', JSON.stringify(auditLogs));
+
+                loadData();
+                updateUI();
+                showAlert('Poll deleted successfully!', 'success');
+            }
+        }
+
+        async function addVoter() {
+            const name = document.getElementById('voterName').value;
+            const email = document.getElementById('voterEmail').value;
+            const identity = document.getElementById('voterIdentity').value;
+            const phone = document.getElementById('voterPhone').value;
+            const organizationId = document.getElementById('voterOrganization').value;
+            const photoFile = document.getElementById('voterPhoto').files[0];
+            
+            if (!name || !email || !identity || !phone || !organizationId) {
+                showAlert('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            try {
+                // Check if email already exists
+                const existingVoter = voters.find(v => v.email === email);
+                if (existingVoter) {
+                    showAlert('A voter with this email already exists', 'error');
+                    return;
+                }
+                
+                // Check if identity already exists
+                const existingIdentity = voters.find(v => v.identity === identity);
+                if (existingIdentity) {
+                    showAlert('A voter with this identity number already exists', 'error');
+                    return;
+                }
+                
+                // Get organization data
+                const organization = organizations.find(org => org.id === organizationId);
+                if (!organization) {
+                    showAlert('Selected organization not found', 'error');
+                    return;
+                }
+                
+                // Handle photo upload (convert to base64 for demo)
+                let photoBase64 = null;
+                if (photoFile) {
+                    photoBase64 = await convertFileToBase64(photoFile);
+                }
+                
+                // Create voter data
+                const voterData = {
+                    name,
+                    email,
+                    identity,
+                    phone,
+                    organizationId,
+                    organizationName: organization.name,
+                    photo: photoBase64,
+                    status: 'active',
+                    createdAt: window.serverTimestamp(),
+                    createdBy: currentUser.uid,
+                    lastLogin: null
+                };
+                
+                // Add to Firestore
+                const voterRef = await window.addDoc(window.collection(window.firebaseDB, 'voters'), voterData);
+                
+                // Add audit log
+                await window.addDoc(window.collection(window.firebaseDB, 'auditLogs'), {
+                    event: 'voter_added',
+                    details: `Voter "${name}" added to ${organization.name}`,
+                    userId: currentUser.uid,
+                    organizationId,
+                    voterId: voterRef.id,
+                    timestamp: window.serverTimestamp(),
+                    metadata: {
+                        voterName: name,
+                        voterEmail: email,
+                        organizationName: organization.name
+                    }
+                });
+                
+                // Close modal
+                closeModal('addVoterModal');
+                
+                // Reload data and update UI
+                await loadData();
+                updateUI();
+                showAlert(`Voter "${name}" added successfully!`, 'success');
+                
+            } catch (error) {
+                console.error('Error adding voter:', error);
+                showAlert('Error adding voter. Please try again.', 'error');
+            }
+        }
+
+        async function updateVoter() {
+            const voterId = document.getElementById('editVoterId').value;
+            const name = document.getElementById('editVoterName').value;
+            const email = document.getElementById('editVoterEmail').value;
+            const identity = document.getElementById('editVoterIdentity').value;
+            const phone = document.getElementById('editVoterPhone').value;
+            const organizationId = document.getElementById('editVoterOrganization').value;
+            const status = document.getElementById('editVoterStatus').value;
+            const photoFile = document.getElementById('editVoterPhoto').files[0];
+
+            // Validate required fields
+            if (!name || !email || !identity || !phone || !organizationId) {
+                showAlert('Please fill in all required fields', 'error');
+                return;
+            }
+
+            try {
+                // Check if email or identity already exists for other voters
+                const existingVoters = voters.filter(v => v.id !== voterId);
+                const emailExists = existingVoters.some(v => v.email === email);
+                const identityExists = existingVoters.some(v => v.identity === identity);
+
+                if (emailExists) {
+                    showAlert('Email address already exists for another voter', 'error');
+                    return;
+                }
+
+                if (identityExists) {
+                    showAlert('Identity number already exists for another voter', 'error');
+                    return;
+                }
+
+                // Get organization name
+                const organization = organizations.find(org => org.id === organizationId);
+                if (!organization) {
+                    showAlert('Selected organization not found', 'error');
+                    return;
+                }
+
+                // Handle photo upload
+                let photoBase64 = null;
+                if (photoFile) {
+                    photoBase64 = await convertFileToBase64(photoFile);
+                }
+
+                // Prepare update data
+                const updateData = {
+                    name,
+                    email,
+                    identity,
+                    phone,
+                    organizationId,
+                    organizationName: organization.name,
+                    status,
+                    updatedAt: window.serverTimestamp(),
+                    updatedBy: currentUser.uid
+                };
+
+                // Add photo if provided
+                if (photoBase64) {
+                    updateData.photo = photoBase64;
+                }
+
+                // Update voter in Firestore
+                await window.updateDoc(window.doc(window.firebaseDB, 'voters', voterId), updateData);
+
+                // Add audit log
+                await window.addDoc(window.collection(window.firebaseDB, 'auditLogs'), {
+                    action: 'voter_updated',
+                    details: `Voter updated: ${name}`,
+                    timestamp: window.serverTimestamp(),
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email
+                });
+
+                // Close modal
+                closeModal('editVoterModal');
+
+                // Reload data and update UI
+                await loadData();
+                updateUI();
+                showAlert(`Voter "${name}" updated successfully!`, 'success');
+
+            } catch (error) {
+                console.error('Error updating voter:', error);
+                showAlert('Error updating voter. Please try again.', 'error');
+            }
+        }
+
+        function convertFileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        function deleteVoter(voterId) {
+            if (confirm('Are you sure you want to delete this voter?')) {
+                voters = voters.filter(voter => voter.id !== voterId);
+                localStorage.setItem('pad_voters', JSON.stringify(voters));
+
+                // Add audit log
+                auditLogs.push({
+                    id: 'audit_' + Date.now(),
+                    timestamp: new Date().toISOString(),
+                    event: 'voter_deleted',
+                    details: `Voter deleted`,
+                    userId: currentUser.id
+                });
+                localStorage.setItem('pad_audit', JSON.stringify(auditLogs));
+
+                loadData();
+                updateUI();
+                showAlert('Voter deleted successfully!', 'success');
+            }
+        }
+
+        function resetDemoData() {
+            if (confirm('Are you sure you want to reset all demo data? This action cannot be undone.')) {
+                localStorage.removeItem('pad_polls');
+                localStorage.removeItem('pad_voters');
+                localStorage.removeItem('pad_votes');
+                localStorage.removeItem('pad_audit');
+                
+                // Reinitialize demo data
+                const samplePolls = [
+                    {
+                        id: "poll_20250927_001",
+                        title: "Board Chair Election 2025",
+                        description: "Election for the organization's Board Chair position.",
+                        options: [
+                            { id: "opt1", text: "Alice Anderson", photo: null, bio: "Experienced leader with 10+ years in management" },
+                            { id: "opt2", text: "Ben Brown", photo: null, bio: "Innovative thinker focused on digital transformation" },
+                            { id: "opt3", text: "Carol Chen", photo: null, bio: "Community advocate with strong communication skills" }
+                        ],
+                        type: "single",
+                        maxSelections: 1,
+                        startAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+                        endAt: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString(),
+                        eligibility: { type: "open" },
+                        anonymous: true,
+                        createdBy: "admin_1",
+                        createdAt: new Date().toISOString(),
+                        status: "active"
+                    }
+                ];
+                localStorage.setItem('pad_polls', JSON.stringify(samplePolls));
+                localStorage.setItem('pad_voters', JSON.stringify([]));
+                localStorage.setItem('pad_votes', JSON.stringify([]));
+                localStorage.setItem('pad_audit', JSON.stringify([]));
+
+                loadData();
+                updateUI();
+                showAlert('Demo data reset successfully!', 'success');
+            }
+        }
+
+        function exportResults() {
+            const csv = 'Poll ID,Title,Option,Votes\n' + 
+                polls.map(poll => {
+                    const pollVotes = votes.filter(vote => vote.pollId === poll.id);
+                    return poll.options.map(option => {
+                        const optionVotes = pollVotes.filter(vote => vote.choices.includes(option.id)).length;
+                        return `${poll.id},"${poll.title}","${option.text}",${optionVotes}`;
+                    }).join('\n');
+                }).join('\n');
+            
+            downloadCSV(csv, 'poll_results.csv');
+        }
+
+        function exportAuditLogs() {
+            const csv = 'Timestamp,Event,Details,User\n' + 
+                auditLogs.map(log => 
+                    `"${formatTimestamp(log.timestamp)}","${log.event}","${log.details}","${log.userId || 'System'}"`
+                ).join('\n');
+            
+            downloadCSV(csv, 'audit_logs.csv');
+        }
+
+        function downloadCSV(csv, filename) {
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        async function logout() {
+            try {
+                await signOut(window.firebaseAuth);
+                showLoginSection();
+            } catch (error) {
+                console.error('Logout error:', error);
+                showLoginSection();
+            }
+        }
+
+        function showLoginSection() {
+            document.getElementById('adminLoginSection').style.display = 'flex';
+            document.getElementById('adminDashboardContent').classList.remove('show');
+        }
+
+        function showDashboardSection() {
+            document.getElementById('adminLoginSection').style.display = 'none';
+            document.getElementById('adminDashboardContent').classList.add('show');
+        }
+
+        function toggleAdminPassword() {
+            const passwordInput = document.getElementById('adminPassword');
+            const icon = document.querySelector('.pad-login-input-icon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                icon.textContent = '👁️';
+            }
+        }
+
+        async function handleAdminLogin() {
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPassword').value.trim();
+            const button = document.getElementById('adminLoginBtn');
+            const buttonText = document.getElementById('adminLoginText');
+            const loading = document.getElementById('adminLoginLoading');
+            const errorDiv = document.getElementById('adminLoginError');
+
+            if (!email || !password) {
+                showLoginError('adminLoginError', 'Please fill in all fields');
+                return;
+            }
+
+            // Show loading state
+            button.disabled = true;
+            buttonText.style.display = 'none';
+            loading.style.display = 'flex';
+            hideLoginError('adminLoginError');
+
+            try {
+                // Simple Firebase authentication - no Firestore checks
+                const userCredential = await window.signInWithEmailAndPassword(window.firebaseAuth, email, password);
+                const user = userCredential.user;
+
+                showLoginSuccess('adminLoginSuccess', 'Login successful! Loading dashboard...');
+                hideLoginError('adminLoginError');
+
+                setTimeout(() => {
+                    showDashboardSection();
+                    // Load dashboard data
+                    loadData();
+                    updateUI();
+                    startRealTimeUpdates();
+                }, 1500);
+
+            } catch (error) {
+                console.error('Admin login error:', error);
+                
+                // Reset button state
+                button.disabled = false;
+                buttonText.style.display = 'inline-block';
+                loading.style.display = 'none';
+
+                let errorMessage = 'Login failed. Please check your credentials.';
+                
+                if (error.code === 'auth/user-not-found') {
+                    errorMessage = 'No account found with this email address.';
+                } else if (error.code === 'auth/wrong-password') {
+                    errorMessage = 'Incorrect password. Please try again.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = 'Please enter a valid email address.';
+                } else if (error.code === 'auth/too-many-requests') {
+                    errorMessage = 'Too many failed attempts. Please try again later.';
+                } else if (error.code === 'auth/invalid-credential') {
+                    errorMessage = 'Invalid credentials. Please check your email and password.';
+                } else if (error.code === 'auth/user-disabled') {
+                    errorMessage = 'This account has been disabled.';
+                } else if (error.code === 'auth/operation-not-allowed') {
+                    errorMessage = 'Email/password login is not enabled for this account.';
+                } else if (error.code === 'auth/network-request-failed') {
+                    errorMessage = 'Network error. Please check your connection and try again.';
+                }
+
+                showLoginError('adminLoginError', errorMessage);
+            }
+        }
+
+        function showLoginError(elementId, message) {
+            const errorEl = document.getElementById(elementId);
+            if (errorEl) {
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+            }
+        }
+
+        function hideLoginError(elementId) {
+            const errorEl = document.getElementById(elementId);
+            if (errorEl) {
+                errorEl.style.display = 'none';
+            }
+        }
+
+        function showLoginSuccess(elementId, message) {
+            const successEl = document.getElementById(elementId);
+            if (successEl) {
+                successEl.textContent = message;
+                successEl.style.display = 'block';
+            }
+        }
+
+        function generateOrgCode() {
+            const code = 'ORG' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            document.getElementById('orgCode').value = code;
+        }
+
+        function generateEditOrgCode() {
+            const code = 'ORG' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            document.getElementById('editOrgCode').value = code;
+        }
+
+        async function createOrganization() {
+            const name = document.getElementById('orgName').value;
+            const description = document.getElementById('orgDescription').value;
+            const code = document.getElementById('orgCode').value;
+            
+            if (!name) {
+                showAlert('Please enter organization name', 'error');
+                return;
+            }
+            
+            if (!code) {
+                showAlert('Please generate an organization code', 'error');
+                return;
+            }
+
+            try {
+                const orgData = {
+                    name,
+                    description: description || '',
+                    code,
+                    createdAt: window.serverTimestamp(),
+                    createdBy: currentUser.uid,
+                    status: 'active'
+                };
+
+                const orgRef = await window.addDoc(window.collection(window.firebaseDB, 'organizations'), orgData);
+
+                // Add audit log
+                await window.addDoc(window.collection(window.firebaseDB, 'auditLogs'), {
+                    event: 'organization_created',
+                    details: `Organization "${name}" created with code: ${code}`,
+                    userId: currentUser.uid,
+                    organizationId: orgRef.id,
+                    timestamp: window.serverTimestamp(),
+                    metadata: {
+                        organizationName: name,
+                        organizationCode: code
+                    }
+                });
+
+                // Close modal
+                closeModal('createOrganizationModal');
+                
+                // Reload data and update UI
+                await loadData();
+                updateUI();
+                showAlert(`Organization created successfully! Code: ${code}`, 'success');
+            } catch (error) {
+                console.error('Error creating organization:', error);
+                showAlert('Error creating organization. Please try again.', 'error');
+            }
+        }
+
+        function editOrganization(orgId) {
+            const org = organizations.find(o => o.id === orgId);
+            if (!org) {
+                showAlert('Organization not found', 'error');
+                return;
+            }
+
+            // Populate edit form
+            document.getElementById('editOrgId').value = orgId;
+            document.getElementById('editOrgName').value = org.name;
+            document.getElementById('editOrgDescription').value = org.description || '';
+            document.getElementById('editOrgCode').value = org.code;
+            document.getElementById('editOrgStatus').value = org.status || 'active';
+
+            // Show edit modal
+            document.getElementById('editOrganizationModal').classList.add('show');
+        }
+
+        async function updateOrganization() {
+            const orgId = document.getElementById('editOrgId').value;
+            const name = document.getElementById('editOrgName').value;
+            const description = document.getElementById('editOrgDescription').value;
+            const code = document.getElementById('editOrgCode').value;
+            const status = document.getElementById('editOrgStatus').value;
+            
+            if (!name) {
+                showAlert('Please enter organization name', 'error');
+                return;
+            }
+            
+            if (!code) {
+                showAlert('Please enter organization code', 'error');
+                return;
+            }
+
+            try {
+                const orgData = {
+                    name,
+                    description: description || '',
+                    code,
+                    status,
+                    updatedAt: window.serverTimestamp(),
+                    updatedBy: currentUser.uid
+                };
+
+                await window.updateDoc(window.doc(window.firebaseDB, 'organizations', orgId), orgData);
+
+                // Add audit log
+                await window.addDoc(window.collection(window.firebaseDB, 'auditLogs'), {
+                    event: 'organization_updated',
+                    details: `Organization "${name}" updated`,
+                    userId: currentUser.uid,
+                    organizationId: orgId,
+                    timestamp: window.serverTimestamp(),
+                    metadata: {
+                        organizationName: name,
+                        organizationCode: code,
+                        status: status
+                    }
+                });
+
+                // Close modal
+                closeModal('editOrganizationModal');
+                
+                // Reload data and update UI
+                await loadData();
+                updateUI();
+                showAlert(`Organization "${name}" updated successfully!`, 'success');
+            } catch (error) {
+                console.error('Error updating organization:', error);
+                showAlert('Error updating organization. Please try again.', 'error');
+            }
+        }
+
+        async function deleteOrganization(orgId) {
+            const org = organizations.find(o => o.id === orgId);
+            if (!org) {
+                showAlert('Organization not found', 'error');
+                return;
+            }
+
+            // Check if organization has voters
+            const orgVoters = voters.filter(v => v.organizationId === orgId);
+            if (orgVoters.length > 0) {
+                showAlert(`Cannot delete organization. It has ${orgVoters.length} registered voters. Please reassign or remove voters first.`, 'error');
+                return;
+            }
+
+            // Check if organization has polls
+            const orgPolls = polls.filter(p => p.organizationId === orgId);
+            if (orgPolls.length > 0) {
+                showAlert(`Cannot delete organization. It has ${orgPolls.length} polls. Please delete or reassign polls first.`, 'error');
+                return;
+            }
+
+            if (confirm(`Are you sure you want to delete the organization "${org.name}"? This action cannot be undone.`)) {
+                try {
+                    await window.deleteDoc(window.doc(window.firebaseDB, 'organizations', orgId));
+
+                    // Add audit log
+                    await window.addDoc(window.collection(window.firebaseDB, 'auditLogs'), {
+                        event: 'organization_deleted',
+                        details: `Organization "${org.name}" deleted`,
+                        userId: currentUser.uid,
+                        organizationId: orgId,
+                        timestamp: window.serverTimestamp(),
+                        metadata: {
+                            organizationName: org.name,
+                            organizationCode: org.code
+                        }
+                    });
+
+                    // Reload data and update UI
+                    await loadData();
+                    updateUI();
+                    showAlert(`Organization "${org.name}" deleted successfully!`, 'success');
+                } catch (error) {
+                    console.error('Error deleting organization:', error);
+                    showAlert('Error deleting organization. Please try again.', 'error');
+                }
+            }
+        }
+
+
+        function startRealTimeUpdates() {
+            // Set up real-time listeners for all data
+            window.onSnapshot(window.collection(window.firebaseDB, 'polls'), (snapshot) => {
+                polls = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                updateUI();
+            });
+
+            window.onSnapshot(window.collection(window.firebaseDB, 'voters'), (snapshot) => {
+                voters = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                updateUI();
+            });
+
+            window.onSnapshot(window.collection(window.firebaseDB, 'votes'), (snapshot) => {
+                votes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                updateUI();
+            });
+
+            window.onSnapshot(window.query(window.collection(window.firebaseDB, 'auditLogs'), window.orderBy('timestamp', 'desc')), (snapshot) => {
+                auditLogs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                updateUI();
+            });
+
+            window.onSnapshot(window.collection(window.firebaseDB, 'organizations'), (snapshot) => {
+                organizations = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                updateUI();
+            });
+
+            window.onSnapshot(window.query(window.collection(window.firebaseDB, 'contactMessages'), window.orderBy('createdAt', 'desc')), (snapshot) => {
+                messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                updateUI();
+            });
+        }
+
+        function showAlert(message, type) {
+            const alertEl = document.getElementById('alertMessage');
+            alertEl.textContent = message;
+            alertEl.className = `pad-alert ${type} show`;
+            
+            setTimeout(() => {
+                alertEl.classList.remove('show');
+            }, 5000);
+        }
+
+        // Handle poll type change
+        document.addEventListener('change', function(e) {
+            if (e.target.name === 'pollType') {
+                const maxSelectionsGroup = document.getElementById('maxSelectionsGroup');
+                if (e.target.value === 'multi') {
+                    maxSelectionsGroup.style.display = 'block';
+                } else {
+                    maxSelectionsGroup.style.display = 'none';
+                }
+            }
+        });
+
+        // Full Screen Display Functions
+        let fullScreenPoll = null;
+        let fullScreenRefreshInterval = null;
+        let fullScreenTimerInterval = null;
+
+        function showFullScreenDisplay() {
+            showSection('fullscreen');
+            populateFullScreenPollSelect();
+        }
+
+        function populateFullScreenPollSelect() {
+            const select = document.getElementById('fullscreenPollSelect');
+            select.innerHTML = '<option value="">Select a poll to display</option>';
+            
+            polls.forEach(poll => {
+                const option = document.createElement('option');
+                option.value = poll.id;
+                option.textContent = `${poll.title} (${poll.status})`;
+                select.appendChild(option);
+            });
+        }
+
+        function updateFullScreenDisplay() {
+            const pollId = document.getElementById('fullscreenPollSelect').value;
+            const previewContent = document.getElementById('fullscreenPreviewContent');
+            
+            if (!pollId) {
+                previewContent.innerHTML = `
+                    <div class="pad-fullscreen-placeholder">
+                        <div class="pad-fullscreen-placeholder-icon">📺</div>
+                        <p>No poll selected</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const poll = polls.find(p => p.id === pollId);
+            if (!poll) return;
+
+            const pollVotes = votes.filter(v => v.pollId === pollId);
+            const totalVotes = pollVotes.length;
+            
+            // Calculate results
+            const optionVotes = {};
+            poll.options.forEach(option => {
+                // Handle both string and object options
+                const optionText = typeof option === 'string' ? option : option.text;
+                optionVotes[optionText] = pollVotes.filter(v => v.selectedOptions.includes(optionText)).length;
+            });
+
+            const maxVotes = Math.max(...Object.values(optionVotes));
+            
+            previewContent.innerHTML = `
+                <div class="pad-fullscreen-poll-title">${poll.title}</div>
+                <div class="pad-fullscreen-poll-description">${poll.description}</div>
+                
+                <div class="pad-fullscreen-stats">
+                    <div class="pad-fullscreen-stat">
+                        <div class="pad-fullscreen-stat-number">${totalVotes}</div>
+                        <div class="pad-fullscreen-stat-label">Total Votes</div>
+                    </div>
+                    <div class="pad-fullscreen-stat">
+                        <div class="pad-fullscreen-stat-number">${poll.options.length}</div>
+                        <div class="pad-fullscreen-stat-label">Options</div>
+                    </div>
+                    <div class="pad-fullscreen-stat">
+                        <div class="pad-fullscreen-stat-number">${poll.status}</div>
+                        <div class="pad-fullscreen-stat-label">Status</div>
+                    </div>
+                </div>
+                
+                <div class="pad-fullscreen-results">
+                    <div class="pad-fullscreen-results-header">
+                        <h3 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 1rem; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);">Voting Options & Live Results</h3>
+                    </div>
+                    <div class="pad-fullscreen-options">
+                        ${poll.options.map((option, index) => {
+                            // Handle both string and object options
+                            const optionText = typeof option === 'string' ? option : option.text;
+                            const votes = optionVotes[optionText] || 0;
+                            const percentage = totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
+                            const barWidth = maxVotes > 0 ? (votes / maxVotes) * 100 : 0;
+                            
+                            // Sort options by vote count for ranking
+                            const sortedOptions = poll.options.map(opt => {
+                                const optText = typeof opt === 'string' ? opt : opt.text;
+                                return {
+                                    option: optText,
+                                    votes: optionVotes[optText] || 0
+                                };
+                            }).sort((a, b) => b.votes - a.votes);
+                            
+                            const rank = sortedOptions.findIndex(item => item.option === optionText) + 1;
+                            
+                            return `
+                                <div class="pad-fullscreen-option">
+                                    <div class="pad-fullscreen-option-header">
+                                        <div class="pad-fullscreen-option-rank">#${rank}</div>
+                                        <div class="pad-fullscreen-option-text">${optionText}</div>
+                                    </div>
+                                    <div class="pad-fullscreen-option-stats">
+                                        <div class="pad-fullscreen-option-votes">${votes}</div>
+                                        <div class="pad-fullscreen-option-percentage">${percentage}%</div>
+                                    </div>
+                                    <div class="pad-fullscreen-progress">
+                                        <div class="pad-fullscreen-progress-fill" style="width: ${barWidth}%"></div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function openFullScreen() {
+            const pollId = document.getElementById('fullscreenPollSelect').value;
+            if (!pollId) {
+                showAlert('Please select a poll to display', 'error');
+                return;
+            }
+
+            fullScreenPoll = polls.find(p => p.id === pollId);
+            if (!fullScreenPoll) return;
+
+            document.getElementById('fullscreenDisplay').classList.add('active');
+            updateFullScreenContent();
+            startFullScreenRefresh();
+            startFullScreenTimer();
+            
+            // Request fullscreen
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            }
+        }
+
+        function closeFullScreen() {
+            document.getElementById('fullscreenDisplay').classList.remove('active');
+            stopFullScreenRefresh();
+            stopFullScreenTimer();
+            
+            // Exit fullscreen
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+
+        function updateFullScreenContent() {
+            if (!fullScreenPoll) return;
+
+            const pollVotes = votes.filter(v => v.pollId === fullScreenPoll.id);
+            const totalVotes = pollVotes.length;
+            
+            // Calculate results
+            const optionVotes = {};
+            fullScreenPoll.options.forEach(option => {
+                // Handle both string and object options
+                const optionText = typeof option === 'string' ? option : option.text;
+                optionVotes[optionText] = pollVotes.filter(v => v.selectedOptions.includes(optionText)).length;
+            });
+
+            const maxVotes = Math.max(...Object.values(optionVotes));
+            
+            document.getElementById('fullscreenContent').innerHTML = `
+                <div class="pad-fullscreen-poll-title">${fullScreenPoll.title}</div>
+                <div class="pad-fullscreen-poll-description">${fullScreenPoll.description}</div>
+                
+                <div class="pad-fullscreen-stats">
+                    <div class="pad-fullscreen-stat">
+                        <div class="pad-fullscreen-stat-number">${totalVotes}</div>
+                        <div class="pad-fullscreen-stat-label">Total Votes</div>
+                    </div>
+                    <div class="pad-fullscreen-stat">
+                        <div class="pad-fullscreen-stat-number">${fullScreenPoll.options.length}</div>
+                        <div class="pad-fullscreen-stat-label">Options</div>
+                    </div>
+                    <div class="pad-fullscreen-stat">
+                        <div class="pad-fullscreen-stat-number">${fullScreenPoll.status}</div>
+                        <div class="pad-fullscreen-stat-label">Status</div>
+                    </div>
+                </div>
+                
+                <div class="pad-fullscreen-results">
+                    <div class="pad-fullscreen-results-header">
+                        <h3 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 1rem; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);">Voting Options & Live Results</h3>
+                    </div>
+                    <div class="pad-fullscreen-options">
+                        ${fullScreenPoll.options.map((option, index) => {
+                            // Handle both string and object options
+                            const optionText = typeof option === 'string' ? option : option.text;
+                            const votes = optionVotes[optionText] || 0;
+                            const percentage = totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
+                            const barWidth = maxVotes > 0 ? (votes / maxVotes) * 100 : 0;
+                            
+                            // Sort options by vote count for ranking
+                            const sortedOptions = fullScreenPoll.options.map(opt => {
+                                const optText = typeof opt === 'string' ? opt : opt.text;
+                                return {
+                                    option: optText,
+                                    votes: optionVotes[optText] || 0
+                                };
+                            }).sort((a, b) => b.votes - a.votes);
+                            
+                            const rank = sortedOptions.findIndex(item => item.option === optionText) + 1;
+                            
+                            return `
+                                <div class="pad-fullscreen-option">
+                                    <div class="pad-fullscreen-option-header">
+                                        <div class="pad-fullscreen-option-rank">#${rank}</div>
+                                        <div class="pad-fullscreen-option-text">${optionText}</div>
+                                    </div>
+                                    <div class="pad-fullscreen-option-stats">
+                                        <div class="pad-fullscreen-option-votes">${votes}</div>
+                                        <div class="pad-fullscreen-option-percentage">${percentage}%</div>
+                                    </div>
+                                    <div class="pad-fullscreen-progress">
+                                        <div class="pad-fullscreen-progress-fill" style="width: ${barWidth}%"></div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function refreshFullScreenData() {
+            if (fullScreenPoll) {
+                updateFullScreenContent();
+            }
+        }
+
+        function startFullScreenRefresh() {
+            // Refresh data every 5 seconds
+            fullScreenRefreshInterval = setInterval(() => {
+                refreshFullScreenData();
+            }, 5000);
+        }
+
+        function stopFullScreenRefresh() {
+            if (fullScreenRefreshInterval) {
+                clearInterval(fullScreenRefreshInterval);
+                fullScreenRefreshInterval = null;
+            }
+        }
+
+        function startFullScreenTimer() {
+            if (!fullScreenPoll) return;
+
+            const updateTimer = () => {
+                const now = new Date();
+                const endTime = new Date(fullScreenPoll.endAt);
+                const timeLeft = endTime - now;
+
+                if (timeLeft <= 0) {
+                    document.getElementById('timerValue').textContent = 'Voting Ended';
+                    stopFullScreenTimer();
+                    return;
+                }
+
+                const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                document.getElementById('timerValue').textContent = 
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            };
+
+            updateTimer();
+            fullScreenTimerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function stopFullScreenTimer() {
+            if (fullScreenTimerInterval) {
+                clearInterval(fullScreenTimerInterval);
+                fullScreenTimerInterval = null;
+            }
+        }
+
+        // Handle fullscreen change events
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                closeFullScreen();
+            }
+        });
+
+        // Handle escape key to close fullscreen
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('fullscreenDisplay').classList.contains('active')) {
+                closeFullScreen();
+            }
+        });
+    </script>
+    </div> <!-- End of adminDashboardContent -->
+
+    <footer class="pad-footer">
+        <div class="pad-container">
+            <div class="pad-footer-content">
+                <div>
+                    <p>&copy; 2025 Prince Alex Digital. All rights reserved.</p>
+                </div>
+                <div class="pad-footer-links">
+                    <a href="index.html#contact" class="pad-footer-link">Contact Us</a>
+                    <a href="index.html#features" class="pad-footer-link">Features</a>
+                    <a href="tel:+254717384875" class="pad-footer-link">Call Now</a>
+                </div>
+            </div>
+            <div class="pad-footer-credit">
+                <p>Designed by <a href="https://www.princealex.pro" target="_blank" rel="noopener">Prince Alex Digital</a></p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

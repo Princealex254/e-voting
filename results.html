@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poll Results - Prince Alex Digital E-voting system</title>
+    <style>
+        /* Prince Alex Digital Brand Colors */
+        :root {
+            --pad-primary: #0b6efd;
+            --pad-accent: #10b981;
+            --pad-dark: #0f172a;
+            --pad-light: #f8fafc;
+            --pad-text: #374151;
+            --pad-text-light: #6b7280;
+            --pad-border: #e5e7eb;
+            --pad-success: #10b981;
+            --pad-warning: #f59e0b;
+            --pad-error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Inter, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--pad-light);
+            color: var(--pad-text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .pad-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .pad-header {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .pad-header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .pad-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--pad-dark);
+        }
+
+        .pad-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--pad-primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .pad-logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+        }
+
+        .pad-back-btn {
+            background: var(--pad-text-light);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .pad-back-btn:hover {
+            background: var(--pad-text);
+        }
+
+        .pad-poll-header {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .pad-poll-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            margin-bottom: 1rem;
+        }
+
+        .pad-poll-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .pad-poll-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .pad-poll-status.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--pad-success);
+        }
+
+        .pad-poll-status.closed {
+            background: rgba(107, 114, 128, 0.1);
+            color: var(--pad-text-light);
+        }
+
+        .pad-poll-type {
+            background: var(--pad-light);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: var(--pad-text);
+        }
+
+        .pad-poll-description {
+            color: var(--pad-text-light);
+            font-size: 1.125rem;
+            line-height: 1.6;
+        }
+
+        .pad-results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .pad-results-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .pad-results-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .pad-chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 1rem;
+        }
+
+        .pad-chart-canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .pad-results-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .pad-results-table th,
+        .pad-results-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--pad-border);
+        }
+
+        .pad-results-table th {
+            background: var(--pad-light);
+            font-weight: 600;
+            color: var(--pad-dark);
+        }
+
+        .pad-results-table tr:hover {
+            background: var(--pad-light);
+        }
+
+        .pad-result-option {
+            font-weight: 500;
+            color: var(--pad-dark);
+        }
+
+        .pad-result-votes {
+            color: var(--pad-text-light);
+            font-size: 0.875rem;
+        }
+
+        .pad-result-percentage {
+            font-weight: 600;
+            color: var(--pad-primary);
+        }
+
+        .pad-result-bar {
+            background: var(--pad-border);
+            border-radius: 4px;
+            height: 8px;
+            margin: 0.5rem 0;
+            overflow: hidden;
+        }
+
+        .pad-result-fill {
+            background: var(--pad-primary);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .pad-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .pad-stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .pad-stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--pad-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-stat-label {
+            color: var(--pad-text-light);
+            font-size: 0.875rem;
+        }
+
+        .pad-export-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .pad-export-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 1rem;
+        }
+
+        .pad-export-description {
+            color: var(--pad-text-light);
+            margin-bottom: 2rem;
+        }
+
+        .pad-btn {
+            display: inline-block;
+            padding: 0.875rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            margin: 0 0.5rem;
+        }
+
+        .pad-btn-primary {
+            background: var(--pad-primary);
+            color: white;
+        }
+
+        .pad-btn-primary:hover:not(:disabled) {
+            background: #0a5fd4;
+            transform: translateY(-1px);
+        }
+
+        .pad-btn-secondary {
+            background: var(--pad-accent);
+            color: white;
+        }
+
+        .pad-btn-secondary:hover:not(:disabled) {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .pad-btn-outline {
+            background: transparent;
+            color: var(--pad-primary);
+            border: 2px solid var(--pad-primary);
+        }
+
+        .pad-btn-outline:hover:not(:disabled) {
+            background: var(--pad-primary);
+            color: white;
+        }
+
+        .pad-alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .pad-alert.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--pad-error);
+            color: #991b1b;
+        }
+
+        .pad-alert.show {
+            display: block;
+        }
+
+        .pad-empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--pad-text-light);
+        }
+
+        .pad-empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .pad-empty-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-empty-description {
+            margin-bottom: 1.5rem;
+        }
+
+        .pad-winner-badge {
+            background: var(--pad-success);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .pad-results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .pad-container {
+                padding: 1rem 0.5rem;
+            }
+
+            .pad-poll-header {
+                padding: 1.5rem;
+            }
+
+            .pad-poll-title {
+                font-size: 1.5rem;
+            }
+
+            .pad-results-card {
+                padding: 1.5rem;
+            }
+
+            .pad-chart-container {
+                height: 250px;
+            }
+
+            .pad-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .pad-stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pad-results-table {
+                font-size: 0.875rem;
+            }
+
+            .pad-results-table th,
+            .pad-results-table td {
+                padding: 0.5rem;
+            }
+            
+            .pad-chart-container {
+                height: 250px;
+            }
+            
+            .pad-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.875rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .pad-container {
+                padding: 0.5rem;
+            }
+            
+            .pad-results-card {
+                padding: 1rem;
+            }
+            
+            .pad-chart-container {
+                height: 200px;
+            }
+            
+            .pad-results-table {
+                font-size: 0.8rem;
+            }
+            
+            .pad-results-table th,
+            .pad-results-table td {
+                padding: 0.25rem;
+            }
+            
+            .pad-form-input {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+        }
+
+        /* Footer Styles */
+        .pad-footer {
+            background: var(--pad-dark);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .pad-footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .pad-footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .pad-footer-link {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .pad-footer-link:hover {
+            color: white;
+        }
+
+        .pad-footer-credit {
+            border-top: 1px solid #374151;
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+
+        .pad-footer-credit p {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        .pad-footer-credit a {
+            color: var(--pad-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .pad-footer-credit a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .pad-footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .pad-footer-links {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="pad-header">
+        <div class="pad-container">
+            <div class="pad-header-content">
+                <a href="index.html" class="pad-logo">
+                    <div class="pad-logo-icon">PAD</div>
+                    <div class="pad-logo-text">Prince Alex Digital</div>
+                </a>
+                <a href="dashboard_voter.html" class="pad-back-btn">← Back to Dashboard</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pad-container">
+        <div class="pad-alert" id="alertMessage"></div>
+
+        <div class="pad-poll-header" id="pollHeader">
+            <!-- Poll header will be populated here -->
+        </div>
+
+        <div class="pad-stats-grid" id="statsGrid">
+            <!-- Stats will be populated here -->
+        </div>
+
+        <div class="pad-results-grid" id="resultsGrid">
+            <!-- Results will be populated here -->
+        </div>
+
+        <div class="pad-export-section">
+            <h3 class="pad-export-title">Export Results</h3>
+            <p class="pad-export-description">Download detailed results and audit data for record keeping</p>
+            <button class="pad-btn pad-btn-primary" onclick="exportResults()">Export CSV</button>
+            <button class="pad-btn pad-btn-secondary" onclick="exportPDF()">Export PDF</button>
+            <button class="pad-btn pad-btn-outline" onclick="printResults()">Print Results</button>
+        </div>
+    </main>
+
+    <script>
+        let currentPoll = null;
+        let votes = [];
+        let results = [];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPoll();
+            loadData();
+            calculateResults();
+            renderResults();
+        });
+
+        function loadPoll() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const pollId = urlParams.get('id');
+            
+            if (!pollId) {
+                showAlert('Poll not found', 'error');
+                setTimeout(() => window.location.href = 'dashboard_voter.html', 2000);
+                return;
+            }
+
+            const polls = JSON.parse(localStorage.getItem('pad_polls') || '[]');
+            currentPoll = polls.find(poll => poll.id === pollId);
+            
+            if (!currentPoll) {
+                showAlert('Poll not found', 'error');
+                setTimeout(() => window.location.href = 'dashboard_voter.html', 2000);
+                return;
+            }
+        }
+
+        function loadData() {
+            votes = JSON.parse(localStorage.getItem('pad_votes') || '[]');
+        }
+
+        function calculateResults() {
+            const pollVotes = votes.filter(vote => vote.pollId === currentPoll.id);
+            
+            results = currentPoll.options.map(option => {
+                const optionVotes = pollVotes.filter(vote => vote.choices.includes(option.id)).length;
+                return {
+                    option,
+                    votes: optionVotes
+                };
+            }).sort((a, b) => b.votes - a.votes);
+
+            // Add percentages
+            const totalVotes = pollVotes.length;
+            results.forEach(result => {
+                result.percentage = totalVotes > 0 ? Math.round((result.votes / totalVotes) * 100) : 0;
+            });
+        }
+
+        function renderResults() {
+            renderPollHeader();
+            renderStats();
+            renderCharts();
+        }
+
+        function renderPollHeader() {
+            const now = new Date();
+            const start = new Date(currentPoll.startAt);
+            const end = new Date(currentPoll.endAt);
+            
+            let status = 'closed';
+            let statusText = 'Closed';
+            let statusClass = 'closed';
+            
+            if (start <= now && now <= end && currentPoll.status === 'active') {
+                status = 'active';
+                statusText = 'Active';
+                statusClass = 'active';
+            }
+
+            document.getElementById('pollHeader').innerHTML = `
+                <h1 class="pad-poll-title">${currentPoll.title}</h1>
+                <div class="pad-poll-meta">
+                    <span class="pad-poll-status ${statusClass}">${statusText}</span>
+                    <span class="pad-poll-type">${currentPoll.type === 'single' ? 'Single Choice' : currentPoll.type === 'multi' ? 'Multiple Choice' : 'Ranked Choice'}</span>
+                </div>
+                <p class="pad-poll-description">${currentPoll.description}</p>
+            `;
+        }
+
+        function renderStats() {
+            const totalVotes = votes.filter(vote => vote.pollId === currentPoll.id).length;
+            const totalVoters = JSON.parse(localStorage.getItem('pad_voters') || '[]').length;
+            const participationRate = totalVoters > 0 ? Math.round((totalVotes / totalVoters) * 100) : 0;
+            const winningOption = results[0];
+            const winningVotes = winningOption ? winningOption.votes : 0;
+
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="pad-stat-card">
+                    <div class="pad-stat-number">${totalVotes}</div>
+                    <div class="pad-stat-label">Total Votes</div>
+                </div>
+                <div class="pad-stat-card">
+                    <div class="pad-stat-number">${participationRate}%</div>
+                    <div class="pad-stat-label">Participation Rate</div>
+                </div>
+                <div class="pad-stat-card">
+                    <div class="pad-stat-number">${currentPoll.options.length}</div>
+                    <div class="pad-stat-label">Options</div>
+                </div>
+                <div class="pad-stat-card">
+                    <div class="pad-stat-number">${winningVotes}</div>
+                    <div class="pad-stat-label">Winning Votes</div>
+                </div>
+            `;
+        }
+
+        function renderCharts() {
+            const totalVotes = votes.filter(vote => vote.pollId === currentPoll.id).length;
+            
+            if (totalVotes === 0) {
+                document.getElementById('resultsGrid').innerHTML = `
+                    <div class="pad-empty-state">
+                        <div class="pad-empty-icon">📊</div>
+                        <div class="pad-empty-title">No votes yet</div>
+                        <div class="pad-empty-description">Results will appear here once votes are cast.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            document.getElementById('resultsGrid').innerHTML = `
+                <div class="pad-results-card">
+                    <h3 class="pad-results-title">Bar Chart</h3>
+                    <div class="pad-chart-container">
+                        <canvas class="pad-chart-canvas" id="barChart"></canvas>
+                    </div>
+                </div>
+                <div class="pad-results-card">
+                    <h3 class="pad-results-title">Pie Chart</h3>
+                    <div class="pad-chart-container">
+                        <canvas class="pad-chart-canvas" id="pieChart"></canvas>
+                    </div>
+                </div>
+                <div class="pad-results-card" style="grid-column: 1 / -1;">
+                    <h3 class="pad-results-title">Detailed Results</h3>
+                    <table class="pad-results-table">
+                        <thead>
+                            <tr>
+                                <th>Option</th>
+                                <th>Votes</th>
+                                <th>Percentage</th>
+                                <th>Visual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${results.map((result, index) => `
+                                <tr>
+                                    <td class="pad-result-option">
+                                        ${result.option.text}
+                                        ${index === 0 && result.votes > 0 ? '<span class="pad-winner-badge">Winner</span>' : ''}
+                                    </td>
+                                    <td class="pad-result-votes">${result.votes}</td>
+                                    <td class="pad-result-percentage">${result.percentage}%</td>
+                                    <td>
+                                        <div class="pad-result-bar">
+                                            <div class="pad-result-fill" style="width: ${result.percentage}%"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            // Draw charts
+            setTimeout(() => {
+                drawBarChart();
+                drawPieChart();
+            }, 100);
+        }
+
+        function drawBarChart() {
+            const canvas = document.getElementById('barChart');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            const width = rect.width;
+            const height = rect.height;
+            const padding = 40;
+            const chartWidth = width - 2 * padding;
+            const chartHeight = height - 2 * padding;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+
+            // Draw axes
+            ctx.strokeStyle = var(--pad-border);
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, height - padding);
+            ctx.lineTo(width - padding, height - padding);
+            ctx.stroke();
+
+            // Draw bars
+            const maxVotes = Math.max(...results.map(r => r.votes));
+            const barWidth = chartWidth / results.length * 0.8;
+            const barSpacing = chartWidth / results.length * 0.2;
+
+            results.forEach((result, index) => {
+                const barHeight = (result.votes / maxVotes) * chartHeight;
+                const x = padding + index * (barWidth + barSpacing) + barSpacing / 2;
+                const y = height - padding - barHeight;
+
+                // Draw bar
+                ctx.fillStyle = index === 0 ? var(--pad-success) : var(--pad-primary);
+                ctx.fillRect(x, y, barWidth, barHeight);
+
+                // Draw value on top
+                ctx.fillStyle = var(--pad-text);
+                ctx.font = '12px Inter';
+                ctx.textAlign = 'center';
+                ctx.fillText(result.votes.toString(), x + barWidth / 2, y - 5);
+
+                // Draw option name
+                ctx.fillStyle = var(--pad-text-light);
+                ctx.font = '10px Inter';
+                ctx.fillText(result.option.text.substring(0, 10) + (result.option.text.length > 10 ? '...' : ''), x + barWidth / 2, height - padding + 15);
+            });
+        }
+
+        function drawPieChart() {
+            const canvas = document.getElementById('pieChart');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            const width = rect.width;
+            const height = rect.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(width, height) / 2 - 20;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+
+            const totalVotes = results.reduce((sum, result) => sum + result.votes, 0);
+            if (totalVotes === 0) return;
+
+            let currentAngle = -Math.PI / 2; // Start from top
+
+            const colors = [var(--pad-primary), var(--pad-accent), var(--pad-warning), var(--pad-error), '#8b5cf6', '#06b6d4'];
+
+            results.forEach((result, index) => {
+                if (result.votes === 0) return;
+
+                const sliceAngle = (result.votes / totalVotes) * 2 * Math.PI;
+                
+                // Draw slice
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+                ctx.closePath();
+                ctx.fillStyle = colors[index % colors.length];
+                ctx.fill();
+
+                // Draw label
+                const labelAngle = currentAngle + sliceAngle / 2;
+                const labelX = centerX + Math.cos(labelAngle) * (radius + 20);
+                const labelY = centerY + Math.sin(labelAngle) * (radius + 20);
+                
+                ctx.fillStyle = var(--pad-text);
+                ctx.font = '12px Inter';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${result.percentage}%`, labelX, labelY);
+
+                currentAngle += sliceAngle;
+            });
+        }
+
+        function exportResults() {
+            const csv = 'Option,Votes,Percentage\n' + 
+                results.map(result => 
+                    `"${result.option.text}",${result.votes},${result.percentage}%`
+                ).join('\n');
+            
+            downloadCSV(csv, `poll_results_${currentPoll.id}.csv`);
+        }
+
+        function exportPDF() {
+            // Simple PDF generation using window.print()
+            window.print();
+        }
+
+        function printResults() {
+            window.print();
+        }
+
+        function downloadCSV(csv, filename) {
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function showAlert(message, type) {
+            const alertEl = document.getElementById('alertMessage');
+            alertEl.textContent = message;
+            alertEl.className = `pad-alert ${type} show`;
+            
+            setTimeout(() => {
+                alertEl.classList.remove('show');
+            }, 5000);
+        }
+
+        // Auto-refresh results every 30 seconds
+        setInterval(() => {
+            loadData();
+            calculateResults();
+            renderResults();
+        }, 30000);
+    </script>
+
+    <footer class="pad-footer">
+        <div class="pad-container">
+            <div class="pad-footer-content">
+                <div>
+                    <p>&copy; 2025 Prince Alex Digital. All rights reserved.</p>
+                </div>
+                <div class="pad-footer-links">
+                    <a href="index.html#contact" class="pad-footer-link">Contact Us</a>
+                    <a href="index.html#features" class="pad-footer-link">Features</a>
+                    <a href="tel:+254717384875" class="pad-footer-link">Call Now</a>
+                </div>
+            </div>
+            <div class="pad-footer-credit">
+                <p>Designed by <a href="https://www.princealex.pro" target="_blank" rel="noopener">Prince Alex Digital</a></p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

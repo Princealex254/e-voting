@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prince Alex Digital E-voting system - Documentation</title>
+    <style>
+        /* Prince Alex Digital Brand Colors */
+        :root {
+            --pad-primary: #0b6efd;
+            --pad-accent: #10b981;
+            --pad-dark: #0f172a;
+            --pad-light: #f8fafc;
+            --pad-text: #374151;
+            --pad-text-light: #6b7280;
+            --pad-border: #e5e7eb;
+            --pad-success: #10b981;
+            --pad-warning: #f59e0b;
+            --pad-error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Inter, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--pad-light);
+            color: var(--pad-text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .pad-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .pad-header {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .pad-header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .pad-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--pad-dark);
+        }
+
+        .pad-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--pad-primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .pad-logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+        }
+
+        .pad-back-btn {
+            background: var(--pad-text-light);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .pad-back-btn:hover {
+            background: var(--pad-text);
+        }
+
+        .pad-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .pad-subtitle {
+            font-size: 1.25rem;
+            color: var(--pad-text-light);
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .pad-section {
+            margin-bottom: 3rem;
+        }
+
+        .pad-section-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--pad-primary);
+            padding-bottom: 0.5rem;
+        }
+
+        .pad-text {
+            font-size: 1.125rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .pad-toc {
+            background: var(--pad-light);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .pad-toc-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            margin-bottom: 1rem;
+        }
+
+        .pad-toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .pad-toc-list li {
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-toc-list a {
+            color: var(--pad-primary);
+            text-decoration: none;
+        }
+
+        .pad-toc-list a:hover {
+            text-decoration: underline;
+        }
+
+        .pad-feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .pad-feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .pad-feature-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .pad-feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .pad-feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .pad-feature-desc {
+            color: var(--pad-text-light);
+            line-height: 1.6;
+        }
+
+        .pad-benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .pad-benefit-item {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .pad-benefit-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .pad-benefit-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .pad-benefit-desc {
+            color: var(--pad-text-light);
+            line-height: 1.6;
+        }
+
+        .pad-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .pad-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .pad-step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--pad-primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.125rem;
+            flex-shrink: 0;
+        }
+
+        .pad-step-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-step-desc {
+            color: var(--pad-text-light);
+            line-height: 1.6;
+        }
+
+        .pad-security-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .pad-security-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .pad-security-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .pad-security-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .pad-security-desc {
+            color: var(--pad-text-light);
+            line-height: 1.6;
+        }
+
+        .pad-trust-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .pad-trust-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--pad-success);
+            color: white;
+            border-radius: 25px;
+            font-weight: 500;
+        }
+
+        .pad-trust-icon {
+            font-size: 1.125rem;
+        }
+
+        .pad-pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .pad-pricing-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .pad-pricing-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .pad-pricing-popular {
+            border: 2px solid var(--pad-primary);
+            transform: scale(1.05);
+        }
+
+        .pad-pricing-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--pad-primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .pad-pricing-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .pad-pricing-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-pricing-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--pad-primary);
+        }
+
+        .pad-pricing-period {
+            font-size: 1rem;
+            color: var(--pad-text-light);
+            font-weight: 400;
+        }
+
+        .pad-pricing-features {
+            margin-bottom: 2rem;
+        }
+
+        .pad-pricing-feature {
+            padding: 0.5rem 0;
+            color: var(--pad-text);
+            font-weight: 500;
+        }
+
+        .pad-pricing-content {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .pad-pricing-intro {
+            margin-bottom: 3rem;
+        }
+
+        .pad-pricing-subtitle {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 1rem;
+        }
+
+        .pad-pricing-desc {
+            font-size: 1.125rem;
+            color: var(--pad-text-light);
+            line-height: 1.7;
+        }
+
+        .pad-pricing-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .pad-pricing-feature-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .pad-pricing-feature-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .pad-pricing-feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .pad-pricing-feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .pad-pricing-feature-desc {
+            color: var(--pad-text-light);
+            line-height: 1.6;
+        }
+
+        .pad-pricing-cta {
+            background: var(--pad-light);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            margin-top: 3rem;
+        }
+
+        .pad-pricing-cta-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 1rem;
+        }
+
+        .pad-pricing-cta-desc {
+            font-size: 1.125rem;
+            color: var(--pad-text-light);
+            margin-bottom: 2rem;
+            line-height: 1.7;
+        }
+
+        .pad-pricing-cta-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .pad-support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .pad-support-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .pad-support-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .pad-support-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-support-desc {
+            color: var(--pad-text);
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .pad-support-time {
+            color: var(--pad-text-light);
+            font-size: 0.875rem;
+        }
+
+        .pad-contact-cta {
+            text-align: center;
+            margin: 3rem 0;
+            padding: 2rem;
+            background: var(--pad-light);
+            border-radius: 12px;
+        }
+
+        .pad-cta-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 1rem;
+        }
+
+        .pad-cta-desc {
+            color: var(--pad-text-light);
+            margin-bottom: 2rem;
+        }
+
+        .pad-demo-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            margin: 2rem 0;
+        }
+
+        .pad-demo-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 1rem;
+        }
+
+        .pad-demo-desc {
+            color: var(--pad-text-light);
+            margin-bottom: 2rem;
+        }
+
+        .pad-demo-features {
+            margin-bottom: 2rem;
+        }
+
+        .pad-demo-feature {
+            padding: 0.5rem 0;
+            color: var(--pad-text);
+            font-weight: 500;
+        }
+
+        .pad-demo-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .pad-demo-placeholder {
+            background: var(--pad-light);
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            border: 2px dashed var(--pad-border);
+        }
+
+        .pad-demo-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .pad-contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .pad-contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .pad-contact-icon {
+            font-size: 2rem;
+            margin-top: 0.25rem;
+        }
+
+        .pad-contact-details h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-contact-details p {
+            color: var(--pad-text);
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .pad-contact-details small {
+            color: var(--pad-text-light);
+            font-size: 0.875rem;
+        }
+
+        .pad-contact-details a {
+            color: var(--pad-primary);
+            text-decoration: none;
+        }
+
+        .pad-contact-details a:hover {
+            text-decoration: underline;
+        }
+
+        .pad-btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            margin: 0.25rem;
+        }
+
+        .pad-btn-primary {
+            background: var(--pad-primary);
+            color: white;
+        }
+
+        .pad-btn-primary:hover {
+            background: #0a5fd4;
+            transform: translateY(-1px);
+        }
+
+        .pad-btn-secondary {
+            background: var(--pad-accent);
+            color: white;
+        }
+
+        .pad-btn-secondary:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .pad-btn-outline {
+            background: transparent;
+            color: var(--pad-primary);
+            border: 2px solid var(--pad-primary);
+        }
+
+        .pad-btn-outline:hover {
+            background: var(--pad-primary);
+            color: white;
+        }
+
+        .pad-btn-large {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+        }
+
+        .pad-info {
+            background: rgba(11, 110, 253, 0.1);
+            border: 1px solid var(--pad-primary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .pad-info-title {
+            font-weight: 600;
+            color: var(--pad-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-info-text {
+            color: var(--pad-primary);
+        }
+
+        .pad-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--pad-success);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .pad-success-title {
+            font-weight: 600;
+            color: #065f46;
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-success-text {
+            color: #065f46;
+        }
+
+        .pad-footer {
+            background: var(--pad-dark);
+            color: white;
+            padding: 3rem 0 1rem;
+            margin-top: 4rem;
+        }
+
+        .pad-footer-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .pad-footer-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .pad-footer-desc {
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        .pad-footer-subtitle {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .pad-footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .pad-footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .pad-footer-links a:hover {
+            color: white;
+        }
+
+        .pad-footer-bottom {
+            max-width: 1000px;
+            margin: 2rem auto 0;
+            padding: 2rem 1rem 0;
+            border-top: 1px solid #374151;
+            text-align: center;
+            color: #94a3b8;
+        }
+
+        .pad-footer-bottom a {
+            color: var(--pad-accent);
+            text-decoration: none;
+        }
+
+        .pad-footer-bottom a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .pad-title {
+                font-size: 2rem;
+            }
+            
+            .pad-demo-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .pad-demo-actions {
+                justify-content: center;
+            }
+            
+            .pad-feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pad-benefits-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pad-pricing-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pad-support-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pad-contact-info {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .pad-container {
+                padding: 1rem 0.5rem;
+            }
+            
+            .pad-title {
+                font-size: 1.75rem;
+            }
+            
+            .pad-subtitle {
+                font-size: 1rem;
+            }
+            
+            .pad-card {
+                padding: 1rem;
+            }
+            
+            .pad-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.875rem;
+            }
+            
+            .pad-form-input {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="pad-header">
+        <div class="pad-container">
+            <div class="pad-header-content">
+                <a href="index.html" class="pad-logo">
+                    <div class="pad-logo-icon">PAD</div>
+                    <div class="pad-logo-text">Prince Alex Digital</div>
+                </a>
+                <a href="index.html" class="pad-back-btn">← Back to Home</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pad-container">
+        <div class="pad-content">
+            <h1 class="pad-title">Prince Alex Digital E-voting system</h1>
+            <p class="pad-subtitle">Secure, Transparent, and Accessible Digital Voting Platform</p>
+
+            <div class="pad-toc">
+                <h3 class="pad-toc-title">Table of Contents</h3>
+                <ul class="pad-toc-list">
+                    <li><a href="#overview">About Our System</a></li>
+                    <li><a href="#features">Key Features</a></li>
+                    <li><a href="#benefits">Why Choose Us</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li><a href="#security">Security & Trust</a></li>
+                    <li><a href="#pricing">Pricing & Plans</a></li>
+                    <li><a href="#support">Support & Contact</a></li>
+                    <li><a href="#demo">Try Our Demo</a></li>
+                </ul>
+            </div>
+
+            <div class="pad-section" id="overview">
+                <h2 class="pad-section-title">About Our System</h2>
+                <p class="pad-text">
+                    Prince Alex Digital E-voting system is a modern, secure, and user-friendly digital voting platform 
+                    designed specifically for organizations, unions, communities, and institutions. Our system makes 
+                    voting accessible, transparent, and trustworthy while maintaining the highest standards of security 
+                    and integrity.
+                </p>
+                
+                <div class="pad-info">
+                    <div class="pad-info-title">🎯 What We Offer</div>
+                    <div class="pad-info-text">
+                        • Secure online voting for any organization size<br>
+                        • Real-time results and live updates<br>
+                        • Mobile-friendly design for accessibility<br>
+                        • Complete audit trails for transparency<br>
+                        • Multiple voting options (single choice, multiple choice, ranked choice)<br>
+                        • Organization-specific voting environments<br>
+                        • Easy voter registration and management<br>
+                        • Professional admin dashboard<br>
+                        • Export capabilities for results and reports<br>
+                        • 24/7 technical support
+                    </div>
+                </div>
+
+                <div class="pad-success">
+                    <div class="pad-success-title">🚀 Trusted by Organizations</div>
+                    <div class="pad-success-text">
+                        Our platform is trusted by organizations worldwide for conducting secure, transparent, 
+                        and efficient digital elections. Each organization gets their own secure voting environment 
+                        with unique access codes and complete data isolation.
+                    </div>
+                </div>
+            </div>
+
+            <div class="pad-section" id="features">
+                <h2 class="pad-section-title">Key Features</h2>
+                
+                <div class="pad-feature-grid">
+                    <div class="pad-feature-card">
+                        <div class="pad-feature-icon">🔐</div>
+                        <h3 class="pad-feature-title">Secure Authentication</h3>
+                        <p class="pad-feature-desc">Advanced security with OTP verification, encrypted data transmission, and secure user authentication to protect your voting process.</p>
+                    </div>
+                    
+                    <div class="pad-feature-card">
+                        <div class="pad-feature-icon">📱</div>
+                        <h3 class="pad-feature-title">Mobile-First Design</h3>
+                        <p class="pad-feature-desc">Fully responsive design that works perfectly on all devices - desktop, tablet, and mobile phones for maximum accessibility.</p>
+                    </div>
+                    
+                    <div class="pad-feature-card">
+                        <div class="pad-feature-icon">⚡</div>
+                        <h3 class="pad-feature-title">Real-Time Results</h3>
+                        <p class="pad-feature-desc">Live voting results with interactive charts and instant updates as votes are cast, providing transparency and engagement.</p>
+                    </div>
+                    
+                    <div class="pad-feature-card">
+                        <div class="pad-feature-icon">🏢</div>
+                        <h3 class="pad-feature-title">Organization Management</h3>
+                        <p class="pad-feature-desc">Dedicated voting environments for each organization with unique access codes and complete data isolation.</p>
+                    </div>
+                    
+                    <div class="pad-feature-card">
+                        <div class="pad-feature-icon">📊</div>
+                        <h3 class="pad-feature-title">Multiple Poll Types</h3>
+                        <p class="pad-feature-desc">Support for single choice, multiple choice, and ranked choice voting to accommodate any voting scenario.</p>
+                    </div>
+                    
+                    <div class="pad-feature-card">
+                        <div class="pad-feature-icon">🔍</div>
+                        <h3 class="pad-feature-title">Complete Audit Trail</h3>
+                        <p class="pad-feature-desc">Comprehensive logging and audit trails for complete transparency and compliance with election regulations.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pad-section" id="benefits">
+                <h2 class="pad-section-title">Why Choose Us</h2>
+                
+                <div class="pad-benefits-grid">
+                    <div class="pad-benefit-item">
+                        <div class="pad-benefit-icon">⚡</div>
+                        <h3 class="pad-benefit-title">Easy Setup</h3>
+                        <p class="pad-benefit-desc">Get your voting system up and running in minutes. No complex installation or technical expertise required.</p>
+                    </div>
+                    
+                    <div class="pad-benefit-item">
+                        <div class="pad-benefit-icon">🔒</div>
+                        <h3 class="pad-benefit-title">Bank-Level Security</h3>
+                        <p class="pad-benefit-desc">Advanced encryption, secure authentication, and tamper-proof audit trails ensure your votes are protected.</p>
+                    </div>
+                    
+                    <div class="pad-benefit-item">
+                        <div class="pad-benefit-icon">📱</div>
+                        <h3 class="pad-benefit-title">Accessible Everywhere</h3>
+                        <p class="pad-benefit-desc">Vote from any device, anywhere. Our mobile-first design ensures everyone can participate.</p>
+                    </div>
+                    
+                    <div class="pad-benefit-item">
+                        <div class="pad-benefit-icon">📊</div>
+                        <h3 class="pad-benefit-title">Real-Time Results</h3>
+                        <p class="pad-benefit-desc">See results as they happen with live updates and interactive charts for complete transparency.</p>
+                    </div>
+                    
+                    <div class="pad-benefit-item">
+                        <div class="pad-benefit-icon">🏢</div>
+                        <h3 class="pad-benefit-title">Scalable Solution</h3>
+                        <p class="pad-benefit-desc">From small groups to large organizations, our system scales to meet your voting needs.</p>
+                    </div>
+                    
+                    <div class="pad-benefit-item">
+                        <div class="pad-benefit-icon">🎯</div>
+                        <h3 class="pad-benefit-title">Dedicated Support</h3>
+                        <p class="pad-benefit-desc">24/7 technical support and dedicated account management to ensure your voting runs smoothly.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pad-section" id="how-it-works">
+                <h2 class="pad-section-title">How It Works</h2>
+                
+                <div class="pad-steps">
+                    <div class="pad-step">
+                        <div class="pad-step-number">1</div>
+                        <div class="pad-step-content">
+                            <h3 class="pad-step-title">Organization Setup</h3>
+                            <p class="pad-step-desc">We create a secure voting environment for your organization with unique access codes and settings.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="pad-step">
+                        <div class="pad-step-number">2</div>
+                        <div class="pad-step-content">
+                            <h3 class="pad-step-title">Voter Registration</h3>
+                            <p class="pad-step-desc">Voters register using their organization code and verify their identity through secure OTP verification.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="pad-step">
+                        <div class="pad-step-number">3</div>
+                        <div class="pad-step-content">
+                            <h3 class="pad-step-title">Poll Creation</h3>
+                            <p class="pad-step-desc">Admins create polls with custom options, timing, and voting rules tailored to your needs.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="pad-step">
+                        <div class="pad-step-number">4</div>
+                        <div class="pad-step-content">
+                            <h3 class="pad-step-title">Secure Voting</h3>
+                            <p class="pad-step-desc">Voters cast their votes securely with real-time confirmation and receipt generation.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="pad-step">
+                        <div class="pad-step-number">5</div>
+                        <div class="pad-step-content">
+                            <h3 class="pad-step-title">Live Results</h3>
+                            <p class="pad-step-desc">View real-time results with interactive charts and export capabilities for reporting.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pad-section" id="security">
+                <h2 class="pad-section-title">Security & Trust</h2>
+                
+                <div class="pad-security-features">
+                    <div class="pad-security-item">
+                        <div class="pad-security-icon">🔐</div>
+                        <h3 class="pad-security-title">End-to-End Encryption</h3>
+                        <p class="pad-security-desc">All data is encrypted in transit and at rest using industry-standard encryption protocols.</p>
+                    </div>
+                    
+                    <div class="pad-security-item">
+                        <div class="pad-security-icon">🛡️</div>
+                        <h3 class="pad-security-title">Secure Authentication</h3>
+                        <p class="pad-security-desc">Multi-factor authentication with OTP verification ensures only authorized users can access the system.</p>
+                    </div>
+                    
+                    <div class="pad-security-item">
+                        <div class="pad-security-icon">🔍</div>
+                        <h3 class="pad-security-title">Audit Trail</h3>
+                        <p class="pad-security-desc">Complete logging of all activities ensures transparency and compliance with election regulations.</p>
+                    </div>
+                    
+                    <div class="pad-security-item">
+                        <div class="pad-security-icon">🚫</div>
+                        <h3 class="pad-security-title">Vote Integrity</h3>
+                        <p class="pad-security-desc">Tamper-proof vote storage with cryptographic verification prevents any manipulation of results.</p>
+                    </div>
+                </div>
+
+                <div class="pad-trust-badges">
+                    <div class="pad-trust-item">
+                        <div class="pad-trust-icon">✅</div>
+                        <span class="pad-trust-text">SOC 2 Compliant</span>
+                    </div>
+                    <div class="pad-trust-item">
+                        <div class="pad-trust-icon">✅</div>
+                        <span class="pad-trust-text">GDPR Compliant</span>
+                    </div>
+                    <div class="pad-trust-item">
+                        <div class="pad-trust-icon">✅</div>
+                        <span class="pad-trust-text">ISO 27001 Certified</span>
+                    </div>
+                    <div class="pad-trust-item">
+                        <div class="pad-trust-icon">✅</div>
+                        <span class="pad-trust-text">99.9% Uptime SLA</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pad-section" id="pricing">
+                <h2 class="pad-section-title">Pricing & Plans</h2>
+                
+                <div class="pad-pricing-content">
+                    <div class="pad-pricing-intro">
+                        <h3 class="pad-pricing-subtitle">Affordable Solutions for Every Organization</h3>
+                        <p class="pad-pricing-desc">
+                            We understand that every organization has unique needs and budgets. Our pricing is designed to be 
+                            affordable and flexible, with options that can be customized to fit your specific requirements.
+                        </p>
+                    </div>
+
+                    <div class="pad-pricing-features">
+                        <div class="pad-pricing-feature-item">
+                            <div class="pad-pricing-feature-icon">💰</div>
+                            <h4 class="pad-pricing-feature-title">Affordable Pricing</h4>
+                            <p class="pad-pricing-feature-desc">Competitive rates that won't break your budget</p>
+                        </div>
+                        
+                        <div class="pad-pricing-feature-item">
+                            <div class="pad-pricing-feature-icon">🤝</div>
+                            <h4 class="pad-pricing-feature-title">Negotiable Terms</h4>
+                            <p class="pad-pricing-feature-desc">Flexible pricing that can be adjusted to your needs</p>
+                        </div>
+                        
+                        <div class="pad-pricing-feature-item">
+                            <div class="pad-pricing-feature-icon">📊</div>
+                            <h4 class="pad-pricing-feature-title">Scalable Solutions</h4>
+                            <p class="pad-pricing-feature-desc">From small groups to large organizations</p>
+                        </div>
+                        
+                        <div class="pad-pricing-feature-item">
+                            <div class="pad-pricing-feature-icon">🎯</div>
+                            <h4 class="pad-pricing-feature-title">Custom Packages</h4>
+                            <p class="pad-pricing-feature-desc">Tailored solutions for your specific requirements</p>
+                        </div>
+                    </div>
+
+                    <div class="pad-pricing-cta">
+                        <h3 class="pad-pricing-cta-title">Ready to Discuss Your Needs?</h3>
+                        <p class="pad-pricing-cta-desc">
+                            Contact our team today for a personalized quote and to discuss how we can create 
+                            an affordable solution that works perfectly for your organization.
+                        </p>
+                        <div class="pad-pricing-cta-actions">
+                            <a href="#contact" class="pad-btn pad-btn-primary pad-btn-large">Get Custom Quote</a>
+                            <a href="tel:+254717384875" class="pad-btn pad-btn-outline pad-btn-large">Call Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pad-section" id="support">
+                <h2 class="pad-section-title">Support & Contact</h2>
+                
+                <div class="pad-support-grid">
+                    <div class="pad-support-item">
+                        <div class="pad-support-icon">📞</div>
+                        <h3 class="pad-support-title">Phone Support</h3>
+                        <p class="pad-support-desc">+254 717 384 875</p>
+                        <p class="pad-support-time">Mon-Fri: 8AM-6PM EAT</p>
+                    </div>
+                    
+                    <div class="pad-support-item">
+                        <div class="pad-support-icon">✉️</div>
+                        <h3 class="pad-support-title">Email Support</h3>
+                        <p class="pad-support-desc">senerwaalex@gmail.com</p>
+                        <p class="pad-support-time">Response within 24 hours</p>
+                    </div>
+                    
+                    <div class="pad-support-item">
+                        <div class="pad-support-icon">💬</div>
+                        <h3 class="pad-support-title">Live Chat</h3>
+                        <p class="pad-support-desc">Available on our website</p>
+                        <p class="pad-support-time">24/7 for Enterprise customers</p>
+                    </div>
+                    
+                    <div class="pad-support-item">
+                        <div class="pad-support-icon">📚</div>
+                        <h3 class="pad-support-title">Documentation</h3>
+                        <p class="pad-support-desc">Comprehensive guides</p>
+                        <p class="pad-support-time">Always available online</p>
+                    </div>
+                </div>
+
+                <div class="pad-contact-cta">
+                    <h3 class="pad-cta-title">Ready to Get Started?</h3>
+                    <p class="pad-cta-desc">Contact us today for a free consultation and demo of our e-voting system.</p>
+                    <a href="#contact" class="pad-btn pad-btn-primary pad-btn-large">Contact Us Now</a>
+                </div>
+            </div>
+
+            <div class="pad-section" id="demo">
+                <h2 class="pad-section-title">Try Our Demo</h2>
+                
+                <div class="pad-demo-content">
+                    <div class="pad-demo-info">
+                        <h3 class="pad-demo-title">Experience Our System</h3>
+                        <p class="pad-demo-desc">
+                            Try our interactive demo to see how our e-voting system works. 
+                            Experience the voter registration, voting process, and admin dashboard.
+                        </p>
+                        
+                        <div class="pad-demo-features">
+                            <div class="pad-demo-feature">✓ Full voter registration flow</div>
+                            <div class="pad-demo-feature">✓ Secure voting process</div>
+                            <div class="pad-demo-feature">✓ Real-time results</div>
+                            <div class="pad-demo-feature">✓ Admin dashboard</div>
+                            <div class="pad-demo-feature">✓ Mobile-responsive design</div>
+                        </div>
+                        
+                        <div class="pad-demo-actions">
+                            <a href="index.html" class="pad-btn pad-btn-primary">Start Demo</a>
+                            <a href="#contact" class="pad-btn pad-btn-outline">Schedule Live Demo</a>
+                        </div>
+                    </div>
+                    
+                    <div class="pad-demo-image">
+                        <div class="pad-demo-placeholder">
+                            <div class="pad-demo-icon">🖥️</div>
+                            <p>Interactive Demo Preview</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pad-section" id="contact">
+                <h2 class="pad-section-title">Get In Touch</h2>
+                
+                <div class="pad-contact-info">
+                    <div class="pad-contact-item">
+                        <div class="pad-contact-icon">📞</div>
+                        <div class="pad-contact-details">
+                            <h3>Phone</h3>
+                            <p>+254 717 384 875</p>
+                            <small>Mon-Fri: 8AM-6PM EAT</small>
+                        </div>
+                    </div>
+                    
+                    <div class="pad-contact-item">
+                        <div class="pad-contact-icon">✉️</div>
+                        <div class="pad-contact-details">
+                            <h3>Email</h3>
+                            <p>senerwaalex@gmail.com</p>
+                            <small>Response within 24 hours</small>
+                        </div>
+                    </div>
+                    
+                    <div class="pad-contact-item">
+                        <div class="pad-contact-icon">🌐</div>
+                        <div class="pad-contact-details">
+                            <h3>Website</h3>
+                            <p><a href="https://www.princealex.pro" target="_blank">www.princealex.pro</a></p>
+                            <small>Visit our website for more info</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="pad-footer">
+        <div class="pad-footer-content">
+            <div class="pad-footer-section">
+                <h3 class="pad-footer-title">Prince Alex Digital E-voting system</h3>
+                <p class="pad-footer-desc">Secure, transparent, and accessible digital voting for organizations worldwide.</p>
+            </div>
+            
+            <div class="pad-footer-section">
+                <h4 class="pad-footer-subtitle">Quick Links</h4>
+                <ul class="pad-footer-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="#security">Security</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+            
+            <div class="pad-footer-section">
+                <h4 class="pad-footer-subtitle">Support</h4>
+                <ul class="pad-footer-links">
+                    <li><a href="tel:+254717384875">+254 717 384 875</a></li>
+                    <li><a href="mailto:senerwaalex@gmail.com">senerwaalex@gmail.com</a></li>
+                    <li><a href="https://www.princealex.pro" target="_blank">www.princealex.pro</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="pad-footer-bottom">
+            <p>&copy; 2024 Prince Alex Digital. All rights reserved.</p>
+            <p>Designed by <a href="https://www.princealex.pro" target="_blank">Prince Alex Digital</a></p>
+        </div>
+    </footer>
+</body>
+</html>

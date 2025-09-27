@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Setup - Prince Alex Digital E-voting system</title>
+    <style>
+        body {
+            font-family: Inter, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f8fafc;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .setup-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+        .btn {
+            background: #0b6efd;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 0.5rem;
+        }
+        .btn:hover {
+            background: #0a5fd4;
+        }
+        .input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .pad-container {
+                padding: 1rem;
+            }
+            
+            .pad-title {
+                font-size: 2rem;
+            }
+            
+            .pad-subtitle {
+                font-size: 1rem;
+            }
+            
+            .pad-card {
+                padding: 1.5rem;
+            }
+            
+            .pad-form-group {
+                margin-bottom: 1rem;
+            }
+            
+            .pad-btn {
+                width: 100%;
+                margin: 0.5rem 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .pad-container {
+                padding: 0.5rem;
+            }
+            
+            .pad-title {
+                font-size: 1.75rem;
+            }
+            
+            .pad-card {
+                padding: 1rem;
+            }
+            
+            .pad-form-input {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+        }
+
+        /* Footer Styles */
+        .pad-footer {
+            background: var(--pad-dark);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .pad-footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .pad-footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .pad-footer-link {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .pad-footer-link:hover {
+            color: white;
+        }
+
+        .pad-footer-credit {
+            border-top: 1px solid #374151;
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+
+        .pad-footer-credit p {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        .pad-footer-credit a {
+            color: var(--pad-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .pad-footer-credit a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .pad-footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .pad-footer-links {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="setup-card">
+        <h1>Firebase Setup - Prince Alex Digital</h1>
+        <p>This page will help you set up the Firebase database with initial data for the E-Voting system.</p>
+        
+        <div id="setupForm">
+            <h3>Create Admin User</h3>
+            <input type="email" id="adminEmail" class="input" placeholder="Admin Email" required>
+            <input type="password" id="adminPassword" class="input" placeholder="Admin Password" required>
+            <input type="text" id="adminName" class="input" placeholder="Admin Name" required>
+            <button class="btn" onclick="createAdmin()">Create Admin User</button>
+        </div>
+        
+        <div id="organizationForm" style="display: none;">
+            <h3>Create Sample Organization</h3>
+            <input type="text" id="orgName" class="input" placeholder="Organization Name" value="Sample Organization">
+            <button class="btn" onclick="createSampleOrganization()">Create Sample Organization</button>
+        </div>
+        
+        <div id="status"></div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase functions
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGErPBeQ1Fdx9EHPXOHepoEoOx7P2f57o",
+            authDomain: "princealextravel.firebaseapp.com",
+            projectId: "princealextravel",
+            storageBucket: "princealextravel.firebasestorage.app",
+            messagingSenderId: "947577729462",
+            appId: "1:947577729462:web:dd4b4c7cb4a984c5e3d117"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Make Firebase available globally
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDB = db;
+
+        async function createAdmin() {
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            const name = document.getElementById('adminName').value;
+            
+            if (!email || !password || !name) {
+                showStatus('Please fill in all fields', 'error');
+                return;
+            }
+
+            try {
+                // Create Firebase Auth user
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                // Create admin document
+                await setDoc(doc(db, 'admins', user.uid), {
+                    name,
+                    email,
+                    role: 'admin',
+                    createdAt: serverTimestamp(),
+                    lastLogin: null,
+                    status: 'active'
+                });
+
+                // Add audit log
+                await addDoc(collection(db, 'auditLogs'), {
+                    event: 'admin_created',
+                    details: `Admin user ${name} created`,
+                    userId: user.uid,
+                    timestamp: serverTimestamp(),
+                    metadata: {
+                        adminName: name,
+                        adminEmail: email
+                    }
+                });
+
+                showStatus('Admin user created successfully!', 'success');
+                document.getElementById('setupForm').style.display = 'none';
+                document.getElementById('organizationForm').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error creating admin:', error);
+                let errorMessage = 'Error creating admin user. ';
+                
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage += 'Email already in use.';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage += 'Password is too weak.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage += 'Invalid email address.';
+                } else {
+                    errorMessage += error.message;
+                }
+                
+                showStatus(errorMessage, 'error');
+            }
+        }
+
+        async function createSampleOrganization() {
+            const name = document.getElementById('orgName').value;
+            
+            if (!name) {
+                showStatus('Please enter organization name', 'error');
+                return;
+            }
+
+            try {
+                const orgData = {
+                    name,
+                    code: 'ORG' + Math.random().toString(36).substring(2, 8).toUpperCase(),
+                    createdAt: serverTimestamp(),
+                    status: 'active'
+                };
+
+                const orgRef = await addDoc(collection(db, 'organizations'), orgData);
+
+                showStatus(`Sample organization created successfully!<br><br>
+                    <strong>Organization Code:</strong> ${orgData.code}<br>
+                    <strong>Organization Name:</strong> ${name}<br><br>
+                    Share this code with voters to allow them to register for this organization.`, 'success');
+                
+            } catch (error) {
+                console.error('Error creating organization:', error);
+                showStatus('Error creating organization: ' + error.message, 'error');
+            }
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="${type}">${message}</div>`;
+        }
+    </script>
+
+    <footer class="pad-footer">
+        <div class="pad-container">
+            <div class="pad-footer-content">
+                <div>
+                    <p>&copy; 2025 Prince Alex Digital. All rights reserved.</p>
+                </div>
+                <div class="pad-footer-links">
+                    <a href="index.html#contact" class="pad-footer-link">Contact Us</a>
+                    <a href="index.html#features" class="pad-footer-link">Features</a>
+                    <a href="tel:+254717384875" class="pad-footer-link">Call Now</a>
+                </div>
+            </div>
+            <div class="pad-footer-credit">
+                <p>Designed by <a href="https://www.princealex.pro" target="_blank" rel="noopener">Prince Alex Digital</a></p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

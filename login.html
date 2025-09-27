@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Prince Alex Digital E-voting system</title>
+    <style>
+        /* Prince Alex Digital Brand Colors */
+        :root {
+            --pad-primary: #0b6efd;
+            --pad-accent: #10b981;
+            --pad-dark: #0f172a;
+            --pad-light: #f8fafc;
+            --pad-text: #374151;
+            --pad-text-light: #6b7280;
+            --pad-border: #e5e7eb;
+            --pad-success: #10b981;
+            --pad-warning: #f59e0b;
+            --pad-error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Inter, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, var(--pad-light) 0%, #e0f2fe 100%);
+            color: var(--pad-text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .pad-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .pad-header {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            margin-bottom: 2rem;
+        }
+
+        .pad-header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .pad-back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--pad-primary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+            background: transparent;
+            border: 1px solid transparent;
+        }
+
+        .pad-back-btn:hover {
+            background: var(--pad-light);
+            border-color: var(--pad-primary);
+        }
+
+        .pad-back-icon {
+            font-size: 1.25rem;
+        }
+
+        .pad-header-center {
+            text-align: center;
+            flex: 1;
+        }
+
+        .pad-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--pad-dark);
+            margin-bottom: 1rem;
+        }
+
+        .pad-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--pad-primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .pad-logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+        }
+
+        .pad-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-subtitle {
+            color: var(--pad-text-light);
+            margin-bottom: 2rem;
+        }
+
+        .pad-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--pad-border);
+        }
+
+        .pad-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--pad-border);
+        }
+
+        .pad-tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .pad-tab.active {
+            color: var(--pad-primary);
+            border-bottom-color: var(--pad-primary);
+        }
+
+        .pad-tab:hover:not(.active) {
+            color: var(--pad-text);
+            background: var(--pad-light);
+        }
+
+        .pad-form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .pad-label {
+            display: block;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--pad-border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .pad-input:focus {
+            outline: none;
+            border-color: var(--pad-primary);
+            box-shadow: 0 0 0 3px rgba(11, 110, 253, 0.1);
+        }
+
+        .pad-input.error {
+            border-color: var(--pad-error);
+        }
+
+        .pad-input-group {
+            position: relative;
+        }
+
+        .pad-input-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--pad-text-light);
+        }
+
+        .pad-error-message {
+            color: var(--pad-error);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .pad-success-message {
+            color: var(--pad-success);
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+            padding: 0.75rem;
+            background: #f0fdf4;
+            border: 1px solid #10b981;
+            border-radius: 8px;
+            display: none;
+            line-height: 1.4;
+        }
+
+        .pad-btn {
+            display: inline-block;
+            padding: 0.875rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            width: 100%;
+        }
+
+        .pad-btn-primary {
+            background: var(--pad-primary);
+            color: white;
+        }
+
+        .pad-btn-primary:hover:not(:disabled) {
+            background: #0a5fd4;
+            transform: translateY(-1px);
+        }
+
+        .pad-btn-primary:disabled {
+            background: var(--pad-text-light);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .pad-btn-secondary {
+            background: var(--pad-accent);
+            color: white;
+        }
+
+        .pad-btn-secondary:hover:not(:disabled) {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .pad-link {
+            color: var(--pad-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .pad-link:hover {
+            text-decoration: underline;
+        }
+
+        .pad-text-center {
+            text-align: center;
+        }
+
+        .pad-mt-2 {
+            margin-top: 1rem;
+        }
+
+        .pad-mb-2 {
+            margin-bottom: 1rem;
+        }
+
+
+        .pad-alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .pad-alert.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--pad-success);
+            color: #065f46;
+        }
+
+        .pad-alert.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--pad-error);
+            color: #991b1b;
+        }
+
+        .pad-alert.show {
+            display: block;
+        }
+
+        .pad-loading {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pad-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #0b6efd;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .pad-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .pad-error-message {
+            background-color: #fee2e2;
+            color: #dc2626;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            border: 1px solid #fecaca;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .pad-login-instructions {
+            background: #f0f9ff;
+            border: 1px solid #0b6efd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pad-instructions-content p {
+            margin-bottom: 0.5rem;
+            color: #374151;
+            line-height: 1.5;
+        }
+
+        .pad-instructions-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .pad-instructions-note {
+            margin-top: 0.75rem !important;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e5e7eb;
+            font-size: 0.9rem;
+        }
+
+        .pad-form-section {
+            display: none;
+        }
+
+        .pad-form-section.active {
+            display: block;
+        }
+
+        .pad-otp-timer {
+            color: var(--pad-text-light);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .pad-otp-timer.warning {
+            color: var(--pad-warning);
+        }
+
+        .pad-otp-timer.error {
+            color: var(--pad-error);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 640px) {
+            .pad-container {
+                padding: 1rem;
+            }
+            
+            .pad-card {
+                padding: 1.5rem;
+            }
+            
+            .pad-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Footer Styles */
+        .pad-footer {
+            background: var(--pad-dark);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .pad-footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .pad-footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .pad-footer-link {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .pad-footer-link:hover {
+            color: white;
+        }
+
+        .pad-footer-credit {
+            border-top: 1px solid #374151;
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+
+        .pad-footer-credit p {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        .pad-footer-credit a {
+            color: var(--pad-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .pad-footer-credit a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .pad-footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .pad-footer-links {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="pad-container">
+        <header class="pad-header">
+            <div class="pad-header-content">
+                <a href="index.html" class="pad-back-btn">
+                    <span class="pad-back-icon">←</span>
+                    <span>Back Home</span>
+                </a>
+                <div class="pad-header-center">
+                    <a href="index.html" class="pad-logo">
+                        <div class="pad-logo-icon">PAD</div>
+                        <div class="pad-logo-text">Prince Alex Digital</div>
+                    </a>
+                </div>
+                <div style="width: 100px;"></div> <!-- Spacer for alignment -->
+            </div>
+        </header>
+
+        <div class="pad-title-section">
+            <h1 class="pad-title" id="pageTitle">Voter Login</h1>
+            <p class="pad-subtitle" id="pageSubtitle">Access your voting account</p>
+        </div>
+
+        <div class="pad-alert" id="alertMessage"></div>
+
+        <div class="pad-card">
+            <div class="pad-tabs">
+                <div class="pad-tab active" id="voterTab">Voter Login</div>
+                <div class="pad-tab" id="adminTab" style="display: none;">Admin Login</div>
+            </div>
+
+            <!-- Voter Login Form -->
+            <div class="pad-form-section active" id="voterForm">
+                <div class="pad-login-instructions">
+                    <div class="pad-instructions-content">
+                        <p>Enter your email or ID number below to get started.</p>
+                        <p class="pad-instructions-note">New user? <a href="voter_register.html" class="pad-link">Register here</a></p>
+                    </div>
+                </div>
+
+                <form id="voterLoginForm">
+                    <div class="pad-form-group">
+                        <label class="pad-label" for="voterId">Email Address or Identity Number</label>
+                        <input type="text" id="voterId" name="voterId" class="pad-input" placeholder="Enter your email address or identity number" required>
+                        <div class="pad-error-message" id="voterIdError"></div>
+                    </div>
+
+                    <div class="pad-form-group">
+                        <label class="pad-label">Login Method</label>
+                        <div style="display: flex; gap: 1rem;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="loginMethod" value="otp" checked style="margin-right: 0.5rem;">
+                                OTP (Email)
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="loginMethod" value="password" style="margin-right: 0.5rem;">
+                                Password
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="pad-form-group" id="passwordGroup" style="display: none;">
+                        <label class="pad-label" for="password">Password</label>
+                        <div class="pad-input-group">
+                            <input type="password" id="password" name="password" class="pad-input" placeholder="Enter your password">
+                            <span class="pad-input-icon" onclick="togglePassword('password')">👁️</span>
+                        </div>
+                        <div class="pad-error-message" id="passwordError"></div>
+                    </div>
+
+                    <button type="button" class="pad-btn pad-btn-primary" onclick="handleVoterLogin()" id="voterLoginBtn">
+                        <span id="voterLoginText">Send OTP</span>
+                        <span id="voterLoginLoading" class="pad-loading" style="display: none;">
+                            <div class="pad-spinner"></div>
+                            <span>Sending...</span>
+                        </span>
+                    </button>
+                    <div class="pad-error-message" id="voterLoginError" style="display: none;"></div>
+                    <div class="pad-success-message" id="voterLoginSuccess" style="display: none;"></div>
+                </form>
+
+                <div class="pad-text-center pad-mt-2">
+                    <p>Don't have an account? <a href="voter_register.html" class="pad-link">Register here</a></p>
+                </div>
+            </div>
+
+            <!-- Admin Login Form -->
+            <div class="pad-form-section" id="adminForm" style="display: none;">
+                <div class="pad-login-instructions">
+                    <div class="pad-instructions-content">
+                        <p>Enter your admin credentials to access the admin dashboard.</p>
+                    </div>
+                </div>
+
+                <form id="adminLoginForm">
+                    <div class="pad-form-group">
+                        <label class="pad-label" for="adminEmail">Email Address</label>
+                        <input type="email" id="adminEmail" name="adminEmail" class="pad-input" placeholder="Enter your admin email" required>
+                        <div class="pad-error-message" id="adminEmailError"></div>
+                    </div>
+
+                    <div class="pad-form-group">
+                        <label class="pad-label" for="adminPassword">Password</label>
+                        <div class="pad-input-group">
+                            <input type="password" id="adminPassword" name="adminPassword" class="pad-input" placeholder="Enter your password" required>
+                            <span class="pad-input-icon" onclick="togglePassword('adminPassword')">👁️</span>
+                        </div>
+                        <div class="pad-error-message" id="adminPasswordError"></div>
+                    </div>
+
+                    <button type="button" class="pad-btn pad-btn-primary" onclick="handleAdminLogin()" id="adminLoginBtn">
+                        <span id="adminLoginText">Login</span>
+                        <span id="adminLoginLoading" class="pad-loading" style="display: none;">
+                            <div class="pad-spinner"></div>
+                            <span>Logging in...</span>
+                        </span>
+                    </button>
+                    <div class="pad-error-message" id="adminLoginError" style="display: none;"></div>
+                    <div class="pad-success-message" id="adminLoginSuccess" style="display: none;"></div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase functions
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, serverTimestamp, collection, addDoc, setDoc, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGErPBeQ1Fdx9EHPXOHepoEoOx7P2f57o",
+            authDomain: "princealextravel.firebaseapp.com",
+            projectId: "princealextravel",
+            storageBucket: "princealextravel.firebasestorage.app",
+            messagingSenderId: "947577729462",
+            appId: "1:947577729462:web:dd4b4c7cb4a984c5e3d117"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Make Firebase available globally
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDB = db;
+        
+        // Make Firebase functions available globally
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.signOut = signOut;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.doc = doc;
+        window.getDoc = getDoc;
+        window.updateDoc = updateDoc;
+        window.serverTimestamp = serverTimestamp;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.setDoc = setDoc;
+        window.getDocs = getDocs;
+        window.query = query;
+        window.where = where;
+        window.orderBy = orderBy;
+
+        // Check authentication state
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in, redirect based on user type
+                checkUserTypeAndRedirect(user.uid);
+            }
+        });
+
+        async function checkUserTypeAndRedirect(uid) {
+            try {
+                // Check if user is admin
+                const adminDoc = await window.getDoc(window.doc(db, 'admins', uid));
+                if (adminDoc.exists()) {
+                    window.location.href = 'dashboard_admin.html';
+                    return;
+                }
+
+                // Check if user is voter
+                const voterDoc = await window.getDoc(window.doc(db, 'voters', uid));
+                if (voterDoc.exists()) {
+                    window.location.href = 'dashboard_voter.html';
+                    return;
+                }
+            } catch (error) {
+                console.error('Error checking user type:', error);
+            }
+        }
+    </script>
+
+    <script>
+        let generatedOTP = '';
+        let otpTimer = null;
+        let otpTimeLeft = 300; // 5 minutes
+        let otpCreatedAt = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            
+            // Check URL parameters for admin login
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('admin') === 'true') {
+                showAdminLogin();
+            }
+        });
+
+        function setupEventListeners() {
+            // Login method change
+            document.querySelectorAll('input[name="loginMethod"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const passwordGroup = document.getElementById('passwordGroup');
+                    const loginBtn = document.getElementById('voterLoginText');
+                    
+                    if (this.value === 'password') {
+                        passwordGroup.style.display = 'block';
+                        loginBtn.textContent = 'Login';
+                    } else {
+                        passwordGroup.style.display = 'none';
+                        loginBtn.textContent = 'Send OTP';
+                    }
+                });
+            });
+        }
+
+
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.nextElementSibling;
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                icon.textContent = '👁️';
+            }
+        }
+
+        async function handleVoterLogin() {
+            const identifier = document.getElementById('voterId').value;
+            const loginMethod = document.querySelector('input[name="loginMethod"]:checked').value;
+            
+            if (!identifier) {
+                showError('voterIdError', 'Please enter your email address or identity number');
+                return;
+            }
+
+            if (loginMethod === 'otp') {
+                // For OTP, we'll use the identifier (email or identity number)
+                sendOTP(identifier);
+            } else {
+                // Password login with Firebase Auth
+                const password = document.getElementById('password').value;
+                if (!password) {
+                    showError('passwordError', 'Please enter your password');
+                    return;
+                }
+                
+                try {
+                    // Show loading state for password login
+                    const button = document.querySelector('#voterLoginBtn');
+                    const buttonText = document.querySelector('#voterLoginText');
+                    const loading = document.querySelector('#voterLoginLoading');
+                    const errorDiv = document.querySelector('#voterLoginError');
+                    
+                    // Clear any previous errors
+                    errorDiv.style.display = 'none';
+                    errorDiv.textContent = '';
+                    
+                    // Show loading state
+                    button.disabled = true;
+                    buttonText.style.display = 'none';
+                    loading.style.display = 'inline-flex';
+                    
+                    // For password login, we need to find the voter first to get their email
+                    const isEmail = identifier.includes('@');
+                    let votersSnapshot;
+                    
+                    if (isEmail) {
+                        votersSnapshot = await window.getDocs(window.query(
+                            window.collection(window.firebaseDB, 'voters'), 
+                            window.where('email', '==', identifier)
+                        ));
+                    } else {
+                        votersSnapshot = await window.getDocs(window.query(
+                            window.collection(window.firebaseDB, 'voters'), 
+                            window.where('identity', '==', identifier)
+                        ));
+                    }
+                    
+                    if (votersSnapshot.empty) {
+                        const fieldType = isEmail ? 'email address' : 'identity number';
+                        errorDiv.textContent = `No voter account found with this ${fieldType}. Please register first or check your details.`;
+                        errorDiv.style.display = 'block';
+                        button.disabled = false;
+                        buttonText.style.display = 'inline-block';
+                        loading.style.display = 'none';
+                        return;
+                    }
+                    
+                    const voterDoc = votersSnapshot.docs[0];
+                    const voterData = voterDoc.data();
+                    
+                    await loginVoterWithFirebase(voterData.email, password);
+                    
+                    // Reset button state on success
+                    button.disabled = false;
+                    buttonText.style.display = 'inline-block';
+                    loading.style.display = 'none';
+                    
+                } catch (error) {
+                    console.error('Login error:', error);
+                    
+                    // Reset button state
+                    const button = document.querySelector('#voterLoginBtn');
+                    const buttonText = document.querySelector('#voterLoginText');
+                    const loading = document.querySelector('#voterLoginLoading');
+                    const errorDiv = document.querySelector('#voterLoginError');
+                    
+                    button.disabled = false;
+                    buttonText.style.display = 'inline-block';
+                    loading.style.display = 'none';
+                    
+                    let errorMessage = 'Login failed. Please check your credentials.';
+                    
+                    if (error.code === 'auth/user-not-found') {
+                        errorMessage = 'No account found with this email. Please register first.';
+                    } else if (error.code === 'auth/wrong-password') {
+                        errorMessage = 'Incorrect password. Please try again.';
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorMessage = 'Invalid email address.';
+                    } else if (error.code === 'auth/too-many-requests') {
+                        errorMessage = 'Too many failed attempts. Please try again later.';
+                    } else if (error.code === 'auth/network-request-failed') {
+                        errorMessage = 'Network error. Please check your internet connection.';
+                    } else if (error.code === 'auth/invalid-credential') {
+                        errorMessage = 'Invalid credentials. Please check your details.';
+                    }
+                    
+                    errorDiv.textContent = errorMessage;
+                    errorDiv.style.display = 'block';
+                }
+            }
+        }
+
+        // Generate random 6 digit OTP
+        function generateOtp() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+
+        async function sendOTP(identifier) {
+            const button = document.querySelector('#voterLoginBtn');
+            const buttonText = document.querySelector('#voterLoginText');
+            const loading = document.querySelector('#voterLoginLoading');
+            const errorDiv = document.querySelector('#voterLoginError');
+            
+            try {
+                // Clear any previous errors
+                errorDiv.style.display = 'none';
+                errorDiv.textContent = '';
+                
+                // Show loading state
+                button.disabled = true;
+                buttonText.style.display = 'none';
+                loading.style.display = 'inline-flex';
+                
+                // Determine if identifier is email or identity number
+                const isEmail = identifier.includes('@');
+                let votersSnapshot;
+                
+                if (isEmail) {
+                    // Search by email
+                    votersSnapshot = await window.getDocs(window.query(
+                        window.collection(window.firebaseDB, 'voters'), 
+                        window.where('email', '==', identifier)
+                    ));
+                } else {
+                    // Search by identity number
+                    votersSnapshot = await window.getDocs(window.query(
+                        window.collection(window.firebaseDB, 'voters'), 
+                        window.where('identity', '==', identifier)
+                    ));
+                }
+                
+                if (votersSnapshot.empty) {
+                    // Reset button state
+                    button.disabled = false;
+                    buttonText.style.display = 'inline-block';
+                    loading.style.display = 'none';
+                    const fieldType = isEmail ? 'email address' : 'identity number';
+                    errorDiv.textContent = `No voter account found with this ${fieldType}. Please register first or check your details.`;
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+
+                const voterDoc = votersSnapshot.docs[0];
+                const voterData = voterDoc.data();
+                
+                // Check if voter is active
+                if (voterData.status !== 'active') {
+                    // Reset button state
+                    button.disabled = false;
+                    buttonText.style.display = 'inline-block';
+                    loading.style.display = 'none';
+                    errorDiv.textContent = 'Your account is not active. Please contact your administrator.';
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+
+                // Generate OTP in frontend
+                const otp = generateOtp();
+                const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes from now
+                
+                // Save OTP to Firestore
+                await window.setDoc(window.doc(window.firebaseDB, 'otp_verification', voterData.email), {
+                    otp,
+                    expiresAt,
+                    used: false,
+                    voterId: voterDoc.id,
+                    voterName: voterData.name,
+                    orgId: voterData.organizationId,
+                    type: 'login_verification',
+                    createdAt: window.serverTimestamp()
+                });
+
+                // Send email via Trigger Email Extension
+                await window.addDoc(window.collection(window.firebaseDB, 'mail'), {
+                    to: voterData.email,
+                    message: {
+                        subject: "Your Login Code - Prince Alex Digital E-voting system 🔐",
+                        text: `Hello ${voterData.name},\n\nYour login verification code is: ${otp}\n\nThis code will expire in 5 minutes.\n\nIf you didn't request this code, please ignore this email.\n\nThank you for using Prince Alex Digital E-voting system.`,
+                        html: `
+                            <!DOCTYPE html>
+                            <html>
+                            <head>
+                                <meta charset="utf-8">
+                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                <title>Login Code - Prince Alex Digital</title>
+                                <style>
+                                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+                                    .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc; }
+                                    .header { background: linear-gradient(135deg, #0b6efd 0%, #10b981 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                                    .content { background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+                                    .code-box { background: #f1f5f9; border: 2px dashed #0b6efd; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px; }
+                                    .code { font-size: 32px; font-weight: bold; color: #0b6efd; letter-spacing: 5px; font-family: 'Courier New', monospace; }
+                                    .warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 4px; }
+                                    .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
+                                    .logo { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+                                </style>
+                            </head>
+                            <body>
+                                <div class="container">
+                                    <div class="header">
+                                        <div class="logo">Prince Alex Digital</div>
+                                        <h1>E-Voting Login Code</h1>
+                                    </div>
+                                    <div class="content">
+                                        <h2>Hello ${voterData.name}!</h2>
+                                        <p>You requested a login verification code for your Prince Alex Digital E-voting system account.</p>
+                                        
+                                        <div class="code-box">
+                                            <p style="margin: 0 0 10px 0; color: #6b7280;">Your verification code is:</p>
+                                            <div class="code">${otp}</div>
+                                        </div>
+                                        
+                                        <div class="warning">
+                                            <strong>⚠️ Important:</strong> This code will expire in 5 minutes for security reasons. If you didn't request this code, please ignore this email.
+                                        </div>
+                                        
+                                        <p>Enter this code in the login form to access your voting dashboard.</p>
+                                        
+                                        <p>If you have any questions or need assistance, please contact your organization administrator.</p>
+                                        
+                                        <div class="footer">
+                                            <p>Thank you for using Prince Alex Digital E-voting system</p>
+                                            <p>This is an automated message. Please do not reply to this email.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </body>
+                            </html>
+                        `
+                    }
+                });
+
+                // Reset button state immediately
+                button.disabled = false;
+                buttonText.style.display = 'inline-block';
+                loading.style.display = 'none';
+                
+                // Show success message near button
+                showSuccess('voterLoginSuccess', `✅ Login OTP sent to ${voterData.email}! Check your email and enter the 6-digit code below.`);
+                hideError('voterLoginError');
+                
+                // Also show prominent success alert at top
+                showAlert(`Login OTP sent to ${voterData.email}! Please check your email and enter the 6-digit code.`, 'success');
+                
+                // Show OTP modal and form
+                startOTPTimer();
+                showOTPForm(identifier);
+                
+            } catch (error) {
+                console.error('Error sending OTP email:', error);
+                
+                // Reset button state
+                button.disabled = false;
+                buttonText.style.display = 'inline-block';
+                loading.style.display = 'none';
+                
+                // Show specific error message
+                let errorMessage = 'Error sending verification code. Please try again.';
+                
+                if (error.code === 'permission-denied') {
+                    errorMessage = 'Permission denied. Please check your Firebase configuration.';
+                } else if (error.code === 'unavailable') {
+                    errorMessage = 'Service temporarily unavailable. Please try again in a moment.';
+                } else if (error.code === 'unauthenticated') {
+                    errorMessage = 'Authentication failed. Please refresh the page and try again.';
+                } else if (error.message && error.message.includes('network')) {
+                    errorMessage = 'Network error. Please check your internet connection and try again.';
+                }
+                
+                errorDiv.textContent = errorMessage;
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        function showOTPForm(identifier) {
+            // Replace the form with OTP input
+            const form = document.getElementById('voterLoginForm');
+            form.innerHTML = `
+                <div class="pad-form-group">
+                    <label class="pad-label" for="otpCode">Enter Verification Code</label>
+                    <input type="text" id="otpCode" name="otpCode" class="pad-input" placeholder="Enter 6-digit code" maxlength="6">
+                    <div class="pad-error-message" id="otpError"></div>
+                    <div class="pad-otp-timer" id="otpTimerDisplay">Code expires in 5:00</div>
+                </div>
+                <button type="button" class="pad-btn pad-btn-primary" id="verifyBtn" onclick="verifyOTP('${identifier}')">
+                    Verify & Login
+                </button>
+                <div class="pad-error-message" id="otpVerifyError" style="display: none;"></div>
+                <div class="pad-success-message" id="otpVerifySuccess" style="display: none;"></div>
+                <div class="pad-text-center pad-mt-2">
+                    <button type="button" class="pad-link" onclick="resendOTP('${identifier}')" id="resendBtn">
+                        Resend Code
+                    </button>
+                </div>
+            `;
+        }
+
+        async function verifyOTP(identifier) {
+            const enteredOTP = document.getElementById('otpCode').value.trim();
+            const verifyBtn = document.getElementById('verifyBtn') || document.querySelector('button[onclick*="verifyOTP"]');
+            
+            // Early validation
+            if (!enteredOTP) {
+                showError('otpVerifyError', 'Please enter the verification code');
+                return;
+            }
+
+            // Quick client-side validation
+            if (!/^\d{6}$/.test(enteredOTP)) {
+                showError('otpVerifyError', 'Please enter a valid 6-digit code');
+                return;
+            }
+
+            // Show loading state
+            if (verifyBtn) {
+                verifyBtn.disabled = true;
+                verifyBtn.innerHTML = '<span class="pad-spinner"></span> Verifying...';
+            }
+            hideError('otpVerifyError');
+
+            try {
+                // Find voter by identifier (email or identity)
+                const isEmail = identifier.includes('@');
+                let votersSnapshot;
+                
+                if (isEmail) {
+                    votersSnapshot = await window.getDocs(window.query(
+                        window.collection(window.firebaseDB, 'voters'),
+                        window.where('email', '==', identifier)
+                    ));
+                } else {
+                    votersSnapshot = await window.getDocs(window.query(
+                        window.collection(window.firebaseDB, 'voters'),
+                        window.where('identity', '==', identifier)
+                    ));
+                }
+                
+                if (votersSnapshot.empty) {
+                    const fieldType = isEmail ? 'email address' : 'identity number';
+                    showError('otpVerifyError', `No voter found with this ${fieldType}`);
+                    return;
+                }
+
+                const voterDoc = votersSnapshot.docs[0];
+                const voterData = voterDoc.data();
+
+                // Get OTP verification document from Firestore
+                const otpDoc = await window.getDoc(window.doc(window.firebaseDB, 'otp_verification', voterData.email));
+                
+                if (!otpDoc.exists()) {
+                    showError('otpVerifyError', 'No verification code found. Please request a new one.');
+                    return;
+                }
+
+                const otpData = otpDoc.data();
+                console.log("OTP data retrieved:", otpData);
+
+                // ✅ Handle Firestore Timestamp correctly (same as registration)
+                let expiryTime;
+                if (otpData.expiresAt?.toMillis) {
+                    expiryTime = otpData.expiresAt.toMillis();
+                } else {
+                    expiryTime = otpData.expiresAt; // in case it was stored as number
+                }
+
+                if (Date.now() > expiryTime) {
+                    showError('otpVerifyError', 'Verification code has expired. Please request a new one.');
+                    return;
+                }
+
+                if (otpData.used) {
+                    showError('otpVerifyError', 'Verification code has already been used. Please request a new one.');
+                    return;
+                }
+
+                if (enteredOTP !== otpData.otp) {
+                    showError('otpVerifyError', 'Invalid verification code. Please try again.');
+                    return;
+                }
+
+                // Mark OTP as used
+                await window.updateDoc(window.doc(window.firebaseDB, 'otp_verification', voterData.email), {
+                    used: true,
+                    usedAt: window.serverTimestamp()
+                });
+
+                // OTP verified, proceed with login
+                await loginVoterWithFirebase(voterData.email, null);
+                
+            } catch (error) {
+                console.error('Error verifying OTP:', error);
+                showError('otpVerifyError', 'Error verifying code. Please try again.');
+            } finally {
+                // Always reset button
+                if (verifyBtn) {
+                    verifyBtn.disabled = false;
+                    verifyBtn.innerHTML = 'Verify & Login';
+                }
+            }
+        }
+
+        function resendOTP(identifier) {
+            hideError('otpVerifyError');
+            hideSuccess('otpVerifySuccess');
+            sendOTP(identifier);
+        }
+
+        function startOTPTimer() {
+            otpTimeLeft = 300; // 5 minutes
+            updateOTPTimer();
+            
+            otpTimer = setInterval(() => {
+                otpTimeLeft--;
+                updateOTPTimer();
+                
+                if (otpTimeLeft <= 0) {
+                    clearInterval(otpTimer);
+                    showAlert('OTP expired. Please request a new code.', 'error');
+                }
+            }, 1000);
+        }
+
+        function updateOTPTimer() {
+            const minutes = Math.floor(otpTimeLeft / 60);
+            const seconds = otpTimeLeft % 60;
+            const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            const timerEl = document.getElementById('otpTimerDisplay');
+            if (timerEl) {
+                timerEl.textContent = `Code expires in ${timeString}`;
+                
+                if (otpTimeLeft < 60) {
+                    timerEl.classList.add('error');
+                } else if (otpTimeLeft < 120) {
+                    timerEl.classList.add('warning');
+                }
+            }
+        }
+
+
+        async function loginVoterWithFirebase(email, password) {
+            // Since we're using OTP-only authentication, we don't need Firebase Auth
+            // The voter data is already retrieved in the verifyOTP function
+            // We just need to update the last login and add audit log
+            
+            try {
+                // Find the voter by email to get their voterId
+                const votersSnapshot = await window.getDocs(window.query(
+                    window.collection(window.firebaseDB, 'voters'),
+                    window.where('email', '==', email)
+                ));
+                
+                if (votersSnapshot.empty) {
+                    throw new Error('Voter data not found');
+                }
+                
+                const voterDoc = votersSnapshot.docs[0];
+                const voterData = voterDoc.data();
+                const voterId = voterDoc.id;
+                
+                // Update last login
+                await window.updateDoc(window.doc(window.firebaseDB, 'voters', voterId), {
+                    lastLogin: window.serverTimestamp()
+                });
+
+                // Add audit log
+                await window.addDoc(window.collection(window.firebaseDB, 'auditLogs'), {
+                    event: 'voter_login',
+                    details: `Voter ${voterData.name} logged in via OTP`,
+                    voterId: voterId,
+                    organizationId: voterData.organizationId,
+                    timestamp: window.serverTimestamp(),
+                    metadata: {
+                        voterName: voterData.name,
+                        organizationName: voterData.organizationName
+                    }
+                });
+
+                // Create voter session in localStorage for OTP-only authentication
+                const voterSession = {
+                    voterId: voterId,
+                    email: voterData.email,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem('voterSession', JSON.stringify(voterSession));
+
+                showSuccess('otpVerifySuccess', 'Login successful! Redirecting...');
+                hideError('otpVerifyError');
+                
+                setTimeout(() => {
+                    window.location.href = 'dashboard_voter.html';
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Error in loginVoterWithFirebase:', error);
+                showError('otpVerifyError', 'Login failed. Please try again.');
+            }
+        }
+
+        // Debug function to test Firebase connection
+        function testFirebaseConnection() {
+            console.log('Firebase App:', window.firebaseApp);
+            console.log('Firebase Auth:', window.firebaseAuth);
+            console.log('Firebase DB:', window.firebaseDB);
+            console.log('Auth current user:', window.firebaseAuth?.currentUser);
+        }
+
+        function showAdminLogin() {
+            // Hide voter form and show admin form
+            document.getElementById('voterForm').classList.remove('active');
+            document.getElementById('adminForm').classList.add('active');
+            document.getElementById('voterTab').classList.remove('active');
+            document.getElementById('adminTab').classList.add('active');
+            document.getElementById('adminTab').style.display = 'block';
+            
+            // Update page title
+            document.getElementById('pageTitle').textContent = 'Admin Login';
+            document.getElementById('pageSubtitle').textContent = 'Access admin dashboard';
+        }
+
+        async function handleAdminLogin() {
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPassword').value.trim();
+            const button = document.getElementById('adminLoginBtn');
+            const buttonText = document.getElementById('adminLoginText');
+            const loading = document.getElementById('adminLoginLoading');
+            const errorDiv = document.getElementById('adminLoginError');
+
+            if (!email || !password) {
+                showError('adminLoginError', 'Please fill in all fields');
+                return;
+            }
+
+            // Show loading state
+            button.disabled = true;
+            buttonText.style.display = 'none';
+            loading.style.display = 'flex';
+            hideError('adminLoginError');
+
+            try {
+                // Authenticate with Firebase
+                const userCredential = await window.signInWithEmailAndPassword(window.firebaseAuth, email, password);
+                const user = userCredential.user;
+
+                // Check if user exists in admins collection, if not create admin record
+                const adminDoc = await window.getDoc(window.doc(window.firebaseDB, 'admins', user.uid));
+                let adminData;
+
+                if (adminDoc.exists()) {
+                    adminData = adminDoc.data();
+                    // Update last login
+                    await window.updateDoc(window.doc(window.firebaseDB, 'admins', user.uid), {
+                        lastLogin: window.serverTimestamp()
+                    });
+                } else {
+                    // Create admin record for new user
+                    adminData = {
+                        email: user.email,
+                        name: user.displayName || 'Admin User',
+                        createdAt: window.serverTimestamp(),
+                        lastLogin: window.serverTimestamp()
+                    };
+                    await window.setDoc(window.doc(window.firebaseDB, 'admins', user.uid), adminData);
+                }
+
+                // Add audit log
+                await window.addDoc(window.collection(window.firebaseDB, 'auditLogs'), {
+                    event: 'admin_login',
+                    details: `Admin ${adminData.name} logged in`,
+                    userId: user.uid,
+                    timestamp: window.serverTimestamp(),
+                    metadata: {
+                        adminName: adminData.name,
+                        adminEmail: adminData.email
+                    }
+                });
+
+                showSuccess('adminLoginSuccess', 'Login successful! Redirecting...');
+                hideError('adminLoginError');
+
+                setTimeout(() => {
+                    window.location.href = 'dashboard_admin.html';
+                }, 1500);
+
+            } catch (error) {
+                console.error('Admin login error:', error);
+                
+                // Reset button state
+                button.disabled = false;
+                buttonText.style.display = 'inline-block';
+                loading.style.display = 'none';
+
+                let errorMessage = 'Login failed. Please check your credentials.';
+                
+                if (error.code === 'auth/user-not-found') {
+                    errorMessage = 'No admin account found with this email address.';
+                } else if (error.code === 'auth/wrong-password') {
+                    errorMessage = 'Incorrect password. Please try again.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = 'Please enter a valid email address.';
+                } else if (error.code === 'auth/too-many-requests') {
+                    errorMessage = 'Too many failed attempts. Please try again later.';
+                } else if (error.code === 'auth/invalid-credential') {
+                    errorMessage = 'Invalid credentials. Please check your email and password.';
+                } else if (error.code === 'auth/user-disabled') {
+                    errorMessage = 'This admin account has been disabled.';
+                } else if (error.code === 'auth/operation-not-allowed') {
+                    errorMessage = 'Email/password login is not enabled for this account.';
+                } else if (error.code === 'auth/network-request-failed') {
+                    errorMessage = 'Network error. Please check your connection and try again.';
+                }
+
+                showError('adminLoginError', errorMessage);
+            }
+        }
+
+
+        function showError(elementId, message) {
+            const errorEl = document.getElementById(elementId);
+            if (errorEl) {
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+            }
+        }
+
+        function hideError(elementId) {
+            const errorEl = document.getElementById(elementId);
+            if (errorEl) {
+                errorEl.style.display = 'none';
+            }
+        }
+
+        function showSuccess(elementId, message) {
+            const successEl = document.getElementById(elementId);
+            if (successEl) {
+                successEl.textContent = message;
+                successEl.style.display = 'block';
+            }
+        }
+
+        function hideSuccess(elementId) {
+            const successEl = document.getElementById(elementId);
+            if (successEl) {
+                successEl.style.display = 'none';
+            }
+        }
+
+        function showAlert(message, type) {
+            const alertEl = document.getElementById('alertMessage');
+            alertEl.textContent = message;
+            alertEl.className = `pad-alert ${type} show`;
+            
+            setTimeout(() => {
+                alertEl.classList.remove('show');
+            }, 5000);
+        }
+    </script>
+
+    <footer class="pad-footer">
+        <div class="pad-container">
+            <div class="pad-footer-content">
+                <div>
+                    <p>&copy; 2025 Prince Alex Digital. All rights reserved.</p>
+                </div>
+                <div class="pad-footer-links">
+                    <a href="index.html#contact" class="pad-footer-link">Contact Us</a>
+                    <a href="index.html#features" class="pad-footer-link">Features</a>
+                    <a href="tel:+254717384875" class="pad-footer-link">Call Now</a>
+                </div>
+            </div>
+            <div class="pad-footer-credit">
+                <p>Designed by <a href="https://www.princealex.pro" target="_blank" rel="noopener">Prince Alex Digital</a></p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

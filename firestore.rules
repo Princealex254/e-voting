@@ -1,0 +1,53 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow authenticated users to read/write their own voter data
+    match /voters/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Allow authenticated users to read/write admin data
+    match /admins/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null; // Allow any authenticated user to create admin record
+    }
+    
+    // Allow authenticated users to read organizations
+    match /organizations/{orgId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    
+    // Allow authenticated users to read polls for their organization
+    match /polls/{pollId} {
+      allow read: if request.auth != null && 
+        resource.data.organizationId == get(/databases/$(database)/documents/voters/$(request.auth.uid)).data.organizationId;
+      allow write: if request.auth != null && 
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    
+    // Allow authenticated users to read/write their own votes
+    match /votes/{voteId} {
+      allow read, write: if request.auth != null && 
+        resource.data.voterId == request.auth.uid;
+    }
+    
+    // Allow authenticated users to read audit logs
+    match /auditLogs/{logId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    // Allow OTP verification to be read/updated by anyone (frontend-only approach)
+    // Note: This is less secure but simpler for frontend-only implementation
+    match /otp_verification/{otpId} {
+      allow read, write: if true; // Allow anyone to read/write OTPs
+    }
+    
+    // Allow mail collection to be written by frontend (for Trigger Email Extension)
+    match /mail/{mailId} {
+      allow write: if true; // Allow frontend to write to trigger email extension
+    }
+  }
+}
