@@ -1690,13 +1690,6 @@
                     </div>
                 </div>
 
-                <div class="pad-content-header">
-                    <h3 class="pad-content-title">Recent Activity</h3>
-                </div>
-
-                <div id="recentActivity">
-                    <!-- Recent activity will be populated here -->
-                </div>
             </div>
 
             <!-- Polls Section -->
@@ -2326,16 +2319,6 @@
             document.getElementById('totalVoters').textContent = totalVoters;
             document.getElementById('totalVotes').textContent = totalVotes;
 
-            // Recent activity
-            const recentActivity = auditLogs.slice(-10).reverse();
-            const activityHtml = recentActivity.map(log => `
-                <div style="padding: 1rem; border-bottom: 1px solid var(--pad-border);">
-                    <div style="font-weight: 600; color: var(--pad-dark);">${log.details}</div>
-                    <div style="font-size: 0.875rem; color: var(--pad-text-light);">${formatTimestamp(log.timestamp)}</div>
-                </div>
-            `).join('');
-
-            document.getElementById('recentActivity').innerHTML = activityHtml || '<div class="pad-empty-state">No recent activity</div>';
         }
 
         function updatePollsTable() {
@@ -2748,14 +2731,15 @@
                                 const results = poll.options.map(option => {
                                     // Handle both string and object options
                                     const optionText = typeof option === 'string' ? option : (option.text || option.name || option);
+                                    const optionId = typeof option === 'string' ? option : (option.id || option);
                                     
                                     const optionVotes = pollVotes.filter(vote => {
                                         if (poll.type === 'single') {
-                                            return vote.choices && vote.choices.includes(optionText);
+                                            return vote.choices && vote.choices.includes(optionId);
                                         } else if (poll.type === 'multi') {
-                                            return vote.choices && vote.choices.includes(optionText);
+                                            return vote.choices && vote.choices.includes(optionId);
                                         } else {
-                                            return vote.choices && vote.choices[0] === optionText;
+                                            return vote.choices && vote.choices[0] === optionId;
                                         }
                                     }).length;
                                     
@@ -3044,15 +3028,16 @@
             const results = poll.options.map(option => {
                 // Handle both string and object options
                 const optionText = typeof option === 'string' ? option : (option.text || option.name || option);
+                const optionId = typeof option === 'string' ? option : (option.id || option);
                 
                 const optionVotes = pollVotes.filter(vote => {
                     if (poll.type === 'single') {
-                        return vote.choices && vote.choices.includes(optionText);
+                        return vote.choices && vote.choices.includes(optionId);
                     } else if (poll.type === 'multi') {
-                        return vote.choices && vote.choices.includes(optionText);
+                        return vote.choices && vote.choices.includes(optionId);
                     } else {
                         // For ranked choice, count first choice
-                        return vote.choices && vote.choices[0] === optionText;
+                        return vote.choices && vote.choices[0] === optionId;
                     }
                 }).length;
                 
@@ -3166,14 +3151,15 @@
             const results = poll.options.map(option => {
                 // Handle both string and object options
                 const optionText = typeof option === 'string' ? option : (option.text || option.name || option);
+                const optionId = typeof option === 'string' ? option : (option.id || option);
                 
                 const optionVotes = pollVotes.filter(vote => {
                     if (poll.type === 'single') {
-                        return vote.choices && vote.choices.includes(optionText);
+                        return vote.choices && vote.choices.includes(optionId);
                     } else if (poll.type === 'multi') {
-                        return vote.choices && vote.choices.includes(optionText);
+                        return vote.choices && vote.choices.includes(optionId);
                     } else {
-                        return vote.choices && vote.choices[0] === optionText;
+                        return vote.choices && vote.choices[0] === optionId;
                     }
                 }).length;
                 
@@ -3236,16 +3222,69 @@
         async function createPoll() {
             const title = document.getElementById('pollTitle').value;
             const description = document.getElementById('pollDescription').value;
-            const type = document.querySelector('input[name="pollType"]:checked').value;
+            const typeRadio = document.querySelector('input[name="pollType"]:checked');
+            const type = typeRadio ? typeRadio.value : 'single';
             const maxSelections = document.getElementById('maxSelections').value;
-            const options = document.getElementById('pollOptions').value.split('\n').filter(opt => opt.trim());
+            const optionsText = document.getElementById('pollOptions').value;
+            const options = optionsText.split('\n').filter(opt => opt.trim());
+            
+            // Debug options processing
+            if (editId) {
+                console.log('Options processing:');
+                console.log('Raw options text:', optionsText);
+                console.log('Split by newline:', optionsText.split('\n'));
+                console.log('After filtering empty:', options);
+                console.log('Each option trimmed:');
+                options.forEach((opt, index) => {
+                    console.log(`  ${index}: "${opt}" (length: ${opt.length})`);
+                });
+            }
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
-            const eligibility = document.querySelector('input[name="eligibility"]:checked').value;
+            const eligibilityRadio = document.querySelector('input[name="eligibility"]:checked');
+            const eligibility = eligibilityRadio ? eligibilityRadio.value : 'open';
             const anonymous = document.getElementById('anonymous').checked;
-            const organizationId = document.getElementById('organizationSelect').value;
+            const organizationSelect = document.getElementById('organizationSelect');
+            const organizationId = organizationSelect ? organizationSelect.value : '';
+            
+            // Debug logging for edit validation
+            const editId = document.getElementById('createPollModal').getAttribute('data-edit-id');
+            
+            // Debug organization selection
+            if (editId) {
+                console.log('Organization selection:');
+                console.log('Select element found:', !!organizationSelect);
+                console.log('Selected value:', organizationId);
+                console.log('All options:', organizationSelect ? Array.from(organizationSelect.options).map(opt => ({value: opt.value, text: opt.text, selected: opt.selected})) : 'N/A');
+            }
+            if (editId) {
+                console.log('Edit mode - validating form data:');
+                console.log('Title:', title, 'Length:', title.length);
+                console.log('Description:', description, 'Length:', description.length);
+                console.log('Options:', options);
+                console.log('Options length:', options.length);
+                console.log('Organization ID:', organizationId, 'Type:', typeof organizationId);
+                console.log('Type:', type);
+                console.log('Eligibility:', eligibility);
+                console.log('Start Date:', startDate);
+                console.log('End Date:', endDate);
+                console.log('Max Selections:', maxSelections);
+                console.log('Anonymous:', anonymous);
+                
+                // Check each validation condition
+                console.log('Validation checks:');
+                console.log('- Title valid:', !!title);
+                console.log('- Description valid:', !!description);
+                console.log('- Options >= 2:', options.length >= 2);
+                console.log('- Organization ID valid:', !!organizationId);
+            }
 
             if (!title || !description || options.length < 2 || !organizationId) {
+                console.error('Validation failed:');
+                console.error('- Title missing:', !title);
+                console.error('- Description missing:', !description);
+                console.error('- Options < 2:', options.length < 2);
+                console.error('- Organization ID missing:', !organizationId);
                 showAlert('Please fill in all required fields and add at least 2 options', 'error');
                 return;
             }
@@ -3351,16 +3390,32 @@
             console.log('Found poll:', poll);
 
             try {
+                // Reset radio buttons to default state
+                document.querySelectorAll('input[name="pollType"]').forEach(radio => {
+                    radio.checked = false;
+                });
+                document.querySelectorAll('input[name="eligibility"]').forEach(radio => {
+                    radio.checked = false;
+                });
+                
+                // Set default values
+                document.querySelector('input[name="pollType"][value="single"]').checked = true;
+                document.querySelector('input[name="eligibility"][value="open"]').checked = true;
                 // Populate create poll form with existing data
                 document.getElementById('pollTitle').value = poll.title || '';
                 document.getElementById('pollDescription').value = poll.description || '';
                 
-                // Set poll type
+                // Set poll type - first uncheck all, then check the correct one
+                document.querySelectorAll('input[name="pollType"]').forEach(radio => {
+                    radio.checked = false;
+                });
                 const typeRadio = document.querySelector(`input[name="pollType"][value="${poll.type}"]`);
                 if (typeRadio) {
                     typeRadio.checked = true;
                 } else {
                     console.warn('Poll type radio not found for:', poll.type);
+                    // Default to single choice if not found
+                    document.querySelector('input[name="pollType"][value="single"]').checked = true;
                 }
                 
                 // Set organization
@@ -3386,12 +3441,18 @@
                 // Set anonymous flag (corrected ID)
                 document.getElementById('anonymous').checked = poll.anonymous || false;
                 
-                // Set eligibility
-                const eligibilityRadio = document.querySelector(`input[name="eligibility"][value="${poll.eligibility?.type || 'open'}"]`);
+                // Set eligibility - first uncheck all, then check the correct one
+                document.querySelectorAll('input[name="eligibility"]').forEach(radio => {
+                    radio.checked = false;
+                });
+                const eligibilityType = poll.eligibility?.type || 'open';
+                const eligibilityRadio = document.querySelector(`input[name="eligibility"][value="${eligibilityType}"]`);
                 if (eligibilityRadio) {
                     eligibilityRadio.checked = true;
                 } else {
-                    console.warn('Eligibility radio not found for:', poll.eligibility?.type || 'open');
+                    console.warn('Eligibility radio not found for:', eligibilityType);
+                    // Default to open if not found
+                    document.querySelector('input[name="eligibility"][value="open"]').checked = true;
                 }
                 
                 console.log('Form populated successfully');
@@ -4213,7 +4274,8 @@
             poll.options.forEach(option => {
                 // Handle both string and object options
                 const optionText = typeof option === 'string' ? option : option.text;
-                optionVotes[optionText] = pollVotes.filter(v => v.selectedOptions.includes(optionText)).length;
+                const optionId = typeof option === 'string' ? option : option.id;
+                optionVotes[optionText] = pollVotes.filter(v => v.choices && v.choices.includes(optionId)).length;
             });
 
             const maxVotes = Math.max(...Object.values(optionVotes));
@@ -4324,7 +4386,8 @@
             fullScreenPoll.options.forEach(option => {
                 // Handle both string and object options
                 const optionText = typeof option === 'string' ? option : option.text;
-                optionVotes[optionText] = pollVotes.filter(v => v.selectedOptions.includes(optionText)).length;
+                const optionId = typeof option === 'string' ? option : option.id;
+                optionVotes[optionText] = pollVotes.filter(v => v.choices && v.choices.includes(optionId)).length;
             });
 
             const maxVotes = Math.max(...Object.values(optionVotes));
@@ -4392,16 +4455,46 @@
             `;
         }
 
-        function refreshFullScreenData() {
+        async function refreshFullScreenData() {
             if (fullScreenPoll) {
-                updateFullScreenContent();
+                // Show loading indicator
+                const refreshBtn = document.querySelector('.pad-fullscreen-refresh');
+                if (refreshBtn) {
+                    const originalText = refreshBtn.innerHTML;
+                    refreshBtn.innerHTML = '🔄 Refreshing...';
+                    refreshBtn.disabled = true;
+                    
+                    try {
+                        // Reload data from Firebase to get latest votes
+                        await loadData();
+                        updateFullScreenContent();
+                        
+                        // Show success briefly
+                        refreshBtn.innerHTML = '✅ Refreshed';
+                        setTimeout(() => {
+                            refreshBtn.innerHTML = originalText;
+                            refreshBtn.disabled = false;
+                        }, 1000);
+                    } catch (error) {
+                        console.error('Error refreshing data:', error);
+                        refreshBtn.innerHTML = '❌ Error';
+                        setTimeout(() => {
+                            refreshBtn.innerHTML = originalText;
+                            refreshBtn.disabled = false;
+                        }, 2000);
+                    }
+                } else {
+                    // Fallback if button not found
+                    await loadData();
+                    updateFullScreenContent();
+                }
             }
         }
 
         function startFullScreenRefresh() {
             // Refresh data every 5 seconds
-            fullScreenRefreshInterval = setInterval(() => {
-                refreshFullScreenData();
+            fullScreenRefreshInterval = setInterval(async () => {
+                await refreshFullScreenData();
             }, 5000);
         }
 
