@@ -1,53 +1,274 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow authenticated users to read/write their own voter data
-    match /voters/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+    
+    // Helper functions for common validations
+    function isAuthenticated() {
+      return request.auth != null;
     }
     
-    // Allow authenticated users to read/write admin data
-    match /admins/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-      allow create: if request.auth != null; // Allow any authenticated user to create admin record
+    function isOwner(userId) {
+      return request.auth.uid == userId;
     }
     
-    // Allow authenticated users to read organizations
+    function isValidEmail(email) {
+      return email is string && email.matches('.*@.*\\..*');
+    }
+    
+    function isValidTimestamp(timestamp) {
+      return timestamp is timestamp;
+    }
+    
+    function isValidString(str) {
+      return str is string && str.size() > 0;
+    }
+    
+    function isValidPhone(phone) {
+      return phone is string && phone.matches('^\\+?[1-9]\\d{1,14}$');
+    }
+    
+    function isValidOTP(otp) {
+      return otp is string && otp.size() == 6 && otp.matches('^[0-9]+$');
+    }
+    
+    function isValidHash(hash) {
+      return hash is string && hash.size() == 64 && hash.matches('^[a-f0-9]+$');
+    }
+    
+    // Voters Collection Rules
+    match /voters/{voterId} {
+      // Allow read access to authenticated users (for admin dashboard)
+      allow read: if isAuthenticated();
+      
+      // Allow create for authenticated users (admin adding voters)
+      allow create: if isAuthenticated() 
+        && isValidString(resource.data.name)
+        && isValidEmail(resource.data.email)
+        && isValidString(resource.data.identity)
+        && isValidPhone(resource.data.phone)
+        && isValidString(resource.data.organizationId)
+        && isValidString(resource.data.organizationName)
+        && resource.data.status in ['active', 'inactive']
+        && resource.data.verified is bool
+        && isValidTimestamp(resource.data.createdAt)
+        && isValidString(resource.data.createdBy);
+      
+      // Allow update for authenticated users (admin editing voters)
+      allow update: if isAuthenticated()
+        && isValidString(resource.data.name)
+        && isValidEmail(resource.data.email)
+        && isValidString(resource.data.identity)
+        && isValidPhone(resource.data.phone)
+        && isValidString(resource.data.organizationId)
+        && isValidString(resource.data.organizationName)
+        && resource.data.status in ['active', 'inactive']
+        && resource.data.verified is bool
+        && isValidTimestamp(resource.data.updatedAt)
+        && isValidString(resource.data.updatedBy);
+      
+      // Allow delete for authenticated users (admin deleting voters)
+      allow delete: if isAuthenticated();
+    }
+    
+    // Organizations Collection Rules
     match /organizations/{orgId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && 
-        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+      // Allow read access to authenticated users
+      allow read: if isAuthenticated();
+      
+      // Allow create for authenticated users (admin creating organizations)
+      allow create: if isAuthenticated()
+        && isValidString(resource.data.name)
+        && isValidString(resource.data.code)
+        && resource.data.status in ['active', 'inactive']
+        && isValidTimestamp(resource.data.createdAt)
+        && isValidString(resource.data.createdBy);
+      
+      // Allow update for authenticated users (admin editing organizations)
+      allow update: if isAuthenticated()
+        && isValidString(resource.data.name)
+        && isValidString(resource.data.code)
+        && resource.data.status in ['active', 'inactive']
+        && isValidTimestamp(resource.data.updatedAt)
+        && isValidString(resource.data.updatedBy);
+      
+      // Allow delete for authenticated users (admin deleting organizations)
+      allow delete: if isAuthenticated();
     }
     
-    // Allow authenticated users to read polls for their organization
+    // Polls Collection Rules
     match /polls/{pollId} {
-      allow read: if request.auth != null && 
-        resource.data.organizationId == get(/databases/$(database)/documents/voters/$(request.auth.uid)).data.organizationId;
-      allow write: if request.auth != null && 
-        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+      // Allow read access to authenticated users
+      allow read: if isAuthenticated();
+      
+      // Allow create for authenticated users (admin creating polls)
+      allow create: if isAuthenticated()
+        && isValidString(resource.data.title)
+        && isValidString(resource.data.description)
+        && resource.data.type in ['single', 'multi', 'ranked']
+        && resource.data.options is list
+        && resource.data.options.size() > 0
+        && resource.data.maxSelections is int
+        && resource.data.maxSelections > 0
+        && isValidTimestamp(resource.data.startAt)
+        && isValidTimestamp(resource.data.endAt)
+        && resource.data.eligibility is map
+        && resource.data.eligibility.type == 'open'
+        && resource.data.anonymous is bool
+        && isValidString(resource.data.organizationId)
+        && isValidString(resource.data.createdBy)
+        && isValidTimestamp(resource.data.createdAt)
+        && resource.data.status == 'draft';
+      
+      // Allow update for authenticated users (admin editing polls)
+      allow update: if isAuthenticated()
+        && isValidString(resource.data.title)
+        && isValidString(resource.data.description)
+        && resource.data.type in ['single', 'multi', 'ranked']
+        && resource.data.options is list
+        && resource.data.options.size() > 0
+        && resource.data.maxSelections is int
+        && resource.data.maxSelections > 0
+        && isValidTimestamp(resource.data.startAt)
+        && isValidTimestamp(resource.data.endAt)
+        && resource.data.eligibility is map
+        && resource.data.eligibility.type == 'open'
+        && resource.data.anonymous is bool
+        && isValidString(resource.data.organizationId)
+        && resource.data.status in ['draft', 'active', 'closed']
+        && isValidTimestamp(resource.data.updatedAt)
+        && isValidString(resource.data.updatedBy);
+      
+      // Allow delete for authenticated users (admin deleting polls)
+      allow delete: if isAuthenticated();
     }
     
-    // Allow authenticated users to read/write their own votes
+    // Votes Collection Rules
     match /votes/{voteId} {
-      allow read, write: if request.auth != null && 
-        resource.data.voterId == request.auth.uid;
+      // Allow read access to authenticated users (for results and audit)
+      allow read: if isAuthenticated();
+      
+      // Allow create for authenticated users (voters casting votes)
+      allow create: if isAuthenticated()
+        && isValidString(resource.data.pollId)
+        && isValidString(resource.data.voterId)
+        && resource.data.choices is list
+        && resource.data.choices.size() > 0
+        && isValidHash(resource.data.receiptHash)
+        && isValidTimestamp(resource.data.timestamp)
+        && resource.data.anonymous is bool;
+      
+      // Prevent updates and deletes to votes (immutable voting records)
+      allow update: if false;
+      allow delete: if false;
     }
     
-    // Allow authenticated users to read audit logs
+    // Audit Logs Collection Rules
     match /auditLogs/{logId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null;
+      // Allow read access to authenticated users (admin viewing audit logs)
+      allow read: if isAuthenticated();
+      
+      // Allow create for authenticated users (system logging activities)
+      allow create: if isAuthenticated()
+        && isValidString(resource.data.action)
+        && isValidString(resource.data.details)
+        && isValidTimestamp(resource.data.timestamp)
+        && isValidString(resource.data.userId)
+        && isValidEmail(resource.data.userEmail);
+      
+      // Prevent updates and deletes to audit logs (immutable audit trail)
+      allow update: if false;
+      allow delete: if false;
     }
     
-    // Allow OTP verification to be read/updated by anyone (frontend-only approach)
-    // Note: This is less secure but simpler for frontend-only implementation
-    match /otp_verification/{otpId} {
-      allow read, write: if true; // Allow anyone to read/write OTPs
+    // OTP Verification Collection Rules
+    match /otp_verification/{email} {
+      // Allow read access to authenticated users (for OTP verification)
+      allow read: if isAuthenticated();
+      
+      // Allow create for authenticated users (generating OTPs)
+      allow create: if isAuthenticated()
+        && isValidEmail(email)
+        && isValidOTP(resource.data.otp)
+        && isValidTimestamp(resource.data.expiresAt)
+        && resource.data.used is bool
+        && isValidTimestamp(resource.data.createdAt);
+      
+      // Allow update for authenticated users (marking OTP as used)
+      allow update: if isAuthenticated()
+        && isValidOTP(resource.data.otp)
+        && isValidTimestamp(resource.data.expiresAt)
+        && resource.data.used is bool;
+      
+      // Allow delete for expired OTPs (cleanup)
+      allow delete: if isAuthenticated();
     }
     
-    // Allow mail collection to be written by frontend (for Trigger Email Extension)
+    // Mail Collection Rules (for email sending)
     match /mail/{mailId} {
-      allow write: if true; // Allow frontend to write to trigger email extension
+      // Allow read access to authenticated users (for email tracking)
+      allow read: if isAuthenticated();
+      
+      // Allow create for authenticated users (sending emails)
+      allow create: if isAuthenticated()
+        && isValidEmail(resource.data.to)
+        && isValidString(resource.data.subject)
+        && isValidString(resource.data.text)
+        && isValidString(resource.data.html)
+        && isValidTimestamp(resource.data.timestamp);
+      
+      // Prevent updates and deletes to mail records
+      allow update: if false;
+      allow delete: if false;
+    }
+    
+    // Contact Messages Collection Rules
+    match /contactMessages/{messageId} {
+      // Allow read access to authenticated users (admin viewing messages)
+      allow read: if isAuthenticated();
+      
+      // Allow create for anyone (contact form submissions)
+      allow create: if isValidString(resource.data.name)
+        && isValidEmail(resource.data.email)
+        && isValidString(resource.data.subject)
+        && isValidString(resource.data.message)
+        && resource.data.read is bool
+        && isValidTimestamp(resource.data.createdAt);
+      
+      // Allow update for authenticated users (marking messages as read)
+      allow update: if isAuthenticated()
+        && resource.data.read is bool;
+      
+      // Allow delete for authenticated users (admin deleting messages)
+      allow delete: if isAuthenticated();
+    }
+    
+    // Admins Collection Rules (for admin user management)
+    match /admins/{adminId} {
+      // Allow read access to authenticated users
+      allow read: if isAuthenticated();
+      
+      // Allow create for authenticated users (admin user creation)
+      allow create: if isAuthenticated()
+        && isValidString(resource.data.email)
+        && isValidString(resource.data.name)
+        && isValidTimestamp(resource.data.createdAt)
+        && isValidString(resource.data.createdBy);
+      
+      // Allow update for authenticated users (admin profile updates)
+      allow update: if isAuthenticated()
+        && isValidString(resource.data.email)
+        && isValidString(resource.data.name)
+        && isValidTimestamp(resource.data.updatedAt)
+        && isValidString(resource.data.updatedBy);
+      
+      // Allow delete for authenticated users (admin user deletion)
+      allow delete: if isAuthenticated();
+    }
+    
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
