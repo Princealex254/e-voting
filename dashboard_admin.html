@@ -470,6 +470,59 @@
             margin-bottom: 1.5rem;
         }
 
+        /* Poll Options Styles */
+        .pad-option-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border: 1px solid var(--pad-border);
+            border-radius: 8px;
+            background: var(--pad-light);
+        }
+
+        .pad-option-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .pad-option-text {
+            width: 100%;
+        }
+
+        .pad-option-image {
+            width: 100%;
+        }
+
+        .pad-option-preview {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--pad-border);
+        }
+
+        .pad-option-preview-placeholder {
+            width: 60px;
+            height: 60px;
+            background: var(--pad-border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--pad-text-light);
+            font-size: 0.875rem;
+        }
+
+        .pad-btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+
         .pad-label {
             display: block;
             font-weight: 600;
@@ -2075,8 +2128,24 @@
                 </div>
 
                 <div class="pad-form-group">
-                    <label class="pad-label" for="pollOptions">Options (one per line) *</label>
-                    <textarea id="pollOptions" name="pollOptions" class="pad-input pad-textarea" placeholder="Option 1&#10;Option 2&#10;Option 3" required></textarea>
+                    <label class="pad-label">Poll Options *</label>
+                    <div id="pollOptionsContainer">
+                        <div class="pad-option-item">
+                            <div class="pad-option-inputs">
+                                <input type="text" class="pad-input pad-option-text" placeholder="Option text" required>
+                                <input type="url" class="pad-input pad-option-image" placeholder="Image URL (optional)">
+                            </div>
+                            <button type="button" class="pad-btn pad-btn-outline pad-btn-sm" onclick="removeOption(this)">Remove</button>
+                        </div>
+                        <div class="pad-option-item">
+                            <div class="pad-option-inputs">
+                                <input type="text" class="pad-input pad-option-text" placeholder="Option text" required>
+                                <input type="url" class="pad-input pad-option-image" placeholder="Image URL (optional)">
+                            </div>
+                            <button type="button" class="pad-btn pad-btn-outline pad-btn-sm" onclick="removeOption(this)">Remove</button>
+                        </div>
+                    </div>
+                    <button type="button" class="pad-btn pad-btn-outline" onclick="addOption()">+ Add Option</button>
                 </div>
 
                 <div class="pad-form-group">
@@ -2306,11 +2375,7 @@
         function updateOverview() {
             const now = new Date();
             const totalPolls = polls.length;
-            const activePolls = polls.filter(poll => {
-                const start = new Date(poll.startAt);
-                const end = new Date(poll.endAt);
-                return start <= now && now <= end && poll.status === 'active';
-            }).length;
+            const activePolls = polls.filter(poll => poll.status === 'active').length;
             const totalVoters = voters.length;
             const totalVotes = votes.length;
 
@@ -2361,19 +2426,23 @@
                             let statusText = 'Draft';
                             
                             if (poll.status === 'active') {
+                                status = 'active';
+                                statusText = 'Active';
+                            } else if (poll.status === 'closed') {
+                                status = 'closed';
+                                statusText = 'Closed';
+                            } else {
+                                // For draft polls, show time-based status
                                 if (start <= now && now <= end) {
-                                    status = 'active';
-                                    statusText = 'Active';
+                                    status = 'draft';
+                                    statusText = 'Ready to Activate';
                                 } else if (start > now) {
                                     status = 'draft';
                                     statusText = 'Upcoming';
                                 } else {
-                                    status = 'closed';
-                                    statusText = 'Closed';
+                                    status = 'draft';
+                                    statusText = 'Expired';
                                 }
-                            } else if (poll.status === 'closed') {
-                                status = 'closed';
-                                statusText = 'Closed';
                             }
 
                             return `
@@ -2388,9 +2457,9 @@
                                     <td class="pad-actions">
                                         <button class="pad-btn pad-btn-outline" onclick="editPoll('${poll.id}')">Edit</button>
                                         <button class="pad-btn pad-btn-secondary" onclick="viewPollResults('${poll.id}')">Results</button>
-                                        ${status === 'draft' ? `<button class="pad-btn pad-btn-success" onclick="activatePoll('${poll.id}')">Activate</button>` : ''}
-                                        ${status === 'active' ? `<button class="pad-btn pad-btn-warning" onclick="closePoll('${poll.id}')">Close</button>` : ''}
-                                        ${status === 'closed' ? `<button class="pad-btn pad-btn-primary" onclick="reopenPoll('${poll.id}')">Reopen</button>` : ''}
+                                        ${poll.status === 'draft' ? `<button class="pad-btn pad-btn-success" onclick="activatePoll('${poll.id}')">Activate</button>` : ''}
+                                        ${poll.status === 'active' ? `<button class="pad-btn pad-btn-warning" onclick="closePoll('${poll.id}')">Close</button>` : ''}
+                                        ${poll.status === 'closed' ? `<button class="pad-btn pad-btn-primary" onclick="reopenPoll('${poll.id}')">Reopen</button>` : ''}
                                         <button class="pad-btn pad-btn-danger" onclick="deletePoll('${poll.id}')">Delete</button>
                                     </td>
                                 </tr>
@@ -2758,19 +2827,23 @@
                                 let statusText = 'Draft';
                                 
                                 if (poll.status === 'active') {
+                                    status = 'active';
+                                    statusText = 'Active';
+                                } else if (poll.status === 'closed') {
+                                    status = 'closed';
+                                    statusText = 'Closed';
+                                } else {
+                                    // For draft polls, show time-based status
                                     if (start <= now && now <= end) {
-                                        status = 'active';
-                                        statusText = 'Active';
+                                        status = 'draft';
+                                        statusText = 'Ready to Activate';
                                     } else if (start > now) {
                                         status = 'draft';
                                         statusText = 'Upcoming';
                                     } else {
-                                        status = 'closed';
-                                        statusText = 'Closed';
+                                        status = 'draft';
+                                        statusText = 'Expired';
                                     }
-                                } else if (poll.status === 'closed') {
-                                    status = 'closed';
-                                    statusText = 'Closed';
                                 }
 
                                 return `
@@ -2788,7 +2861,13 @@
                                                 <div class="pad-results-poll-item">
                                                     <div class="pad-results-poll-option">
                                                         <span class="pad-results-poll-rank">#${index + 1}</span>
-                                                        <span class="pad-results-poll-option-text">${result.option}</span>
+                                                        <span class="pad-results-poll-option-text">
+                                                            ${poll.options.find(opt => (typeof opt === 'string' ? opt : opt.text) === result.option)?.imageUrl ? 
+                                                                `<img src="${poll.options.find(opt => (typeof opt === 'string' ? opt : opt.text) === result.option).imageUrl}" alt="${result.option}" style="width: 30px; height: 30px; margin-right: 0.5rem; border-radius: 4px; object-fit: cover;" onerror="this.style.display='none';">` :
+                                                                ''
+                                                            }
+                                                            ${result.option}
+                                                        </span>
                                                         <span class="pad-results-poll-stats">${result.votes} (${result.percentage}%)</span>
                                                     </div>
                                                     <div class="pad-results-poll-bar">
@@ -3084,7 +3163,13 @@
                                 <div class="pad-result-item">
                                     <div class="pad-result-header">
                                         <span class="pad-result-rank">#${index + 1}</span>
-                                        <span class="pad-result-option">${result.option}</span>
+                                        <span class="pad-result-option">
+                                            ${poll.options.find(opt => (typeof opt === 'string' ? opt : opt.text) === result.option)?.imageUrl ? 
+                                                `<img src="${poll.options.find(opt => (typeof opt === 'string' ? opt : opt.text) === result.option).imageUrl}" alt="${result.option}" style="width: 40px; height: 40px; margin-right: 0.5rem; border-radius: 4px; object-fit: cover;" onerror="this.style.display='none';">` :
+                                                ''
+                                            }
+                                            ${result.option}
+                                        </span>
                                         <span class="pad-result-stats">${result.votes} votes (${result.percentage}%)</span>
                                     </div>
                                     <div class="pad-result-bar">
@@ -3220,24 +3305,21 @@
         }
 
         async function createPoll() {
+            // Check if we're editing an existing poll
+            const editId = document.getElementById('createPollModal').getAttribute('data-edit-id');
+            
             const title = document.getElementById('pollTitle').value;
             const description = document.getElementById('pollDescription').value;
             const typeRadio = document.querySelector('input[name="pollType"]:checked');
             const type = typeRadio ? typeRadio.value : 'single';
             const maxSelections = document.getElementById('maxSelections').value;
-            const optionsText = document.getElementById('pollOptions').value;
-            const options = optionsText.split('\n').filter(opt => opt.trim());
+            const options = getPollOptions();
             
             // Debug options processing
             if (editId) {
                 console.log('Options processing:');
-                console.log('Raw options text:', optionsText);
-                console.log('Split by newline:', optionsText.split('\n'));
-                console.log('After filtering empty:', options);
-                console.log('Each option trimmed:');
-                options.forEach((opt, index) => {
-                    console.log(`  ${index}: "${opt}" (length: ${opt.length})`);
-                });
+                console.log('Options from form:', options);
+                console.log('Options count:', options.length);
             }
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
@@ -3248,7 +3330,6 @@
             const organizationId = organizationSelect ? organizationSelect.value : '';
             
             // Debug logging for edit validation
-            const editId = document.getElementById('createPollModal').getAttribute('data-edit-id');
             
             // Debug organization selection
             if (editId) {
@@ -3295,7 +3376,8 @@
                     description,
                     options: options.map((opt, index) => ({
                         id: `opt${index + 1}`,
-                        text: opt.trim(),
+                        text: opt.text,
+                        imageUrl: opt.imageUrl || '',
                         photo: null,
                         bio: ''
                     })),
@@ -3311,9 +3393,6 @@
                     status: 'draft'
                 };
 
-                // Check if we're editing an existing poll
-                const editId = document.getElementById('createPollModal').getAttribute('data-edit-id');
-                
                 if (editId) {
                     // Update existing poll
                     await window.updateDoc(window.doc(window.firebaseDB, 'polls', editId), {
@@ -3376,6 +3455,107 @@
             document.getElementById(modalId).classList.remove('show');
         }
 
+        // Poll Options Management
+        function addOption() {
+            const container = document.getElementById('pollOptionsContainer');
+            const optionItem = document.createElement('div');
+            optionItem.className = 'pad-option-item';
+            optionItem.innerHTML = `
+                <div class="pad-option-inputs">
+                    <input type="text" class="pad-input pad-option-text" placeholder="Option text" required>
+                    <input type="url" class="pad-input pad-option-image" placeholder="Image URL (optional)" onchange="updateImagePreview(this)">
+                </div>
+                <button type="button" class="pad-btn pad-btn-outline pad-btn-sm" onclick="removeOption(this)">Remove</button>
+            `;
+            container.appendChild(optionItem);
+        }
+
+        function removeOption(button) {
+            const container = document.getElementById('pollOptionsContainer');
+            if (container.children.length > 1) {
+                button.parentElement.remove();
+            } else {
+                showAlert('At least one option is required', 'warning');
+            }
+        }
+
+        function updateImagePreview(input) {
+            const optionItem = input.closest('.pad-option-item');
+            let preview = optionItem.querySelector('.pad-option-preview');
+            let placeholder = optionItem.querySelector('.pad-option-preview-placeholder');
+            
+            if (input.value) {
+                if (!preview) {
+                    // Create preview image
+                    preview = document.createElement('img');
+                    preview.className = 'pad-option-preview';
+                    preview.onerror = function() {
+                        this.style.display = 'none';
+                        if (!placeholder) {
+                            placeholder = document.createElement('div');
+                            placeholder.className = 'pad-option-preview-placeholder';
+                            placeholder.textContent = 'Invalid';
+                            optionItem.insertBefore(placeholder, optionItem.firstChild);
+                        }
+                        placeholder.style.display = 'flex';
+                    };
+                    preview.onload = function() {
+                        if (placeholder) placeholder.style.display = 'none';
+                        this.style.display = 'block';
+                    };
+                    optionItem.insertBefore(preview, optionItem.firstChild);
+                }
+                preview.src = input.value;
+                preview.style.display = 'block';
+                if (placeholder) placeholder.style.display = 'none';
+            } else {
+                if (preview) preview.style.display = 'none';
+                if (placeholder) placeholder.style.display = 'none';
+            }
+        }
+
+        function getPollOptions() {
+            const container = document.getElementById('pollOptionsContainer');
+            const options = [];
+            
+            Array.from(container.children).forEach(item => {
+                const textInput = item.querySelector('.pad-option-text');
+                const imageInput = item.querySelector('.pad-option-image');
+                
+                if (textInput && textInput.value.trim()) {
+                    options.push({
+                        text: textInput.value.trim(),
+                        imageUrl: imageInput ? imageInput.value.trim() : ''
+                    });
+                }
+            });
+            
+            return options;
+        }
+
+        function setPollOptions(options) {
+            const container = document.getElementById('pollOptionsContainer');
+            container.innerHTML = '';
+            
+            options.forEach((option, index) => {
+                const optionItem = document.createElement('div');
+                optionItem.className = 'pad-option-item';
+                optionItem.innerHTML = `
+                    <div class="pad-option-inputs">
+                        <input type="text" class="pad-input pad-option-text" placeholder="Option text" value="${option.text || ''}" required>
+                        <input type="url" class="pad-input pad-option-image" placeholder="Image URL (optional)" value="${option.imageUrl || ''}" onchange="updateImagePreview(this)">
+                    </div>
+                    <button type="button" class="pad-btn pad-btn-outline pad-btn-sm" onclick="removeOption(this)">Remove</button>
+                `;
+                container.appendChild(optionItem);
+                
+                // Update preview if image URL exists
+                if (option.imageUrl) {
+                    setTimeout(() => updateImagePreview(optionItem.querySelector('.pad-option-image')), 100);
+                }
+            });
+        }
+
         function editPoll(pollId) {
             console.log('Edit poll called with ID:', pollId);
             console.log('Available polls:', polls);
@@ -3390,6 +3570,9 @@
             console.log('Found poll:', poll);
 
             try {
+                // Populate organization dropdown first
+                populateOrganizationDropdown();
+                
                 // Reset radio buttons to default state
                 document.querySelectorAll('input[name="pollType"]').forEach(radio => {
                     radio.checked = false;
@@ -3418,12 +3601,17 @@
                     document.querySelector('input[name="pollType"][value="single"]').checked = true;
                 }
                 
-                // Set organization
-                document.getElementById('organizationSelect').value = poll.organizationId || '';
+                // Set organization (after dropdown is populated)
+                setTimeout(() => {
+                    document.getElementById('organizationSelect').value = poll.organizationId || '';
+                }, 100);
                 
                 // Set poll options
-                const optionsText = poll.options ? poll.options.map(opt => opt.text).join('\n') : '';
-                document.getElementById('pollOptions').value = optionsText;
+                const pollOptions = poll.options ? poll.options.map(opt => ({
+                    text: opt.text || '',
+                    imageUrl: opt.imageUrl || ''
+                })) : [];
+                setPollOptions(pollOptions);
                 
                 // Set dates
                 if (poll.startAt) {
@@ -4326,7 +4514,13 @@
                                 <div class="pad-fullscreen-option">
                                     <div class="pad-fullscreen-option-header">
                                         <div class="pad-fullscreen-option-rank">#${rank}</div>
-                                        <div class="pad-fullscreen-option-text">${optionText}</div>
+                                        <div class="pad-fullscreen-option-text">
+                                            ${fullScreenPoll.options.find(opt => (typeof opt === 'string' ? opt : opt.text) === optionText)?.imageUrl ? 
+                                                `<img src="${fullScreenPoll.options.find(opt => (typeof opt === 'string' ? opt : opt.text) === optionText).imageUrl}" alt="${optionText}" style="width: 50px; height: 50px; margin-right: 1rem; border-radius: 8px; object-fit: cover;" onerror="this.style.display='none';">` :
+                                                ''
+                                            }
+                                            ${optionText}
+                                        </div>
                                     </div>
                                     <div class="pad-fullscreen-option-stats">
                                         <div class="pad-fullscreen-option-votes">${votes}</div>
@@ -4438,7 +4632,13 @@
                                 <div class="pad-fullscreen-option">
                                     <div class="pad-fullscreen-option-header">
                                         <div class="pad-fullscreen-option-rank">#${rank}</div>
-                                        <div class="pad-fullscreen-option-text">${optionText}</div>
+                                        <div class="pad-fullscreen-option-text">
+                                            ${fullScreenPoll.options.find(opt => (typeof opt === 'string' ? opt : opt.text) === optionText)?.imageUrl ? 
+                                                `<img src="${fullScreenPoll.options.find(opt => (typeof opt === 'string' ? opt : opt.text) === optionText).imageUrl}" alt="${optionText}" style="width: 50px; height: 50px; margin-right: 1rem; border-radius: 8px; object-fit: cover;" onerror="this.style.display='none';">` :
+                                                ''
+                                            }
+                                            ${optionText}
+                                        </div>
                                     </div>
                                     <div class="pad-fullscreen-option-stats">
                                         <div class="pad-fullscreen-option-votes">${votes}</div>
