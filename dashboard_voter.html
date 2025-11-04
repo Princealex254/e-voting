@@ -681,9 +681,6 @@
                 document.addEventListener(event, resetSessionTimeout, true);
             });
 
-            // Check for maximum session duration
-            checkMaxSessionDuration();
-            
             // Start the initial timeout
             resetSessionTimeout();
         }
@@ -691,6 +688,17 @@
         function resetSessionTimeout() {
             lastActivity = Date.now();
             
+            // First, check if the total session duration has exceeded the maximum
+            const voterSession = localStorage.getItem('voterSession');
+            if (voterSession) {
+                const sessionData = JSON.parse(voterSession);
+                const sessionAge = Date.now() - sessionData.timestamp;
+                if (sessionAge > MAX_SESSION_DURATION) {
+                    forceLogout('Your session has expired for security reasons. Please log in again.');
+                    return; // Stop further processing
+                }
+            }
+
             // Clear existing timeouts
             if (sessionTimeout) clearTimeout(sessionTimeout);
             if (warningTimeout) clearTimeout(warningTimeout);
@@ -732,18 +740,6 @@
                     sessionIndicator.textContent = '●';
                     sessionStatus.innerHTML = '<span id="sessionIndicator">●</span> Session Expired';
                     break;
-            }
-        }
-
-        function checkMaxSessionDuration() {
-            const voterSession = localStorage.getItem('voterSession');
-            if (voterSession) {
-                const sessionData = JSON.parse(voterSession);
-                const sessionAge = Date.now() - sessionData.timestamp;
-                
-                if (sessionAge > MAX_SESSION_DURATION) {
-                    forceLogout('Your session has expired. Please log in again.');
-                }
             }
         }
 
