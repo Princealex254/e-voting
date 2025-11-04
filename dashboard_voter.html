@@ -613,8 +613,8 @@
         let sessionTimeout = null;
         let warningTimeout = null;
         let lastActivity = Date.now();
-        const SESSION_WARNING_TIME = 5 * 60 * 1000; // 5 minutes before logout
-        const SESSION_TIMEOUT = 2 * 60 * 60 * 1000; // 2 hours of inactivity
+        const SESSION_TIMEOUT = 15 * 60 * 1000; // 15 minutes of inactivity
+        const SESSION_WARNING_TIME = 5 * 60 * 1000; // 5 minutes before logout (shows warning at 10 minutes of inactivity)
         const MAX_SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours total
 
         // Initialize page
@@ -700,7 +700,7 @@
             
             // Set warning timeout (5 minutes before logout)
             warningTimeout = setTimeout(() => {
-                updateSessionStatus('warning');
+                // The showSessionWarning function will update the status
                 showSessionWarning();
             }, SESSION_TIMEOUT - SESSION_WARNING_TIME);
             
@@ -786,7 +786,7 @@
                     ">⚠️</div>
                     <h3 style="margin-bottom: 1rem; color: #374151;">Session Expiring Soon</h3>
                     <p style="margin-bottom: 1.5rem; color: #6b7280;">
-                        Your session will expire in 5 minutes due to inactivity. 
+                        Your session will expire soon due to inactivity. 
                         Click "Stay Logged In" to continue or you'll be automatically logged out.
                     </p>
                     <div style="display: flex; gap: 1rem; justify-content: center;">
@@ -816,6 +816,9 @@
         }
 
         function extendSession() {
+            // Update session status indicator
+            updateSessionStatus('active');
+
             // Remove warning modal
             const warningModal = document.getElementById('sessionWarningModal');
             if (warningModal) {
