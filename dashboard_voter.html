@@ -601,6 +601,24 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // Make Firebase available globally
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDB = db;
+        
+        // Make Firebase functions globally available
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.signOut = signOut;
+        window.doc = doc;
+        window.getDoc = getDoc;
+        window.collection = collection;
+        window.query = query;
+        window.where = where;
+        window.getDocs = getDocs;
+        window.orderBy = orderBy;
+        window.onSnapshot = onSnapshot;
+        window.addDoc = addDoc;
+        window.serverTimestamp = serverTimestamp;
     </script>
 
     <script>
@@ -613,8 +631,8 @@
         let sessionTimeout = null;
         let warningTimeout = null;
         let lastActivity = Date.now();
-        const SESSION_TIMEOUT = 15 * 60 * 1000; // 15 minutes of inactivity
-        const SESSION_WARNING_TIME = 5 * 60 * 1000; // 5 minutes before logout (shows warning at 10 minutes of inactivity)
+        const SESSION_WARNING_TIME = 5 * 60 * 1000; // 5 minutes before logout
+        const SESSION_TIMEOUT = 2 * 60 * 60 * 1000; // 2 hours of inactivity
         const MAX_SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours total
 
         // Initialize page
@@ -647,14 +665,14 @@
                 }
 
                 // Get voter data from Firestore
-                const voterDoc = await getDoc(doc(db, 'voters', voterId));
+                const voterDoc = await window.getDoc(window.doc(window.firebaseDB, 'voters', voterId));
                 if (!voterDoc.exists()) {
                     localStorage.removeItem('voterSession');
                     window.location.href = 'login.html';
                     return;
                 }
 
-                currentUser = { id: voterId, ...voterDoc.data() };
+                currentUser = { uid: voterId, ...voterDoc.data() };
                 userOrganizationId = currentUser.organizationId;
 
                 // Update user info in header
@@ -667,7 +685,7 @@
                 updateUI();
                 startRealTimeUpdates();
             } catch (error) {
-                console.error(`Auth Error: ${error.code} - ${error.message}`);
+                console.error('Error checking auth:', error);
                 localStorage.removeItem('voterSession');
                 window.location.href = 'login.html';
             }
@@ -681,6 +699,9 @@
                 document.addEventListener(event, resetSessionTimeout, true);
             });
 
+            // Check for maximum session duration
+            checkMaxSessionDuration();
+            
             // Start the initial timeout
             resetSessionTimeout();
         }
@@ -688,17 +709,6 @@
         function resetSessionTimeout() {
             lastActivity = Date.now();
             
-            // First, check if the total session duration has exceeded the maximum
-            const voterSession = localStorage.getItem('voterSession');
-            if (voterSession) {
-                const sessionData = JSON.parse(voterSession);
-                const sessionAge = Date.now() - sessionData.timestamp;
-                if (sessionAge > MAX_SESSION_DURATION) {
-                    forceLogout('Your session has expired for security reasons. Please log in again.');
-                    return; // Stop further processing
-                }
-            }
-
             // Clear existing timeouts
             if (sessionTimeout) clearTimeout(sessionTimeout);
             if (warningTimeout) clearTimeout(warningTimeout);
@@ -708,7 +718,7 @@
             
             // Set warning timeout (5 minutes before logout)
             warningTimeout = setTimeout(() => {
-                // The showSessionWarning function will update the status
+                updateSessionStatus('warning');
                 showSessionWarning();
             }, SESSION_TIMEOUT - SESSION_WARNING_TIME);
             
@@ -740,6 +750,18 @@
                     sessionIndicator.textContent = '●';
                     sessionStatus.innerHTML = '<span id="sessionIndicator">●</span> Session Expired';
                     break;
+            }
+        }
+
+        function checkMaxSessionDuration() {
+            const voterSession = localStorage.getItem('voterSession');
+            if (voterSession) {
+                const sessionData = JSON.parse(voterSession);
+                const sessionAge = Date.now() - sessionData.timestamp;
+                
+                if (sessionAge > MAX_SESSION_DURATION) {
+                    forceLogout('Your session has expired. Please log in again.');
+                }
             }
         }
 
@@ -782,7 +804,7 @@
                     ">⚠️</div>
                     <h3 style="margin-bottom: 1rem; color: #374151;">Session Expiring Soon</h3>
                     <p style="margin-bottom: 1.5rem; color: #6b7280;">
-                        Your session will expire soon due to inactivity. 
+                        Your session will expire in 5 minutes due to inactivity. 
                         Click "Stay Logged In" to continue or you'll be automatically logged out.
                     </p>
                     <div style="display: flex; gap: 1rem; justify-content: center;">
@@ -812,9 +834,6 @@
         }
 
         function extendSession() {
-            // Update session status indicator
-            updateSessionStatus('active');
-
             // Remove warning modal
             const warningModal = document.getElementById('sessionWarningModal');
             if (warningModal) {
@@ -1065,7 +1084,7 @@
                 // Since we're not using Firebase Auth, just redirect
                 window.location.href = 'index.html';
             } catch (error) {
-                console.error(`Logout Error: ${error.code} - ${error.message}`);
+                console.error('Logout error:', error);
                 // Clear session even if there's an error
                 localStorage.removeItem('voterSession');
                 window.location.href = 'index.html';
@@ -1075,7 +1094,7 @@
         function startRealTimeUpdates() {
             // Set up real-time listener for polls (only active and closed polls)
             const pollsQuery = query(
-                collection(db, 'polls'),
+                window.collection(window.firebaseDB, 'polls'),
                 where('organizationId', '==', userOrganizationId),
                 where('status', 'in', ['active', 'closed'])
             );
@@ -1095,8 +1114,8 @@
 
             // Set up real-time listener for votes
             const votesQuery = query(
-                collection(db, 'votes'),
-                where('voterId', '==', currentUser.id)
+                window.collection(window.firebaseDB, 'votes'),
+                where('voterId', '==', currentUser.uid)
             );
             
             onSnapshot(votesQuery, (snapshot) => {
