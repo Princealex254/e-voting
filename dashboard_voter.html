@@ -601,6 +601,24 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // Make Firebase available globally
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDB = db;
+        
+        // Make Firebase functions globally available
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.signOut = signOut;
+        window.doc = doc;
+        window.getDoc = getDoc;
+        window.collection = collection;
+        window.query = query;
+        window.where = where;
+        window.getDocs = getDocs;
+        window.orderBy = orderBy;
+        window.onSnapshot = onSnapshot;
+        window.addDoc = addDoc;
+        window.serverTimestamp = serverTimestamp;
     </script>
 
     <script>
@@ -647,14 +665,14 @@
                 }
 
                 // Get voter data from Firestore
-                const voterDoc = await getDoc(doc(db, 'voters', voterId));
+                const voterDoc = await window.getDoc(window.doc(window.firebaseDB, 'voters', voterId));
                 if (!voterDoc.exists()) {
                     localStorage.removeItem('voterSession');
                     window.location.href = 'login.html';
                     return;
                 }
 
-                currentUser = { id: voterId, ...voterDoc.data() };
+                currentUser = { uid: voterId, ...voterDoc.data() };
                 userOrganizationId = currentUser.organizationId;
 
                 // Update user info in header
@@ -667,7 +685,7 @@
                 updateUI();
                 startRealTimeUpdates();
             } catch (error) {
-                console.error(`Auth Error: ${error.code} - ${error.message}`);
+                console.error('Error checking auth:', error);
                 localStorage.removeItem('voterSession');
                 window.location.href = 'login.html';
             }
@@ -1066,7 +1084,7 @@
                 // Since we're not using Firebase Auth, just redirect
                 window.location.href = 'index.html';
             } catch (error) {
-                console.error(`Logout Error: ${error.code} - ${error.message}`);
+                console.error('Logout error:', error);
                 // Clear session even if there's an error
                 localStorage.removeItem('voterSession');
                 window.location.href = 'index.html';
@@ -1076,7 +1094,7 @@
         function startRealTimeUpdates() {
             // Set up real-time listener for polls (only active and closed polls)
             const pollsQuery = query(
-                collection(db, 'polls'),
+                window.collection(window.firebaseDB, 'polls'),
                 where('organizationId', '==', userOrganizationId),
                 where('status', 'in', ['active', 'closed'])
             );
@@ -1096,8 +1114,8 @@
 
             // Set up real-time listener for votes
             const votesQuery = query(
-                collection(db, 'votes'),
-                where('voterId', '==', currentUser.id)
+                window.collection(window.firebaseDB, 'votes'),
+                where('voterId', '==', currentUser.uid)
             );
             
             onSnapshot(votesQuery, (snapshot) => {
