@@ -632,47 +632,84 @@
         let warningTimeout = null;
         let lastActivity = Date.now();
         const SESSION_WARNING_TIME = 5 * 60 * 1000; // 5 minutes before logout
-        const SESSION_TIMEOUT = 2 * 60 * 60 * 1000; // 2 hours of inactivity
-        const MAX_SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours total
+        const SESSION_TIMEOUT = 15 * 60 * 1000; // 15 minutes of inactivity
+        const MAX_SESSION_DURATION = 1 * 60 * 60 * 1000; // 1 hour total
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             checkAuth();
-            setupSessionManagement();
         });
 
-        async function checkAuth() {
-            // Since we're using OTP-only authentication, check for voter session in localStorage
+        function checkAuth() {
+            // First, check for the custom OTP session in localStorage
             const voterSession = localStorage.getItem('voterSession');
-            
-            if (!voterSession) {
-                window.location.href = 'login.html';
-                return;
+            if (voterSession) {
+                try {
+                    const sessionData = JSON.parse(voterSession);
+                    const sessionAge = Date.now() - sessionData.timestamp;
+
+                    if (sessionData.voterId && sessionAge <= MAX_SESSION_DURATION) {
+                        // If the custom session is valid, load user data with it
+                        loadUserData(null, sessionData.voterId); // Pass voterId directly
+                        return; // Exit the function, we are authenticated
+                    } else {
+                        localStorage.removeItem('voterSession'); // Clean up expired session
+                    }
+                } catch (e) {
+                    localStorage.removeItem('voterSession'); // Clean up corrupted session
+                }
             }
 
+            // If no custom session, check for standard Firebase Auth state (for password logins)
+            window.onAuthStateChanged(window.firebaseAuth, (user) => {
+                if (user) {
+                    // User is signed in. Load their data.
+                    loadUserData(user.uid);
+                } else {
+                    // User is not signed in. Redirect to login page.
+                    console.log("No valid session found. Redirecting to login.");
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+
+        async function loadUserData(firebaseAuthUid, directVoterId = null) {
             try {
-                const sessionData = JSON.parse(voterSession);
-                const { voterId, email, timestamp } = sessionData;
-                
-                // Check if session is still valid (24 hours)
-                const sessionAge = Date.now() - timestamp;
-                const maxSessionAge = 24 * 60 * 60 * 1000; // 24 hours
-                
-                if (sessionAge > maxSessionAge) {
-                    localStorage.removeItem('voterSession');
-                    window.location.href = 'login.html';
-                    return;
+                let userDoc;
+                let finalUid = firebaseAuthUid;
+
+                if (directVoterId) {
+                    // OTP Login: We have the voter's document ID directly
+                    const userDocRef = window.doc(window.firebaseDB, 'voters', directVoterId);
+                    userDoc = await window.getDoc(userDocRef);
+                    finalUid = directVoterId; // The document ID is the UID for our purposes
+                } else {
+                    // Password Login: Find voter document via email from Firebase Auth user
+                    const firebaseUser = window.firebaseAuth.currentUser;
+                    if (!firebaseUser || !firebaseUser.email) {
+                        throw new Error("Firebase Auth user not found or email missing.");
+                    }
+
+                    const votersQuery = window.query(
+                        window.collection(window.firebaseDB, 'voters'),
+                        window.where('email', '==', firebaseUser.email)
+                    );
+                    const votersSnapshot = await window.getDocs(votersQuery);
+
+                    if (votersSnapshot.empty) {
+                        throw new Error("Voter document not found for email: " + firebaseUser.email);
+                    }
+                    userDoc = votersSnapshot.docs[0];
+                    finalUid = userDoc.id; // Use the Firestore document ID
                 }
 
-                // Get voter data from Firestore
-                const voterDoc = await window.getDoc(window.doc(window.firebaseDB, 'voters', voterId));
-                if (!voterDoc.exists()) {
-                    localStorage.removeItem('voterSession');
-                    window.location.href = 'login.html';
-                    return;
+                if (!userDoc.exists()) {
+                    throw new Error("Voter document does not exist.");
                 }
 
-                currentUser = { uid: voterId, ...voterDoc.data() };
+                const voterData = userDoc.data();
+
+                currentUser = { uid: finalUid, ...voterData }; // Use the Firestore document ID as the consistent UID
                 userOrganizationId = currentUser.organizationId;
 
                 // Update user info in header
@@ -681,12 +718,12 @@
                 document.getElementById('userAvatar').textContent = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
 
                 // Load data and update UI
-                await loadData();
-                updateUI();
-                startRealTimeUpdates();
+                await loadData(); // Load polls and votes
+                updateUI(); // Render the UI with the data
+                startRealTimeUpdates(); // Listen for changes
+                setupSessionManagement(); // Start session timers
             } catch (error) {
-                console.error('Error checking auth:', error);
-                localStorage.removeItem('voterSession');
+                console.error('Error loading user data:', error);
                 window.location.href = 'login.html';
             }
         }
@@ -943,7 +980,7 @@
                 const start = new Date(poll.startAt);
                 return poll.status === 'active' && start > now;
             }).length;
-            const votedPolls = votes.filter(vote => vote.voterId === currentUser.id).length;
+            const votedPolls = votes.filter(vote => vote.voterId === currentUser.uid).length;
 
             document.getElementById('totalPolls').textContent = totalPolls;
             document.getElementById('activePolls').textContent = activePolls;
@@ -971,7 +1008,7 @@
             pollsGrid.innerHTML = sortedPolls.map(poll => {
                 const start = new Date(poll.startAt);
                 const end = new Date(poll.endAt);
-                const hasVoted = votes.some(vote => vote.pollId === poll.id && vote.voterId === currentUser.id);
+                const hasVoted = votes.some(vote => vote.pollId === poll.id && vote.voterId === currentUser.uid);
                 
                 // Use same status logic as admin dashboard
                 let status = 'draft';
@@ -1078,16 +1115,15 @@
                 if (sessionTimeout) clearTimeout(sessionTimeout);
                 if (warningTimeout) clearTimeout(warningTimeout);
                 
-                // Clear voter session from localStorage
-                localStorage.removeItem('voterSession');
+                // Sign out from Firebase Authentication
+                await window.signOut(window.firebaseAuth);
                 
-                // Since we're not using Firebase Auth, just redirect
-                window.location.href = 'index.html';
+                // Redirect to the login page after successful logout
+                window.location.href = 'login.html';
             } catch (error) {
                 console.error('Logout error:', error);
-                // Clear session even if there's an error
-                localStorage.removeItem('voterSession');
-                window.location.href = 'index.html';
+                // As a fallback, still redirect to the login page
+                window.location.href = 'login.html';
             }
         }
 
