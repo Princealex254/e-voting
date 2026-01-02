@@ -499,7 +499,6 @@
         <div class="pad-card">
             <div class="pad-tabs">
                 <div class="pad-tab active" id="voterTab">Voter Login</div>
-                <div class="pad-tab" id="adminTab" style="display: none;">Admin Login</div>
             </div>
 
             <!-- Voter Login Form -->
@@ -557,42 +556,6 @@
                 </div>
             </div>
 
-            <!-- Admin Login Form -->
-            <div class="pad-form-section" id="adminForm" style="display: none;">
-                <div class="pad-login-instructions">
-                    <div class="pad-instructions-content">
-                        <p>Enter your admin credentials to access the admin dashboard.</p>
-                    </div>
-                </div>
-
-                <form id="adminLoginForm">
-                    <div class="pad-form-group">
-                        <label class="pad-label" for="adminEmail">Email Address</label>
-                        <input type="email" id="adminEmail" name="adminEmail" class="pad-input" placeholder="Enter your admin email" required>
-                        <div class="pad-error-message" id="adminEmailError"></div>
-                    </div>
-
-                    <div class="pad-form-group">
-                        <label class="pad-label" for="adminPassword">Password</label>
-                        <div class="pad-input-group">
-                            <input type="password" id="adminPassword" name="adminPassword" class="pad-input" placeholder="Enter your password" required>
-                            <span class="pad-input-icon" onclick="togglePassword('adminPassword')">👁️</span>
-                        </div>
-                        <div class="pad-error-message" id="adminPasswordError"></div>
-                    </div>
-
-                    <button type="button" class="pad-btn pad-btn-primary" onclick="handleAdminLogin()" id="adminLoginBtn">
-                        <span id="adminLoginText">Login</span>
-                        <span id="adminLoginLoading" class="pad-loading" style="display: none;">
-                            <div class="pad-spinner"></div>
-                            <span>Logging in...</span>
-                        </span>
-                    </button>
-                    <div class="pad-error-message" id="adminLoginError" style="display: none;"></div>
-                    <div class="pad-success-message" id="adminLoginSuccess" style="display: none;"></div>
-                </form>
-            </div>
-
         </div>
     </div>
 
@@ -601,8 +564,8 @@
     <script type="module">
         // Import Firebase functions
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, serverTimestamp, collection, addDoc, setDoc, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, serverTimestamp, collection, addDoc, setDoc, getDocs, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // Firebase configuration
         const firebaseConfig = {
@@ -628,6 +591,8 @@
         window.signInWithEmailAndPassword = signInWithEmailAndPassword;
         window.signOut = signOut;
         window.onAuthStateChanged = onAuthStateChanged;
+        window.signInWithCustomToken = signInWithCustomToken;
+        window.signInAnonymously = signInAnonymously;
         window.doc = doc;
         window.getDoc = getDoc;
         window.updateDoc = updateDoc;
@@ -639,32 +604,40 @@
         window.query = query;
         window.where = where;
         window.orderBy = orderBy;
+        window.limit = limit;
 
         // Check authentication state
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User is signed in, redirect based on user type
-                checkUserTypeAndRedirect(user.uid);
+                // User is signed in, check if they are a voter and redirect.
+                checkUserTypeAndRedirect(user);
             }
         });
 
-        async function checkUserTypeAndRedirect(uid) {
+        async function checkUserTypeAndRedirect(user) {
             try {
-                // Check if user is admin
-                const adminDoc = await window.getDoc(window.doc(db, 'admins', uid));
-                if (adminDoc.exists()) {
-                    window.location.href = 'dashboard_voter.html';
-                    return;
+                // This page is for voters. Check if the logged-in user is a voter.
+                let votersQuery;
+                if (user.isAnonymous) {
+                    // This is an OTP-based login session
+                    votersQuery = window.query(window.collection(db, 'voters'), where('firebaseUid', '==', user.uid));
+                } else {
+                    // This is a password-based login session
+                    votersQuery = window.query(window.collection(db, 'voters'), where('email', '==', user.email));
                 }
+                
+                const voterSnapshot = await window.getDocs(votersQuery);
 
-                // Check if user is voter
-                const voterDoc = await window.getDoc(window.doc(db, 'voters', uid));
-                if (voterDoc.exists()) {
+                if (!voterSnapshot.empty) {
+                    // User is a voter, redirect to their dashboard.
                     window.location.href = 'dashboard_voter.html';
-                    return;
+                } else {
+                    // User is logged in but not a voter (e.g., an admin). Sign them out from the voter login page.
+                    await window.signOut(auth);
                 }
             } catch (error) {
-                console.error('Error checking user type:', error);
+                console.error('Error checking user type on voter login page:', error);
+                await window.signOut(auth); // Sign out on error to be safe
             }
         }
     </script>
@@ -678,12 +651,6 @@
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             setupEventListeners();
-            
-            // Check URL parameters for admin login
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('admin') === 'true') {
-                showAdminLogin();
-            }
         });
 
         function setupEventListeners() {
@@ -829,9 +796,20 @@
             }
         }
 
-        // Generate random 6 digit OTP
+        // Generate random 6 digit OTP securely using Crypto API
         function generateOtp() {
-            return Math.floor(100000 + Math.random() * 900000).toString();
+            const array = new Uint32Array(1);
+            window.crypto.getRandomValues(array);
+            // Modulo to get 6 digits (100000-999999)
+            return (array[0] % 900000 + 100000).toString();
+        }
+
+        async function hashOTP(otp) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(otp);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
         async function sendOTP(identifier) {
@@ -839,16 +817,35 @@
             const buttonText = document.querySelector('#voterLoginText');
             const loading = document.querySelector('#voterLoginLoading');
             const errorDiv = document.querySelector('#voterLoginError');
+            const resendBtn = document.querySelector('#resendBtn');
+            const otpErrorDiv = document.querySelector('#otpVerifyError');
             
             try {
                 // Clear any previous errors
                 errorDiv.style.display = 'none';
                 errorDiv.textContent = '';
+                if (errorDiv) {
+                    errorDiv.style.display = 'none';
+                    errorDiv.textContent = '';
+                }
+                if (otpErrorDiv) {
+                    otpErrorDiv.style.display = 'none';
+                    otpErrorDiv.textContent = '';
+                }
                 
                 // Show loading state
                 button.disabled = true;
                 buttonText.style.display = 'none';
                 loading.style.display = 'inline-flex';
+                if (button) {
+                    button.disabled = true;
+                    if (buttonText) buttonText.style.display = 'none';
+                    if (loading) loading.style.display = 'inline-flex';
+                }
+                if (resendBtn) {
+                    resendBtn.disabled = true;
+                    resendBtn.textContent = 'Sending...';
+                }
                 
                 // Determine if identifier is email or identity number
                 const isEmail = identifier.includes('@');
@@ -873,9 +870,27 @@
                     button.disabled = false;
                     buttonText.style.display = 'inline-block';
                     loading.style.display = 'none';
+                    if (button) {
+                        button.disabled = false;
+                        if (buttonText) buttonText.style.display = 'inline-block';
+                        if (loading) loading.style.display = 'none';
+                    }
+                    if (resendBtn) {
+                        resendBtn.disabled = false;
+                        resendBtn.textContent = 'Resend Code';
+                    }
+
                     const fieldType = isEmail ? 'email address' : 'identity number';
                     errorDiv.textContent = `No voter account found with this ${fieldType}. Please register first or check your details.`;
                     errorDiv.style.display = 'block';
+                    const msg = `No voter account found with this ${fieldType}. Please register first or check your details.`;
+                    if (errorDiv) {
+                        errorDiv.textContent = msg;
+                        errorDiv.style.display = 'block';
+                    } else if (otpErrorDiv) {
+                        otpErrorDiv.textContent = msg;
+                        otpErrorDiv.style.display = 'block';
+                    }
                     return;
                 }
 
@@ -890,23 +905,123 @@
                     loading.style.display = 'none';
                     errorDiv.textContent = 'Your account is not active. Please contact your administrator.';
                     errorDiv.style.display = 'block';
+                    if (button) {
+                        button.disabled = false;
+                        if (buttonText) buttonText.style.display = 'inline-block';
+                        if (loading) loading.style.display = 'none';
+                    }
+                    if (resendBtn) {
+                        resendBtn.disabled = false;
+                        resendBtn.textContent = 'Resend Code';
+                    }
+                    const msg = 'Your account is not active. Please contact your administrator.';
+                    if (errorDiv) {
+                        errorDiv.textContent = msg;
+                        errorDiv.style.display = 'block';
+                    } else if (otpErrorDiv) {
+                        otpErrorDiv.textContent = msg;
+                        otpErrorDiv.style.display = 'block';
+                    }
                     return;
+                }
+
+                // Rate Limiting Check
+                const otpQuery = window.query(
+                    window.collection(window.firebaseDB, 'otp_verification'),
+                    window.where('email', '==', voterData.email),
+                    window.orderBy('createdAt', 'desc'),
+                    window.limit(1)
+                );
+                const otpSnapshot = await window.getDocs(otpQuery);
+                const otpDoc = otpSnapshot.empty ? null : otpSnapshot.docs[0];
+                
+                let sendCount = 0;
+                let lastSentAt = 0;
+
+                if (otpDoc) {
+                    const data = otpDoc.data();
+                    lastSentAt = data.lastSentAt?.toMillis ? data.lastSentAt.toMillis() : (data.lastSentAt || 0);
+                    sendCount = data.sendCount || 0;
+                    const now = Date.now();
+
+                    // 1. Cooldown check (60s)
+                    if (now - lastSentAt < 60000) {
+                        const remaining = Math.ceil((60000 - (now - lastSentAt)) / 1000);
+                        button.disabled = false;
+                        buttonText.style.display = 'inline-block';
+                        loading.style.display = 'none';
+                        errorDiv.textContent = `Please wait ${remaining} seconds before requesting a new code.`;
+                        errorDiv.style.display = 'block';
+                        if (button) {
+                            button.disabled = false;
+                            if (buttonText) buttonText.style.display = 'inline-block';
+                            if (loading) loading.style.display = 'none';
+                        }
+                        if (resendBtn) {
+                            resendBtn.disabled = false;
+                            resendBtn.textContent = 'Resend Code';
+                        }
+                        const msg = `Please wait ${remaining} seconds before requesting a new code.`;
+                        if (errorDiv) {
+                            errorDiv.textContent = msg;
+                            errorDiv.style.display = 'block';
+                        } else if (otpErrorDiv) {
+                            otpErrorDiv.textContent = msg;
+                            otpErrorDiv.style.display = 'block';
+                        }
+                        return;
+                    }
+
+                    // 2. Max attempts check (3 per 15 mins)
+                    if (now - lastSentAt > 15 * 60 * 1000) {
+                        sendCount = 0;
+                    } else if (sendCount >= 3) {
+                        button.disabled = false;
+                        buttonText.style.display = 'inline-block';
+                        loading.style.display = 'none';
+                        errorDiv.textContent = 'Too many requests. Please try again in 15 minutes.';
+                        errorDiv.style.display = 'block';
+                        if (button) {
+                            button.disabled = false;
+                            if (buttonText) buttonText.style.display = 'inline-block';
+                            if (loading) loading.style.display = 'none';
+                        }
+                        if (resendBtn) {
+                            resendBtn.disabled = false;
+                            resendBtn.textContent = 'Resend Code';
+                        }
+                        const msg = 'Too many requests. Please try again in 15 minutes.';
+                        if (errorDiv) {
+                            errorDiv.textContent = msg;
+                            errorDiv.style.display = 'block';
+                        } else if (otpErrorDiv) {
+                            otpErrorDiv.textContent = msg;
+                            otpErrorDiv.style.display = 'block';
+                        }
+                        return;
+                    }
                 }
 
                 // Generate OTP in frontend
                 const otp = generateOtp();
+                const otpHash = await hashOTP(otp);
                 const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes from now
                 
                 // Save OTP to Firestore
-                await window.setDoc(window.doc(window.firebaseDB, 'otp_verification', voterData.email), {
-                    otp,
+                await window.addDoc(window.collection(window.firebaseDB, 'otp_verification'), {
+                    email: voterData.email,
+                    otpHash,
+                    attempts: 0,
+                    maxAttempts: 3,
                     expiresAt,
                     used: false,
                     voterId: voterDoc.id,
                     voterName: voterData.name,
                     orgId: voterData.organizationId,
                     type: 'login_verification',
-                    createdAt: window.serverTimestamp()
+                    createdAt: window.serverTimestamp(),
+                    lastSentAt: window.serverTimestamp(),
+                    sendCount: sendCount + 1
                 });
 
                 // Send email via Trigger Email Extension
@@ -932,8 +1047,8 @@
                                     .warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 4px; }
                                     .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
                                     .logo { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
-                                </style>
-                            </head>
+                                <\/style>
+                            <\/head>
                             <body>
                                 <div class="container">
                                     <div class="header">
@@ -963,16 +1078,18 @@
                                         </div>
                                     </div>
                                 </div>
-                            </body>
-                            </html>
+                            <\/body>
+                            <\/html>
                         `
                     }
                 });
 
                 // Reset button state immediately
-                button.disabled = false;
-                buttonText.style.display = 'inline-block';
-                loading.style.display = 'none';
+                if (button) {
+                    button.disabled = false;
+                    if (buttonText) buttonText.style.display = 'inline-block';
+                    if (loading) loading.style.display = 'none';
+                }
                 
                 // Show success message near button
                 const successMsg = `✅ Login OTP sent to ${voterData.email}! Check your email and enter the 6-digit code below.`;
@@ -987,9 +1104,15 @@
                 console.error('Error sending OTP email:', error);
                 
                 // Reset button state
-                button.disabled = false;
-                buttonText.style.display = 'inline-block';
-                loading.style.display = 'none';
+                if (button) {
+                    button.disabled = false;
+                    if (buttonText) buttonText.style.display = 'inline-block';
+                    if (loading) loading.style.display = 'none';
+                }
+                if (resendBtn) {
+                    resendBtn.disabled = false;
+                    resendBtn.textContent = 'Resend Code';
+                }
                 
                 // Show specific error message
                 let errorMessage = 'Error sending verification code. Please try again.';
@@ -1006,6 +1129,15 @@
                 
                 errorDiv.textContent = errorMessage;
                 errorDiv.style.display = 'block';
+                if (errorDiv) {
+                    errorDiv.textContent = errorMessage;
+                    errorDiv.style.display = 'block';
+                } else if (otpErrorDiv) {
+                    otpErrorDiv.textContent = errorMessage;
+                    otpErrorDiv.style.display = 'block';
+                } else {
+                    alert(errorMessage);
+                }
             }
         }
 
@@ -1097,14 +1229,22 @@
                 const voterData = voterDoc.data();
 
                 // Get OTP verification document from Firestore
-                const otpDoc = await window.getDoc(window.doc(window.firebaseDB, 'otp_verification', voterData.email));
+                const otpQuery = window.query(
+                    window.collection(window.firebaseDB, 'otp_verification'),
+                    window.where('email', '==', voterData.email),
+                    window.orderBy('createdAt', 'desc'),
+                    window.limit(1)
+                );
+                const otpSnapshot = await window.getDocs(otpQuery);
                 
-                if (!otpDoc.exists()) {
+                if (otpSnapshot.empty) {
                     showError('otpVerifyError', 'No verification code found. Please request a new one.');
                     return;
                 }
 
-                const otpData = otpDoc.data();
+                const otpDocSnapshot = otpSnapshot.docs[0];
+                const otpData = otpDocSnapshot.data();
+                const otpDocRef = window.doc(window.firebaseDB, 'otp_verification', otpDocSnapshot.id);
 
                 // ✅ Handle Firestore Timestamp correctly (same as registration)
                 let expiryTime;
@@ -1124,13 +1264,23 @@
                     return;
                 }
 
-                if (enteredOTP !== otpData.otp) {
+                if ((otpData.attempts || 0) >= (otpData.maxAttempts || 5)) {
+                    showError('otpVerifyError', 'Too many failed attempts. Please request a new one.');
+                    return;
+                }
+
+                const inputHash = await hashOTP(enteredOTP);
+
+                if (inputHash !== otpData.otpHash) {
+                    await window.updateDoc(otpDocRef, {
+                        attempts: (otpData.attempts || 0) + 1
+                    });
                     showError('otpVerifyError', 'Invalid verification code. Please try again.');
                     return;
                 }
 
                 // Mark OTP as used
-                await window.updateDoc(window.doc(window.firebaseDB, 'otp_verification', voterData.email), {
+                await window.updateDoc(otpDocRef, {
                     used: true,
                     usedAt: window.serverTimestamp()
                 });
@@ -1222,14 +1372,14 @@
                     // The main password login auth is handled in handleVoterLogin.
                     await window.signInWithEmailAndPassword(window.firebaseAuth, email, password);
                 } else {
-                    // For OTP login, create a secure session in localStorage.
-                    // The dashboard will verify this.
-                    const voterSession = {
-                        voterId: voterId,
-                        email: voterData.email,
-                        timestamp: Date.now()
-                    };
-                    localStorage.setItem('voterSession', JSON.stringify(voterSession));
+                    // OTP Login - Use Anonymous Auth to create a Firebase session
+                    const userCredential = await window.signInAnonymously(window.firebaseAuth);
+                    const user = userCredential.user;
+                    
+                    // Link the anonymous Firebase UID to the voter document for session persistence
+                    await window.updateDoc(window.doc(window.firebaseDB, 'voters', voterId), {
+                        firebaseUid: user.uid
+                    });
                 }
 
 
@@ -1242,7 +1392,7 @@
 
             } catch (error) {
                 console.error('Error in loginVoterWithFirebase:', error);
-                showError('otpVerifyError', 'Login failed. Please try again.');
+                showError('otpVerifyError', error.message || 'Login failed. Please try again.');
             }
         }
 
@@ -1253,116 +1403,6 @@
             console.log('Firebase DB:', window.firebaseDB);
             console.log('Auth current user:', window.firebaseAuth?.currentUser);
         }
-
-        function showAdminLogin() {
-            // Hide voter form and show admin form
-            document.getElementById('voterForm').classList.remove('active');
-            document.getElementById('adminForm').classList.add('active');
-            document.getElementById('voterTab').classList.remove('active');
-            document.getElementById('adminTab').classList.add('active');
-            document.getElementById('adminTab').style.display = 'block';
-            
-            // Update page title
-            document.getElementById('pageTitle').textContent = 'Admin Login';
-            document.getElementById('pageSubtitle').textContent = 'Access admin dashboard';
-        }
-
-        async function handleAdminLogin() {
-            const email = document.getElementById('adminEmail').value.trim();
-            const password = document.getElementById('adminPassword').value.trim();
-            const button = document.getElementById('adminLoginBtn');
-            const buttonText = document.getElementById('adminLoginText');
-            const loading = document.getElementById('adminLoginLoading');
-            const errorDiv = document.getElementById('adminLoginError');
-
-            if (!email || !password) {
-                showError('adminLoginError', 'Please fill in all fields');
-                return;
-            }
-
-            // Show loading state
-            button.disabled = true;
-            buttonText.style.display = 'none';
-            loading.style.display = 'flex';
-            hideError('adminLoginError');
-
-            try {
-                // Authenticate with Firebase
-                const userCredential = await window.signInWithEmailAndPassword(window.firebaseAuth, email, password);
-                const user = userCredential.user;
-
-                // Check if user exists in admins collection, if not create admin record
-                const adminDoc = await window.getDoc(window.doc(window.firebaseDB, 'admins', user.uid));
-                let adminData;
-
-                if (adminDoc.exists()) {
-                    adminData = adminDoc.data();
-                    // Update last login
-                    await window.updateDoc(window.doc(window.firebaseDB, 'admins', user.uid), {
-                        lastLogin: window.serverTimestamp()
-                    });
-                } else {
-                    // Create admin record for new user
-                    adminData = {
-                        email: user.email,
-                        name: user.displayName || 'Admin User',
-                        createdAt: window.serverTimestamp(),
-                        lastLogin: window.serverTimestamp()
-                    };
-                    await window.setDoc(window.doc(window.firebaseDB, 'admins', user.uid), adminData);
-                }
-
-                // Add audit log
-                await window.addDoc(window.collection(window.firebaseDB, 'auditLogs'), {
-                    event: 'admin_login',
-                    details: `Admin ${adminData.name} logged in`,
-                    userId: user.uid,
-                    timestamp: window.serverTimestamp(),
-                    metadata: {
-                        adminName: adminData.name,
-                        adminEmail: adminData.email
-                    }
-                });
-
-                showSuccess('adminLoginSuccess', 'Login successful! Redirecting...');
-                hideError('adminLoginError');
-
-                setTimeout(() => {
-                    window.location.href = 'dashboard_voter.html';
-                }, 1500);
-
-            } catch (error) {
-                console.error('Admin login error:', error);
-                
-                // Reset button state
-                button.disabled = false;
-                buttonText.style.display = 'inline-block';
-                loading.style.display = 'none';
-
-                let errorMessage = 'Login failed. Please check your credentials.';
-                
-                if (error.code === 'auth/user-not-found') {
-                    errorMessage = 'No admin account found with this email address.';
-                } else if (error.code === 'auth/wrong-password') {
-                    errorMessage = 'Incorrect password. Please try again.';
-                } else if (error.code === 'auth/invalid-email') {
-                    errorMessage = 'Please enter a valid email address.';
-                } else if (error.code === 'auth/too-many-requests') {
-                    errorMessage = 'Too many failed attempts. Please try again later.';
-                } else if (error.code === 'auth/invalid-credential') {
-                    errorMessage = 'Invalid credentials. Please check your email and password.';
-                } else if (error.code === 'auth/user-disabled') {
-                    errorMessage = 'This admin account has been disabled.';
-                } else if (error.code === 'auth/operation-not-allowed') {
-                    errorMessage = 'Email/password login is not enabled for this account.';
-                } else if (error.code === 'auth/network-request-failed') {
-                    errorMessage = 'Network error. Please check your connection and try again.';
-                }
-
-                showError('adminLoginError', errorMessage);
-            }
-        }
-
 
         function showError(elementId, message) {
             const errorEl = document.getElementById(elementId);
