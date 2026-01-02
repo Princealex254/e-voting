@@ -1677,7 +1677,7 @@
     <header class="pad-header">
         <div class="pad-container">
             <div class="pad-header-content">
-                <a href="dashboard_admin.html" class="pad-logo">
+                <a href="admin.html" class="pad-logo">
                     <div class="pad-logo-icon">PAD</div>
                     <div class="pad-logo-text">Prince Alex Digital</div>
                 </a>
@@ -3749,25 +3749,27 @@
             }
         }
 
-        function deletePoll(pollId) {
-            if (confirm('Are you sure you want to delete this poll?')) {
-                polls = polls.filter(poll => poll.id !== pollId);
-                localStorage.setItem('pad_polls', JSON.stringify(polls));
+        async function deletePoll(pollId) {
+            if (confirm('Are you sure you want to delete this poll? This action cannot be undone.')) {
+                try {
+                    await window.deleteDoc(window.doc(window.firebaseDB, 'polls', pollId));
 
-                // Add audit log
-                auditLogs.push({
-                    id: 'audit_' + Date.now(),
-                    timestamp: new Date().toISOString(),
-                    event: 'poll_deleted',
-                    details: `Poll deleted`,
-                    userId: currentUser.id,
-                    pollId
-                });
-                localStorage.setItem('pad_audit', JSON.stringify(auditLogs));
+                    // Add audit log
+                    await window.addDoc(window.collection(window.firebaseDB, 'auditLogs'), {
+                        event: 'poll_deleted',
+                        details: `Poll deleted`,
+                        userId: currentUser.uid,
+                        pollId: pollId,
+                        timestamp: window.serverTimestamp()
+                    });
 
-                loadData();
-                updateUI();
-                showAlert('Poll deleted successfully!', 'success');
+                    await loadData();
+                    updateUI();
+                    showAlert('Poll deleted successfully!', 'success');
+                } catch (error) {
+                    console.error('Error deleting poll:', error);
+                    showAlert('Error deleting poll. Please try again.', 'error');
+                }
             }
         }
 
@@ -3957,24 +3959,26 @@
             });
         }
 
-        function deleteVoter(voterId) {
+        async function deleteVoter(voterId) {
             if (confirm('Are you sure you want to delete this voter?')) {
-                voters = voters.filter(voter => voter.id !== voterId);
-                localStorage.setItem('pad_voters', JSON.stringify(voters));
+                try {
+                    await window.deleteDoc(window.doc(window.firebaseDB, 'voters', voterId));
 
-                // Add audit log
-                auditLogs.push({
-                    id: 'audit_' + Date.now(),
-                    timestamp: new Date().toISOString(),
-                    event: 'voter_deleted',
-                    details: `Voter deleted`,
-                    userId: currentUser.id
-                });
-                localStorage.setItem('pad_audit', JSON.stringify(auditLogs));
+                    // Add audit log
+                    await window.addDoc(window.collection(window.firebaseDB, 'auditLogs'), {
+                        event: 'voter_deleted',
+                        details: `Voter deleted`,
+                        userId: currentUser.uid,
+                        timestamp: window.serverTimestamp()
+                    });
 
-                loadData();
-                updateUI();
-                showAlert('Voter deleted successfully!', 'success');
+                    await loadData();
+                    updateUI();
+                    showAlert('Voter deleted successfully!', 'success');
+                } catch (error) {
+                    console.error('Error deleting voter:', error);
+                    showAlert('Error deleting voter. Please try again.', 'error');
+                }
             }
         }
 
