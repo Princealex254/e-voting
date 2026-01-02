@@ -686,7 +686,7 @@
         }
 
         async function handleVoterLogin() {
-            const identifier = document.getElementById('voterId').value;
+            const identifier = document.getElementById('voterId').value.trim();
             const loginMethod = document.querySelector('input[name="loginMethod"]:checked').value;
             
             if (!identifier) {
@@ -881,9 +881,8 @@
                     }
 
                     const fieldType = isEmail ? 'email address' : 'identity number';
-                    errorDiv.textContent = `No voter account found with this ${fieldType}. Please register first or check your details.`;
-                    errorDiv.style.display = 'block';
-                    const msg = `No voter account found with this ${fieldType}. Please register first or check your details.`;
+                    const msg = `We could not find an account with this ${fieldType}. Please check for typos or register a new account.`;
+                    
                     if (errorDiv) {
                         errorDiv.textContent = msg;
                         errorDiv.style.display = 'block';
