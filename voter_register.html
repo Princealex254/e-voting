@@ -849,7 +849,7 @@
         // Import Firebase functions
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, serverTimestamp, query, where, getDocs, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // Firebase configuration
         const firebaseConfig = {
@@ -885,6 +885,8 @@
         window.query = query;
         window.where = where;
         window.getDocs = getDocs;
+        window.orderBy = orderBy;
+        window.limit = limit;
     </script>
 
     <script>
@@ -1134,8 +1136,10 @@
                     };
 
                     // Show email verification modal
-                    sendOTP();
-                    showEmailVerificationModal();
+                    const sent = await sendOTP();
+                    if (sent) {
+                        showEmailVerificationModal();
+                    }
                     
                 } catch (error) {
                     console.error('Error checking existing accounts:', error);
@@ -1144,9 +1148,20 @@
             }
         }
 
-        // Generate random 6 digit OTP
+        // Generate random 6 digit OTP securely using Crypto API
         function generateOtp() {
-            return Math.floor(100000 + Math.random() * 900000).toString();
+            const array = new Uint32Array(1);
+            window.crypto.getRandomValues(array);
+            // Modulo to get 6 digits (100000-999999)
+            return (array[0] % 900000 + 100000).toString();
+        }
+
+        async function hashOTP(otp) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(otp);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
         async function sendOTP() {
@@ -1160,22 +1175,63 @@
                 
                 if (!votersSnapshot.empty) {
                     showAlert('An account with this email already exists. Please use a different email or try logging in.', 'error');
-                    return;
+                    return false;
                 }
                 
+                // Rate Limiting Check
+                const otpQuery = query(
+                    collection(window.firebaseDB, 'otp_verification'),
+                    where('email', '==', registrationData.email),
+                    orderBy('createdAt', 'desc'),
+                    limit(1)
+                );
+                const otpSnapshot = await getDocs(otpQuery);
+                const otpDoc = otpSnapshot.empty ? null : otpSnapshot.docs[0];
+                
+                let sendCount = 0;
+                let lastSentAt = 0;
+
+                if (otpDoc) {
+                    const data = otpDoc.data();
+                    lastSentAt = data.lastSentAt?.toMillis ? data.lastSentAt.toMillis() : (data.lastSentAt || 0);
+                    sendCount = data.sendCount || 0;
+                    const now = Date.now();
+
+                    // 1. Cooldown check (60s)
+                    if (now - lastSentAt < 60000) {
+                        const remaining = Math.ceil((60000 - (now - lastSentAt)) / 1000);
+                        showAlert(`Please wait ${remaining} seconds before requesting a new code.`, 'error');
+                        return false;
+                    }
+
+                    // 2. Max attempts check (3 per 15 mins)
+                    if (now - lastSentAt > 15 * 60 * 1000) {
+                        sendCount = 0; // Reset if window passed
+                    } else if (sendCount >= 3) {
+                        showAlert('Too many requests. Please try again in 15 minutes.', 'error');
+                        return false;
+                    }
+                }
+
                 // Generate OTP in frontend
                 const otp = generateOtp();
+                const otpHash = await hashOTP(otp);
                 const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes from now
                 
                 // Save OTP to Firestore
-                await setDoc(doc(window.firebaseDB, 'otp_verification', registrationData.email), {
-                    otp,
+                await addDoc(collection(window.firebaseDB, 'otp_verification'), {
+                    email: registrationData.email,
+                    otpHash,
+                    attempts: 0,
+                    maxAttempts: 5,
                     expiresAt,
                     used: false,
                     voterName: registrationData.fullName,
                     orgId: organizationData.id,
                     type: 'registration_verification',
-                    createdAt: serverTimestamp()
+                    createdAt: serverTimestamp(),
+                    lastSentAt: serverTimestamp(),
+                    sendCount: sendCount + 1
                 });
 
                 // Send email via Trigger Email Extension
@@ -1201,8 +1257,8 @@
                                     .warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 4px; }
                                     .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
                                     .logo { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
-                                </style>
-                            </head>
+                                <\/style>
+                            <\/head>
                             <body>
                                 <div class="container">
                                     <div class="header">
@@ -1232,17 +1288,19 @@
                                         </div>
                                     </div>
                                 </div>
-                            </body>
-                            </html>
+                            <\/body>
+                            <\/html>
                         `
                     }
                 });
 
                 showAlert('Verification code sent to your email!', 'success');
+                return true;
                 
             } catch (error) {
                 console.error('Error sending OTP email:', error);
                 showAlert('Error sending verification code. Please try again.', 'error');
+                return false;
             }
         }
 
@@ -1284,14 +1342,21 @@
             hideError('otpError');
 
             try {
-                const otpDocRef = doc(window.firebaseDB, 'otp_verification', email);
-                const otpDoc = await getDoc(otpDocRef);
+                const otpQuery = query(
+                    collection(window.firebaseDB, 'otp_verification'),
+                    where('email', '==', email),
+                    orderBy('createdAt', 'desc'),
+                    limit(1)
+                );
+                const otpSnapshot = await getDocs(otpQuery);
 
-                if (!otpDoc.exists()) {
+                if (otpSnapshot.empty) {
                     return failVerification("No OTP found. Please request again.");
                 }
 
-                const otpData = otpDoc.data();
+                const otpDocSnapshot = otpSnapshot.docs[0];
+                const otpData = otpDocSnapshot.data();
+                const otpDocRef = doc(window.firebaseDB, 'otp_verification', otpDocSnapshot.id);
                 console.log("OTP data retrieved:", otpData);
 
                 // ✅ Handle Firestore Timestamp correctly
@@ -1310,7 +1375,16 @@
                     return failVerification("This code has already been used. Please request a new one.");
                 }
 
-                if (otp !== otpData.otp) {
+                if ((otpData.attempts || 0) >= (otpData.maxAttempts || 5)) {
+                    return failVerification("Too many failed attempts. Please request a new one.");
+                }
+
+                const inputHash = await hashOTP(otp);
+
+                if (inputHash !== otpData.otpHash) {
+                    await updateDoc(otpDocRef, {
+                        attempts: (otpData.attempts || 0) + 1
+                    });
                     return failVerification("Invalid OTP. Please try again.");
                 }
 
