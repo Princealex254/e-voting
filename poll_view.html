@@ -40,7 +40,8 @@
         }
 
         .pad-header {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             padding: 1rem 0;
             position: sticky;
@@ -100,10 +101,11 @@
 
         .pad-poll-card {
             background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
             margin-bottom: 2rem;
+            border: 1px solid rgba(0,0,0,0.05);
         }
 
         .pad-poll-header {
@@ -211,22 +213,28 @@
 
         .pad-option {
             border: 2px solid var(--pad-border);
-            border-radius: 12px;
-            padding: 1.5rem;
+            border-radius: 16px;
+            padding: 1.25rem;
             margin-bottom: 1rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: white;
         }
 
         .pad-option:hover {
             border-color: var(--pad-primary);
-            background: rgba(11, 110, 253, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(11, 110, 253, 0.15);
         }
 
         .pad-option.selected {
             border-color: var(--pad-primary);
-            background: rgba(11, 110, 253, 0.1);
+            background: rgba(11, 110, 253, 0.04);
+            box-shadow: 0 0 0 3px rgba(11, 110, 253, 0.15);
         }
 
         .pad-option.disabled {
@@ -235,16 +243,39 @@
         }
 
         .pad-option-input {
-            position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
-            width: 20px;
-            height: 20px;
+            appearance: none;
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #cbd5e1;
+            border-radius: 50%;
+            margin: 0;
             cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s;
+            background: white;
+            order: 2;
+            margin-left: auto;
+        }
+        
+        input[type="checkbox"].pad-option-input {
+            border-radius: 6px;
+        }
+
+        .pad-option-input:checked {
+            background-color: var(--pad-primary);
+            border-color: var(--pad-primary);
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
         .pad-option-content {
-            padding-right: 2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .pad-option-title {
@@ -263,7 +294,7 @@
             width: 100%;
             height: 200px;
             object-fit: cover;
-            border-radius: 8px;
+            border-radius: 12px;
             margin-bottom: 1rem;
             border: 1px solid var(--pad-border);
         }
@@ -283,9 +314,10 @@
         }
 
         .pad-vote-section {
-            background: var(--pad-light);
-            border-radius: 12px;
-            padding: 1.5rem;
+            background: white;
+            border-top: 1px solid var(--pad-border);
+            padding: 2rem 0 0 0;
+            margin-top: 2rem;
             margin-bottom: 2rem;
         }
 
@@ -556,10 +588,12 @@
         @media (max-width: 768px) {
             .pad-container {
                 padding: 1rem 0.5rem;
+                padding-bottom: 100px;
             }
 
             .pad-poll-card {
-                padding: 1.5rem;
+                padding: 1.25rem;
+                border-radius: 16px;
             }
 
             .pad-poll-title {
@@ -575,13 +609,17 @@
                 padding: 1rem;
             }
 
-            .pad-option-input {
-                position: static;
-                margin-bottom: 1rem;
-            }
-
-            .pad-option-content {
-                padding-right: 0;
+            .pad-vote-section {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin: 0;
+                padding: 1rem;
+                background: white;
+                box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+                z-index: 1000;
+                border-radius: 16px 16px 0 0;
             }
         }
 
@@ -715,7 +753,7 @@
             </div>
             <div style="display: flex; gap: 1rem; margin-top: 2rem;">
                 <button class="pad-btn pad-btn-outline" onclick="closeVoteModal()">Cancel</button>
-                <button type="button" class="pad-btn pad-btn-primary ${hasVoted ? 'voted' : ''}" onclick="submitVote(event)" ${hasVoted ? 'disabled' : ''}>${hasVoted ? 'Voted' : 'Cast Vote'}</button>
+                <button type="button" class="pad-btn pad-btn-primary" onclick="submitVote(event)">Submit Vote</button>
             </div>
         </div>
     </div>
@@ -737,40 +775,30 @@
         });
 
         async function checkAuth() {
-            // Check voter session from localStorage
-            const voterSession = localStorage.getItem('voterSession');
-            
-            if (!voterSession) {
-                window.location.href = 'login.html';
-                return;
-            }
-
-            try {
-                const sessionData = JSON.parse(voterSession);
-                const now = Date.now();
-                
-                // Check if session is expired (24 hours)
-                if (now - sessionData.timestamp > 24 * 60 * 60 * 1000) {
-                    localStorage.removeItem('voterSession');
-                    window.location.href = 'login.html';
-                    return;
-                }
-
-                // Fetch complete voter data from Firebase
-                const voterDoc = await window.getDoc(window.doc(window.firebaseDB, 'voters', sessionData.voterId));
-                if (!voterDoc.exists()) {
-                    localStorage.removeItem('voterSession');
-                    window.location.href = 'login.html';
-                    return;
-                }
-
-                currentUser = { id: voterDoc.id, ...voterDoc.data() };
-            } catch (error) {
-                console.error('Error in checkAuth:', error);
-                localStorage.removeItem('voterSession');
-                window.location.href = 'login.html';
-                return;
-            }
+            return new Promise((resolve) => {
+                window.onAuthStateChanged(window.firebaseAuth, async (user) => {
+                    if (!user) {
+                        window.location.href = 'login.html';
+                        return;
+                    }
+                    
+                    let votersQuery;
+                    if (user.isAnonymous) {
+                        votersQuery = window.query(window.collection(window.firebaseDB, 'voters'), window.where('firebaseUid', '==', user.uid));
+                    } else {
+                        votersQuery = window.query(window.collection(window.firebaseDB, 'voters'), window.where('email', '==', user.email));
+                    }
+                    
+                    const votersSnapshot = await window.getDocs(votersQuery);
+                    if (!votersSnapshot.empty) {
+                        const voterDoc = votersSnapshot.docs[0];
+                        currentUser = { id: voterDoc.id, ...voterDoc.data() };
+                        resolve();
+                    } else {
+                        window.location.href = 'login.html';
+                    }
+                });
+            });
         }
 
         async function loadPoll() {
@@ -794,6 +822,18 @@
                 }
 
                 currentPoll = { id: pollDoc.id, ...pollDoc.data() };
+
+                // Fetch organization details if organizationId exists
+                if (currentPoll.organizationId) {
+                    try {
+                        const orgDoc = await window.getDoc(window.doc(window.firebaseDB, 'organizations', currentPoll.organizationId));
+                        if (orgDoc.exists()) {
+                            currentPoll.organizationName = orgDoc.data().name;
+                        }
+                    } catch (orgError) {
+                        console.error('Error loading organization:', orgError);
+                    }
+                }
             } catch (error) {
                 console.error('Error loading poll:', error);
                 showAlert('Error loading poll. Please try again.', 'error');
@@ -844,27 +884,54 @@
                 status = 'active';
                 statusText = 'Active';
                 statusClass = 'active';
+            } else if (now > end) {
+                status = 'closed';
+                statusText = 'Closed';
+                statusClass = 'closed';
             }
 
             const timeLeft = getTimeLeft(end, now);
             const progress = getPollProgress();
 
             if (hasVoted) {
-                pollCard.innerHTML = `
-                    <div class="pad-voted-message">
-                        <div class="pad-voted-icon">✅</div>
-                        <div class="pad-voted-title">Thank you for voting!</div>
-                        <div class="pad-voted-text">Your vote has been recorded successfully. A confirmation email has been sent to your registered email address.</div>
-                        <div class="pad-vote-receipt">
-                            <div><strong>Vote Receipt:</strong></div>
-                            <div class="pad-receipt-code">${getVoteReceipt()}</div>
+                if (status === 'closed') {
+                    pollCard.innerHTML = `
+                        <div class="pad-poll-header">
+                            <h1 class="pad-poll-title">${currentPoll.title}</h1>
+                            <div class="pad-poll-meta">
+                                <span class="pad-poll-status ${statusClass}">${statusText}</span>
+                                <span class="pad-poll-type">${currentPoll.type === 'single' ? 'Single Choice' : currentPoll.type === 'multi' ? 'Multiple Choice' : 'Ranked Choice'}</span>
+                            </div>
+                            <p class="pad-poll-description">${currentPoll.description}</p>
                         </div>
-                        <div class="pad-vote-info">
-                            <p><strong>Important:</strong> Your vote is anonymous and secure. Results will be available after the poll closes.</p>
-                            <p>Please keep your vote receipt for your records.</p>
+                        <div class="pad-voted-message">
+                            <div class="pad-voted-icon">📊</div>
+                            <div class="pad-voted-title">Poll Results</div>
+                            <div class="pad-voted-text">This poll has ended. Here are the final results.</div>
+                            <div class="pad-vote-receipt">
+                                <div><strong>Your Vote Receipt:</strong></div>
+                                <div class="pad-receipt-code">${getVoteReceipt()}</div>
+                            </div>
                         </div>
-                    </div>
-                `;
+                        ${renderResultsPreview()}
+                    `;
+                } else {
+                    pollCard.innerHTML = `
+                        <div class="pad-voted-message">
+                            <div class="pad-voted-icon">✅</div>
+                            <div class="pad-voted-title">Thank you for voting!</div>
+                            <div class="pad-voted-text">Your vote has been recorded successfully. A confirmation email has been sent to your registered email address.</div>
+                            <div class="pad-vote-receipt">
+                                <div><strong>Vote Receipt:</strong></div>
+                                <div class="pad-receipt-code">${getVoteReceipt()}</div>
+                            </div>
+                            <div class="pad-vote-info">
+                                <p><strong>Important:</strong> Your vote is anonymous and secure. Results will be available here after the poll closes.</p>
+                                <p>Please keep your vote receipt for your records.</p>
+                            </div>
+                        </div>
+                    `;
+                }
             } else {
                 pollCard.innerHTML = `
                     <div class="pad-poll-header">
@@ -921,13 +988,10 @@
                         <div class="pad-vote-summary-text" id="selectionSummary">No options selected</div>
                     </div>
                     <button class="pad-btn pad-btn-primary ${hasVoted ? 'voted' : ''}" onclick="showVoteModal()" id="voteBtn" ${hasVoted ? 'disabled' : ''}>
-                        ${hasVoted ? 'Voted' : 'Cast Vote'}
+                    ${hasVoted ? 'Voted' : 'Submit Vote'}
                     </button>
                 </div>
             `;
-            
-            // Update button text after rendering
-            updateVoteButtonText();
         }
 
         function renderInactiveMessage(status) {
@@ -966,19 +1030,23 @@
                     <h3 class="pad-results-title">Results (${totalVotes} vote${totalVotes !== 1 ? 's' : ''})</h3>
                     ${results.map(result => `
                         <div class="pad-result-item">
-                            <div class="pad-result-option">
-                                ${result.option.imageUrl ? 
-                                    `<img src="${result.option.imageUrl}" alt="${result.option.text}" class="pad-option-image" style="width: 60px; height: 60px; margin-right: 1rem;" onerror="this.style.display='none';">` :
-                                    ''
-                                }
-                                <div>
-                                    <div>${result.option.text}</div>
-                                    <div class="pad-result-votes">${result.votes} vote${result.votes !== 1 ? 's' : ''}</div>
+                            <div class="pad-result-option" style="width: 100%;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <div style="display: flex; align-items: center;">
+                                        ${result.option.imageUrl ? 
+                                            `<img src="${result.option.imageUrl}" alt="${result.option.text}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover; margin-right: 1rem;" onerror="this.style.display='none';">` :
+                                            ''
+                                        }
+                                        <span>${result.option.text}</span>
+                                    </div>
+                                    <div class="pad-result-votes">
+                                        <strong>${result.votes}</strong> (${totalVotes > 0 ? Math.round((result.votes / totalVotes) * 100) : 0}%)
+                                    </div>
+                                </div>
+                                <div class="pad-result-bar">
+                                    <div class="pad-result-fill" style="width: ${maxVotes > 0 ? (result.votes / maxVotes) * 100 : 0}%"></div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="pad-result-bar">
-                            <div class="pad-result-fill" style="width: ${maxVotes > 0 ? (result.votes / maxVotes) * 100 : 0}%"></div>
                         </div>
                     `).join('')}
                 </div>
@@ -1154,15 +1222,25 @@
         }
 
         function generateVoteReceipt() {
-            // Simple hash generation for demo (in production, use proper cryptographic hash)
-            const data = `${currentUser.id}_${currentPoll.id}_${selectedOptions.join(',')}_${Date.now()}`;
-            return btoa(data).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16).toUpperCase();
+            // Generate a cryptographically strong unique receipt code
+            const array = new Uint8Array(12);
+            window.crypto.getRandomValues(array);
+            
+            // Convert to hex string
+            const hex = Array.from(array)
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('')
+                .toUpperCase();
+            
+            // Format: VOTE-XXXX-XXXX-XXXX-XXXX
+            const code = hex.substring(0, 16);
+            return `VOTE-${code.match(/.{1,4}/g).join('-')}`;
         }
 
         function updateVoteButtonText() {
             const voteBtn = document.getElementById('voteBtn');
             if (voteBtn) {
-                voteBtn.textContent = hasVoted ? 'Voted' : 'Cast Vote';
+                voteBtn.textContent = hasVoted ? 'Voted' : 'Submit Vote';
                 voteBtn.disabled = hasVoted;
                 if (hasVoted) {
                     voteBtn.classList.add('voted');
@@ -1228,8 +1306,8 @@ Prince Alex Digital E-voting system
         .receipt { background: #e5e7eb; padding: 15px; border-radius: 6px; font-family: monospace; font-weight: bold; margin: 10px 0; }
         .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
         .important { background: #fef3c7; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #f59e0b; }
-    </style>
-</head>
+    <\/style>
+<\/head>
 <body>
     <div class="header">
         <h1>🗳️ Vote Confirmation</h1>
@@ -1270,8 +1348,8 @@ Prince Alex Digital E-voting system
             <p>Best regards,<br>Prince Alex Digital E-voting system</p>
         </div>
     </div>
-</body>
-</html>
+<\/body>
+<\/html>
                 `;
 
                 // Add email to mail collection to trigger Firebase extension
@@ -1354,6 +1432,7 @@ Prince Alex Digital E-voting system
     <script type="module">
         // Import Firebase functions
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // Firebase configuration
@@ -1368,10 +1447,13 @@ Prince Alex Digital E-voting system
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
 
         // Make Firebase functions globally available
+        window.firebaseAuth = auth;
         window.firebaseDB = db;
+        window.onAuthStateChanged = onAuthStateChanged;
         window.collection = collection;
         window.addDoc = addDoc;
         window.serverTimestamp = serverTimestamp;
