@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poll View - Prince Alex Digital E-voting system</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        :root {
+            --pad-primary: #0b6efd;
+            --pad-primary-dark: #0956c4;
+            --pad-primary-light: #3b8dff;
+            --pad-accent: #10b981;
+            --pad-accent-dark: #059669;
+            --pad-dark: #0f172a;
+            --pad-dark-2: #1e293b;
+            --pad-light: #f8fafc;
+            --pad-text: #374151;
+            --pad-text-light: #6b7280;
+            --pad-text-muted: #94a3b8;
+            --pad-border: rgba(229, 231, 235, 0.5);
+            --pad-success: #10b981;
+            --pad-warning: #f59e0b;
+            --pad-error: #ef4444;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+            --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.04);
+            --card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 12px 40px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0f5ff 0%, #faf5ff 50%, #ecfdf5 100%);
+            color: var(--pad-text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.12;
+            z-index: -1;
+            pointer-events: none;
+        }
+        body::before {
+            width: 500px; height: 500px;
+            background: var(--pad-primary);
+            top: -150px; right: -150px;
+            animation: floatBlob 20s ease-in-out infinite;
+        }
+        body::after {
+            width: 400px; height: 400px;
+            background: var(--pad-accent);
+            bottom: -100px; left: -100px;
+            animation: floatBlob 25s ease-in-out infinite reverse;
+        }
+
+        @keyframes floatBlob {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(50px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 40px) scale(0.95); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .pad-container { max-width: 860px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* ===== HEADER ===== */
+        .pad-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 0.75rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .pad-header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .pad-header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .pad-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--pad-dark);
+        }
+
+        .pad-logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--pad-primary) 0%, var(--pad-accent) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 8px rgba(11, 110, 253, 0.3);
+        }
+
+        .pad-logo-text {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            letter-spacing: -0.5px;
+        }
+
+        .pad-logo-text span {
+            background: linear-gradient(135deg, var(--pad-primary), var(--pad-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pad-back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.25rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--pad-text);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .pad-back-btn:hover {
+            background: white;
+            border-color: var(--pad-primary);
+            color: var(--pad-primary);
+            transform: translateX(-2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        /* ===== MAIN ===== */
+        .pad-main {
+            padding: 2rem 0 3rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .pad-alert {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            animation: slideInRight 0.3s ease-out;
+        }
+        .pad-alert.success { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #065f46; }
+        .pad-alert.error { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #991b1b; }
+        .pad-alert.warning { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); color: #92400e; }
+        .pad-alert.show { display: block; }
+
+        /* ===== POLL CARD ===== */
+        .pad-poll-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: var(--card-shadow);
+            animation: fadeInUp 0.6s ease-out;
+            margin-bottom: 2rem;
+        }
+
+        .pad-poll-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--pad-dark);
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.5px;
+            line-height: 1.3;
+        }
+
+        .pad-poll-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .pad-poll-status-badge {
+            padding: 0.25rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .pad-poll-status-badge.active { background: rgba(16, 185, 129, 0.12); color: var(--pad-accent-dark); }
+        .pad-poll-status-badge.upcoming { background: rgba(245, 158, 11, 0.12); color: #b45309; }
+        .pad-poll-status-badge.closed { background: rgba(107, 114, 128, 0.1); color: var(--pad-text-light); }
+
+        .pad-poll-type-badge {
+            padding: 0.25rem 0.6rem;
+            background: var(--pad-light);
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--pad-text);
+        }
+
+        .pad-poll-timer {
+            font-size: 0.85rem;
+            color: var(--pad-text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .pad-poll-timer.warning { color: var(--pad-warning); }
+        .pad-poll-timer.error { color: var(--pad-error); font-weight: 600; }
+
+        .pad-poll-description {
+            color: var(--pad-text-light);
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .pad-poll-progress {
+            margin-bottom: 2rem;
+            padding: 1rem 1.25rem;
+            background: rgba(11, 110, 253, 0.04);
+            border-radius: 12px;
+            border: 1px solid rgba(11, 110, 253, 0.06);
+        }
+
+        .pad-progress-track {
+            background: #f1f5f9;
+            border-radius: 6px;
+            height: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .pad-progress-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(90deg, var(--pad-primary), var(--pad-accent));
+        }
+
+        .pad-progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+
+        .pad-progress-text {
+            font-size: 0.85rem;
+            color: var(--pad-text-muted);
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        /* ===== OPTIONS ===== */
+        .pad-options-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            margin-bottom: 1.25rem;
+        }
+
+        .pad-option {
+            border: 2px solid var(--pad-border);
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 0.875rem;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: white;
+            overflow: hidden;
+        }
+
+        .pad-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--pad-primary), var(--pad-accent));
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .pad-option:hover {
+            border-color: rgba(11, 110, 253, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(11, 110, 253, 0.08);
+        }
+
+        .pad-option:hover::before {
+            opacity: 0.5;
+        }
+
+        .pad-option.selected {
+            border-color: var(--pad-primary);
+            background: rgba(11, 110, 253, 0.04);
+            box-shadow: 0 0 0 3px rgba(11, 110, 253, 0.12), 0 4px 16px rgba(11, 110, 253, 0.08);
+        }
+
+        .pad-option.selected::before {
+            opacity: 1;
+        }
+
+        .pad-option.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pad-option-input {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 26px;
+            height: 26px;
+            border: 2px solid #d1d5db;
+            border-radius: 50%;
+            margin: 0;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s;
+            background: white;
+            order: 2;
+            margin-left: auto;
+            position: relative;
+        }
+
+        input[type="checkbox"].pad-option-input {
+            border-radius: 8px;
+        }
+
+        .pad-option-input:checked {
+            background-color: var(--pad-primary);
+            border-color: var(--pad-primary);
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            box-shadow: 0 2px 8px rgba(11, 110, 253, 0.3);
+        }
+
+        .pad-option-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .pad-option-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .pad-option-bio {
+            color: var(--pad-text-light);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .pad-option-image {
+            width: 100%; height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            border: 1px solid var(--pad-border);
+        }
+
+        .pad-option-image-placeholder {
+            width: 100%; height: 200px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--pad-text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem;
+            border: 1px solid var(--pad-border);
+        }
+
+        /* ===== VOTE SECTION ===== */
+        .pad-vote-section {
+            background: white;
+            border: 1px solid var(--pad-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .pad-vote-summary {
+            margin-bottom: 1rem;
+        }
+
+        .pad-vote-summary-title {
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .pad-vote-summary-text {
+            color: var(--pad-text-muted);
+            font-size: 0.85rem;
+            padding: 0.5rem 0.75rem;
+            background: var(--pad-light);
+            border-radius: 8px;
+            min-height: 2.5rem;
+        }
+
+        .pad-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            flex: 1;
+        }
+
+        .pad-btn-primary {
+            background: var(--pad-primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(11, 110, 253, 0.25);
+        }
+
+        .pad-btn-primary:hover:not(:disabled) {
+            background: var(--pad-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(11, 110, 253, 0.35);
+        }
+
+        .pad-btn-primary:disabled {
+            background: var(--pad-text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .pad-btn-outline {
+            background: transparent;
+            color: var(--pad-text);
+            border: 1.5px solid var(--pad-border);
+        }
+
+        .pad-btn-outline:hover {
+            border-color: var(--pad-primary);
+            color: var(--pad-primary);
+        }
+
+        .pad-btn-group {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .pad-btn-full {
+            width: 100%;
+        }
+
+        /* ===== VOTED STATE ===== */
+        .pad-voted-message {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            border-radius: 16px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            margin-bottom: 2rem;
+        }
+
+        .pad-voted-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .pad-voted-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--pad-accent-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-voted-text {
+            color: var(--pad-text-light);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .pad-vote-receipt {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            display: inline-block;
+            text-align: left;
+            min-width: 280px;
+        }
+
+        .pad-vote-receipt strong {
+            font-size: 0.85rem;
+            color: var(--pad-text);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-receipt-code {
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--pad-primary);
+            background: var(--pad-light);
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--pad-border);
+            letter-spacing: 1px;
+            word-break: keep-all;
+        }
+
+        .pad-vote-info {
+            background: rgba(11, 110, 253, 0.06);
+            border: 1px solid rgba(11, 110, 253, 0.12);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-top: 1.5rem;
+            text-align: left;
+        }
+
+        .pad-vote-info p {
+            margin: 0.5rem 0;
+            color: var(--pad-text);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .pad-vote-info p:first-child { margin-top: 0; }
+        .pad-vote-info p:last-child { margin-bottom: 0; }
+
+        /* ===== RESULTS ===== */
+        .pad-results-section {
+            background: white;
+            border: 1px solid var(--pad-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .pad-results-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-results-total {
+            font-size: 0.85rem;
+            color: var(--pad-text-muted);
+            margin-bottom: 1.25rem;
+        }
+
+        .pad-result-item {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--pad-border);
+        }
+
+        .pad-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .pad-result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-result-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+            color: var(--pad-dark);
+            font-size: 0.9rem;
+        }
+
+        .pad-result-thumb {
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .pad-result-thumb-placeholder {
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            background: var(--pad-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: var(--pad-text-muted);
+            flex-shrink: 0;
+        }
+
+        .pad-result-votes {
+            font-weight: 600;
+            color: var(--pad-text);
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .pad-result-bar {
+            background: #f1f5f9;
+            border-radius: 4px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .pad-result-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(90deg, var(--pad-primary), var(--pad-accent));
+        }
+
+        .pad-result-fill.winner {
+            background: linear-gradient(90deg, var(--pad-accent), #06b6d4);
+        }
+
+        /* ===== INACTIVE STATE ===== */
+        .pad-inactive-message {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: var(--pad-light);
+            border-radius: 16px;
+            border: 1px solid var(--pad-border);
+            margin-bottom: 2rem;
+        }
+
+        .pad-inactive-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .pad-inactive-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-inactive-text {
+            color: var(--pad-text-light);
+            font-size: 0.9rem;
+        }
+
+        /* ===== MODAL ===== */
+        .pad-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .pad-modal.show { display: flex; animation: fadeIn 0.2s ease-out; }
+
+        .pad-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            animation: scaleIn 0.3s ease-out;
+        }
+
+        .pad-modal-icon {
+            width: 56px; height: 56px;
+            background: rgba(11, 110, 253, 0.1);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 1rem;
+        }
+
+        .pad-modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .pad-modal-text {
+            color: var(--pad-text-light);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .pad-modal-selection {
+            background: var(--pad-light);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pad-modal-selection strong {
+            font-size: 0.85rem;
+            color: var(--pad-text);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-modal-selection-item {
+            font-size: 0.9rem;
+            color: var(--pad-text);
+            padding: 0.35rem 0;
+        }
+
+        .pad-modal-selection-item::before {
+            content: '•';
+            color: var(--pad-primary);
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .pad-modal-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* ===== FOOTER ===== */
+        .pad-footer {
+            background: var(--pad-dark);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .pad-footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .pad-footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .pad-footer-link {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.875rem;
+        }
+
+        .pad-footer-link:hover { color: white; }
+
+        .pad-footer-credit {
+            border-top: 1px solid #1e293b;
+            padding-top: 1.25rem;
+            margin-top: 1.25rem;
+        }
+
+        .pad-footer-credit p {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        .pad-footer-credit a {
+            color: var(--pad-primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .pad-footer-credit a:hover { text-decoration: underline; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .pad-container { padding: 0 1rem; }
+
+            .pad-poll-card {
+                padding: 1.5rem;
+                border-radius: 20px;
+            }
+
+            .pad-poll-title {
+                font-size: 1.35rem;
+            }
+
+            .pad-poll-meta {
+                gap: 0.5rem;
+            }
+
+            .pad-option {
+                padding: 1rem 1.25rem;
+            }
+
+            .pad-option-title {
+                font-size: 0.95rem;
+            }
+
+            .pad-vote-section {
+                padding: 1.25rem;
+                margin-top: 1.5rem;
+            }
+
+            .pad-voted-message {
+                padding: 2rem 1.5rem;
+            }
+
+            .pad-modal-content {
+                padding: 1.5rem;
+            }
+
+            .pad-footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .pad-footer-links { gap: 1rem; }
+
+            .pad-back-btn span.back-text {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .pad-main { padding: 1rem 0 2rem; }
+
+            .pad-poll-card {
+                padding: 1.25rem;
+                border-radius: 16px;
+            }
+
+            .pad-option {
+                padding: 0.875rem 1rem;
+                flex-wrap: wrap;
+            }
+
+            .pad-option-image,
+            .pad-option-image-placeholder {
+                height: 140px;
+            }
+
+            .pad-vote-section {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin: 0;
+                padding: 1rem;
+                background: white;
+                box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+                z-index: 100;
+                border-radius: 16px 16px 0 0;
+                border: none;
+            }
+
+            .pad-container {
+                padding-bottom: 100px;
+            }
+
+            .pad-modal-actions {
+                flex-direction: column;
+            }
+
+            .pad-vote-receipt {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .pad-result-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="pad-header">
+        <div class="pad-container">
+            <div class="pad-header-content">
+                <div class="pad-header-left">
+                    <a href="index.html" class="pad-logo">
+                        <div class="pad-logo-icon">PAD</div>
+                        <div class="pad-logo-text">Prince Alex Digital <span>E-Voting</span></div>
+                    </a>
+                </div>
+                <a href="dashboard_voter.html" class="pad-back-btn">
+                    ← <span class="back-text">Back to Dashboard</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pad-main">
+        <div class="pad-container">
+            <div class="pad-alert" id="alertMessage"></div>
+
+            <div class="pad-poll-card" id="pollCard">
+                <!-- Poll content rendered by JS -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Vote Confirmation Modal -->
+    <div class="pad-modal" id="voteModal">
+        <div class="pad-modal-content">
+            <div class="pad-modal-icon">🗳️</div>
+            <h3 class="pad-modal-title">Confirm Your Vote</h3>
+            <p class="pad-modal-text">Please review your selection before submitting</p>
+            <div class="pad-modal-selection" id="voteSummary"></div>
+            <div style="margin-bottom: 1.5rem;">
+                <div class="pad-vote-receipt" style="width: 100%; min-width: auto; text-align: left;">
+                    <strong>Vote Receipt:</strong>
+                    <div class="pad-receipt-code" id="receiptHash" style="font-size: 0.85rem;"></div>
+                </div>
+            </div>
+            <div class="pad-modal-actions">
+                <button class="pad-btn pad-btn-outline" onclick="closeVoteModal()">Cancel</button>
+                <button class="pad-btn pad-btn-primary" onclick="submitVote(event)">Confirm & Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="pad-footer">
+        <div class="pad-container">
+            <div class="pad-footer-content">
+                <div><p>&copy; 2025 Prince Alex Digital. All rights reserved.</p></div>
+                <div class="pad-footer-links">
+                    <a href="index.html#contact" class="pad-footer-link">Contact Us</a>
+                    <a href="index.html#features" class="pad-footer-link">Features</a>
+                    <a href="tel:+254717384875" class="pad-footer-link">Call Now</a>
+                </div>
+            </div>
+            <div class="pad-footer-credit">
+                <p>Designed by <a href="https://www.princealex.pro" target="_blank" rel="noopener">Prince Alex Digital</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const app = initializeApp({
+            apiKey: "AIzaSyDGErPBeQ1Fdx9EHPXOHepoEoOx7P2f57o",
+            authDomain: "princealextravel.firebaseapp.com",
+            projectId: "princealextravel",
+            storageBucket: "princealextravel.firebasestorage.app",
+            messagingSenderId: "947577729462",
+            appId: "1:947577729462:web:dd4b4c7cb4a984c5e3d117"
+        });
+
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        window.firebaseAuth = auth;
+        window.firebaseDB = db;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.serverTimestamp = serverTimestamp;
+        window.query = query;
+        window.where = where;
+        window.getDocs = getDocs;
+        window.doc = doc;
+        window.getDoc = getDoc;
+    </script>
+
+    <script>
+        let currentUser = null;
+        let currentPoll = null;
+        let votes = [];
+        let selectedOptions = [];
+        let hasVoted = false;
+        let isSubmittingVote = false;
+        let currentReceiptHash = null;
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            await checkAuth();
+            await loadPoll();
+            await loadData();
+            renderPoll();
+        });
+
+        async function checkAuth() {
+            return new Promise((resolve) => {
+                window.onAuthStateChanged(window.firebaseAuth, async (user) => {
+                    if (!user) { window.location.href = 'login.html'; return; }
+                    let votersQuery = user.isAnonymous
+                        ? window.query(window.collection(window.firebaseDB, 'voters'), window.where('firebaseUid', '==', user.uid))
+                        : window.query(window.collection(window.firebaseDB, 'voters'), window.where('email', '==', user.email));
+                    const snapshot = await window.getDocs(votersQuery);
+                    if (!snapshot.empty) {
+                        currentUser = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+                        resolve();
+                    } else { window.location.href = 'login.html'; }
+                });
+            });
+        }
+
+        async function loadPoll() {
+            const params = new URLSearchParams(window.location.search);
+            const pollId = params.get('id');
+            if (!pollId) { showAlert('Poll not found', 'error'); setTimeout(() => window.location.href = 'dashboard_voter.html', 2000); return; }
+            try {
+                const docSnap = await window.getDoc(window.doc(window.firebaseDB, 'polls', pollId));
+                if (!docSnap.exists()) { showAlert('Poll not found', 'error'); setTimeout(() => window.location.href = 'dashboard_voter.html', 2000); return; }
+                currentPoll = { id: docSnap.id, ...docSnap.data() };
+                if (currentPoll.organizationId) {
+                    try {
+                        const orgDoc = await window.getDoc(window.doc(window.firebaseDB, 'organizations', currentPoll.organizationId));
+                        if (orgDoc.exists()) currentPoll.organizationName = orgDoc.data().name;
+                    } catch(e) { console.error(e); }
+                }
+            } catch (e) { console.error(e); showAlert('Error loading poll', 'error'); setTimeout(() => window.location.href = 'dashboard_voter.html', 2000); }
+        }
+
+        async function loadData() {
+            try {
+                const q = window.query(window.collection(window.firebaseDB, 'votes'), window.where('pollId', '==', currentPoll.id), window.where('voterId', '==', currentUser.id));
+                const snap = await window.getDocs(q);
+                votes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                if (!hasVoted) hasVoted = votes.length > 0;
+            } catch (e) { console.error(e); votes = []; hasVoted = false; }
+        }
+
+        function renderPoll() {
+            const card = document.getElementById('pollCard');
+            const now = new Date();
+            const start = new Date(currentPoll.startAt);
+            const end = new Date(currentPoll.endAt);
+
+            let status = 'upcoming', statusText = 'Upcoming', statusClass = 'upcoming';
+            if (currentPoll.status === 'closed') { status = 'closed'; statusText = 'Closed'; statusClass = 'closed'; }
+            else if (start <= now && now <= end) { status = 'active'; statusText = 'Active'; statusClass = 'active'; }
+            else if (now > end) { status = 'closed'; statusText = 'Closed'; statusClass = 'closed'; }
+
+            const timeLeft = getTimeLeft(end, now);
+            const progress = getPollProgress();
+
+            if (hasVoted) {
+                if (status === 'closed') {
+                    card.innerHTML = `
+                        <div class="pad-poll-header">
+                            <h1 class="pad-poll-title">${currentPoll.title}</h1>
+                            <div class="pad-poll-meta">
+                                <span class="pad-poll-status-badge ${statusClass}">${statusText}</span>
+                                <span class="pad-poll-type-badge">${currentPoll.type === 'single' ? 'Single Choice' : currentPoll.type === 'multi' ? 'Multiple Choice' : 'Ranked Choice'}</span>
+                            </div>
+                            <p class="pad-poll-description">${currentPoll.description}</p>
+                        </div>
+                        <div class="pad-voted-message">
+                            <div class="pad-voted-icon">📊</div>
+                            <div class="pad-voted-title">Poll Results</div>
+                            <div class="pad-voted-text">This poll has ended. Here are the final results.</div>
+                            <div class="pad-vote-receipt">
+                                <strong>Your Vote Receipt:</strong>
+                                <div class="pad-receipt-code">${getVoteReceipt()}</div>
+                            </div>
+                        </div>
+                        ${renderResultsPreview()}
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <div class="pad-poll-header">
+                            <h1 class="pad-poll-title">${currentPoll.title}</h1>
+                            <div class="pad-poll-meta">
+                                <span class="pad-poll-status-badge ${statusClass}">${statusText}</span>
+                                <span class="pad-poll-type-badge">${currentPoll.type === 'single' ? 'Single Choice' : currentPoll.type === 'multi' ? 'Multiple Choice' : 'Ranked Choice'}</span>
+                            </div>
+                            <p class="pad-poll-description">${currentPoll.description}</p>
+                        </div>
+                        <div class="pad-voted-message">
+                            <div class="pad-voted-icon">✅</div>
+                            <div class="pad-voted-title">Thank you for voting!</div>
+                            <div class="pad-voted-text">Your vote has been recorded successfully. A confirmation email has been sent to your registered email address.</div>
+                            <div class="pad-vote-receipt">
+                                <strong>Vote Receipt:</strong>
+                                <div class="pad-receipt-code">${getVoteReceipt()}</div>
+                            </div>
+                            <div class="pad-vote-info">
+                                <p>🔒 Your vote is anonymous and secure. Results will be available here after the poll closes.</p>
+                                <p>📁 Please keep your vote receipt for your records.</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                card.innerHTML = `
+                    <div class="pad-poll-header">
+                        <h1 class="pad-poll-title">${currentPoll.title}</h1>
+                        <div class="pad-poll-meta">
+                            <span class="pad-poll-status-badge ${statusClass}">${statusText}</span>
+                            <span class="pad-poll-type-badge">${currentPoll.type === 'single' ? 'Single Choice' : currentPoll.type === 'multi' ? 'Multiple Choice' : 'Ranked Choice'}</span>
+                            <span class="pad-poll-timer ${timeLeft.warning ? 'warning' : timeLeft.error ? 'error' : ''}">
+                                ${timeLeft.error ? '⏰' : timeLeft.warning ? '⏳' : '📅'} ${timeLeft.text}
+                            </span>
+                        </div>
+                        <p class="pad-poll-description">${currentPoll.description}</p>
+                        ${status === 'active' ? `
+                            <div class="pad-poll-progress">
+                                <div class="pad-progress-track">
+                                    <div class="pad-progress-fill" style="width: ${progress.percentage}%"></div>
+                                </div>
+                                <div class="pad-progress-text">${progress.text}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    ${status === 'active' ? renderVotingForm() : renderInactiveMessage(status)}
+                `;
+            }
+        }
+
+        function renderVotingForm() {
+            const maxSelections = currentPoll.maxSelections || 1;
+            const inputType = currentPoll.type === 'single' ? 'radio' : 'checkbox';
+            return `
+                <div class="pad-options-title">Select your ${currentPoll.type === 'single' ? 'choice' : 'choices'}:</div>
+                <div class="pad-options">
+                    ${currentPoll.options.map((option, index) => `
+                        <div class="pad-option" onclick="selectOption('${option.id}')">
+                            <input type="${inputType}" name="pollOption" value="${option.id}" class="pad-option-input" ${maxSelections === 1 ? 'onclick="event.stopPropagation()"' : ''}>
+                            <div class="pad-option-content">
+                                ${option.imageUrl ?
+                                    `<img src="${option.imageUrl}" alt="${option.text}" class="pad-option-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="pad-option-image-placeholder" style="display:none;">Image not available</div>` :
+                                    ''}
+                                <div class="pad-option-title">${option.text}</div>
+                                ${option.bio ? `<div class="pad-option-bio">${option.bio}</div>` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="pad-vote-section">
+                    <div class="pad-vote-summary">
+                        <div class="pad-vote-summary-title">Selection Summary</div>
+                        <div class="pad-vote-summary-text" id="selectionSummary">No options selected</div>
+                    </div>
+                    <button class="pad-btn pad-btn-primary pad-btn-full" onclick="showVoteModal()" id="voteBtn" disabled>Submit Vote</button>
+                </div>
+            `;
+        }
+
+        function renderInactiveMessage(status) {
+            if (status === 'upcoming') {
+                return `<div class="pad-inactive-message"><div class="pad-inactive-icon">⏰</div><div class="pad-inactive-title">Poll Not Yet Started</div><div class="pad-inactive-text">This poll will begin on ${new Date(currentPoll.startAt).toLocaleString()}</div></div>`;
+            }
+            return `<div class="pad-inactive-message"><div class="pad-inactive-icon">🔒</div><div class="pad-inactive-title">Poll Closed</div><div class="pad-inactive-text">This poll ended on ${new Date(currentPoll.endAt).toLocaleString()}</div></div>${renderResultsPreview()}`;
+        }
+
+        function renderResultsPreview() {
+            const pollVotes = votes.filter(v => v.pollId === currentPoll.id);
+            const results = currentPoll.options.map(opt => {
+                const count = pollVotes.filter(v => v.choices.includes(opt.id)).length;
+                return { option: opt, votes: count };
+            }).sort((a, b) => b.votes - a.votes);
+            const total = pollVotes.length;
+            const maxVotes = Math.max(...results.map(r => r.votes), 1);
+
+            return `
+                <div class="pad-results-section">
+                    <div class="pad-results-title">Results</div>
+                    <div class="pad-results-total">${total} vote${total !== 1 ? 's' : ''} cast</div>
+                    ${results.map(r => `
+                        <div class="pad-result-item">
+                            <div class="pad-result-header">
+                                <div class="pad-result-option">
+                                    ${r.option.imageUrl ? `<img src="${r.option.imageUrl}" class="pad-result-thumb" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="pad-result-thumb-placeholder" style="display:none;">📷</div>` : `<div class="pad-result-thumb-placeholder">#</div>`}
+                                    <span>${r.option.text}</span>
+                                </div>
+                                <div class="pad-result-votes">${r.votes} (${total > 0 ? Math.round((r.votes / total) * 100) : 0}%)</div>
+                            </div>
+                            <div class="pad-result-bar">
+                                <div class="pad-result-fill ${r.votes === maxVotes && r.votes > 0 ? 'winner' : ''}" style="width: ${(r.votes / maxVotes) * 100}%"></div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function selectOption(optionId) {
+            if (hasVoted) return;
+            const option = currentPoll.options.find(o => o.id === optionId);
+            if (!option) return;
+            if (currentPoll.type === 'single') {
+                selectedOptions = [optionId];
+                updateOptionSelection();
+            } else {
+                const idx = selectedOptions.indexOf(optionId);
+                if (idx > -1) selectedOptions.splice(idx, 1);
+                else if (selectedOptions.length < (currentPoll.maxSelections || 5)) selectedOptions.push(optionId);
+                else { showAlert(`You can only select up to ${currentPoll.maxSelections} options`, 'warning'); return; }
+                updateOptionSelection();
+            }
+            updateSelectionSummary();
+        }
+
+        function updateOptionSelection() {
+            document.querySelectorAll('.pad-option').forEach(el => {
+                const input = el.querySelector('input');
+                const checked = selectedOptions.includes(input.value);
+                el.classList.toggle('selected', checked);
+                input.checked = checked;
+            });
+            const btn = document.getElementById('voteBtn');
+            if (btn) btn.disabled = selectedOptions.length === 0;
+        }
+
+        function updateSelectionSummary() {
+            const el = document.getElementById('selectionSummary');
+            if (!el) return;
+            el.textContent = selectedOptions.length === 0 ? 'No options selected' : selectedOptions.map(id => currentPoll.options.find(o => o.id === id).text).join(', ');
+        }
+
+        function showVoteModal() {
+            if (hasVoted) { showAlert('You have already voted in this poll', 'warning'); return; }
+            if (selectedOptions.length === 0) { showAlert('Please select at least one option', 'error'); return; }
+            const texts = selectedOptions.map(id => currentPoll.options.find(o => o.id === id).text);
+            document.getElementById('voteSummary').innerHTML = `<strong>Your selection:</strong>${texts.map(t => `<div class="pad-modal-selection-item">${t}</div>`).join('')}`;
+            currentReceiptHash = generateVoteReceipt();
+            document.getElementById('receiptHash').textContent = currentReceiptHash;
+            document.getElementById('voteModal').classList.add('show');
+        }
+
+        function closeVoteModal() { document.getElementById('voteModal').classList.remove('show'); }
+
+        async function submitVote(event) {
+            if (event) { event.preventDefault(); event.stopPropagation(); }
+            if (isSubmittingVote) return;
+            isSubmittingVote = true;
+            try {
+                await window.addDoc(window.collection(window.firebaseDB, 'votes'), {
+                    pollId: currentPoll.id, voterId: currentUser.id, choices: selectedOptions,
+                    receiptHash: currentReceiptHash, timestamp: window.serverTimestamp(), anonymous: currentPoll.anonymous || true
+                });
+                await window.addDoc(window.collection(window.firebaseDB, 'auditLogs'), {
+                    action: 'vote_cast', details: `Vote cast in poll "${currentPoll.title}"`,
+                    timestamp: window.serverTimestamp(), userId: currentUser.id, userEmail: currentUser.email, pollId: currentPoll.id
+                });
+                try { await sendVoteConfirmationEmail({ id: 'vote_' + Date.now(), pollId: currentPoll.id, voterId: currentUser.id, choices: selectedOptions, timestamp: new Date().toISOString(), receiptHash: currentReceiptHash }); }
+                catch (e) { console.error('Error sending confirmation email:', e); }
+                hasVoted = true;
+                closeVoteModal();
+                await loadData();
+                renderPoll();
+                showAlert('Your vote has been recorded successfully! A confirmation email has been sent to your registered email address.', 'success');
+            } catch (e) { console.error('Error submitting vote:', e); showAlert('Error submitting vote. Please try again.', 'error'); }
+            finally { isSubmittingVote = false; }
+        }
+
+        async function sendEmailWithWorker(payload) {
+            try {
+                const r = await fetch("https://payroll.princealexdigital.workers.dev/", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+                const d = await r.json();
+                return r.ok ? { success: true, data: d } : { success: false, error: d.error || 'Unknown error' };
+            } catch (e) { return { success: false, error: 'Network error' }; }
+        }
+
+        function generateVoteReceipt() {
+            const array = new Uint8Array(12);
+            window.crypto.getRandomValues(array);
+            const hex = Array.from(array).map(b => b.toString(16).padStart(2,'0')).join('').toUpperCase().substring(0,16);
+            return `VOTE-${hex.match(/.{1,4}/g).join('-')}`;
+        }
+
+        async function sendVoteConfirmationEmail(vote) {
+            const email = currentUser.email;
+            if (!email) return;
+            const payload = {
+                toEmail: email, toName: currentUser.name,
+                subject: `Vote Confirmation - ${currentPoll.title}`,
+                htmlContent: `<h2>Dear ${currentUser.name},</h2><p>Your vote for the poll "<strong>${currentPoll.title}</strong>" has been recorded.</p><p>Your vote receipt is: <strong>${vote.receiptHash}</strong></p>`,
+                textContent: `Dear ${currentUser.name},\n\nYour vote for the poll "${currentPoll.title}" has been recorded.\n\nYour vote receipt is: ${vote.receiptHash}`
+            };
+            const result = await sendEmailWithWorker(payload);
+            if (result.success) console.log('Vote confirmation email queued for:', email);
+            else console.error('Failed to send vote confirmation email.');
+        }
+
+        function getVoteReceipt() {
+            const v = votes.find(v => v.pollId === currentPoll.id && v.voterId === currentUser.id);
+            return v ? v.receiptHash : 'N/A';
+        }
+
+        function getTimeLeft(end, now) {
+            const diff = end - now;
+            if (diff <= 0) return { text: 'Ended', warning: false, error: true };
+            const d = Math.floor(diff / (1000*60*60*24));
+            const h = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+            const m = Math.floor((diff % (1000*60*60)) / (1000*60));
+            if (d > 0) return { text: `${d}d ${h}h remaining`, warning: false, error: false };
+            if (h > 0) return { text: `${h}h ${m}m remaining`, warning: true, error: false };
+            return { text: `${m}m remaining`, warning: false, error: true };
+        }
+
+        function getPollProgress() {
+            const pv = votes.filter(v => v.pollId === currentPoll.id);
+            const total = pv.length;
+            if (total === 0) return { percentage: 0, text: 'No votes yet' };
+            const pct = Math.min((total / ((currentPoll.options?.length || 1) * 10)) * 100, 100);
+            return { percentage: Math.round(pct), text: `${total} vote${total !== 1 ? 's' : ''} cast` };
+        }
+
+        function showAlert(message, type) {
+            const el = document.getElementById('alertMessage');
+            el.textContent = message;
+            el.className = `pad-alert ${type} show`;
+            setTimeout(() => el.classList.remove('show'), 5000);
+        }
+
+        window.addEventListener('popstate', function() { loadData(); renderPoll(); });
+    </script>
+</body>
+</html>

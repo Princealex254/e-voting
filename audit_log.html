@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Logs - Prince Alex Digital E-voting system</title>
+    <style>
+        /* Prince Alex Digital Brand Colors */
+        :root {
+            --pad-primary: #0b6efd;
+            --pad-accent: #10b981;
+            --pad-dark: #0f172a;
+            --pad-light: #f8fafc;
+            --pad-text: #374151;
+            --pad-text-light: #6b7280;
+            --pad-border: #e5e7eb;
+            --pad-success: #10b981;
+            --pad-warning: #f59e0b;
+            --pad-error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Inter, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--pad-light);
+            color: var(--pad-text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .pad-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .pad-header {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .pad-header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .pad-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--pad-dark);
+        }
+
+        .pad-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--pad-primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .pad-logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+        }
+
+        .pad-back-btn {
+            background: var(--pad-text-light);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .pad-back-btn:hover {
+            background: var(--pad-text);
+        }
+
+        .pad-page-header {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .pad-page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-page-subtitle {
+            color: var(--pad-text-light);
+            margin-bottom: 2rem;
+        }
+
+        .pad-filters {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .pad-filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .pad-filter-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+        }
+
+        .pad-filter-input {
+            padding: 0.5rem 0.75rem;
+            border: 2px solid var(--pad-border);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .pad-filter-input:focus {
+            outline: none;
+            border-color: var(--pad-primary);
+        }
+
+        .pad-btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .pad-btn-primary {
+            background: var(--pad-primary);
+            color: white;
+        }
+
+        .pad-btn-primary:hover:not(:disabled) {
+            background: #0a5fd4;
+            transform: translateY(-1px);
+        }
+
+        .pad-btn-secondary {
+            background: var(--pad-accent);
+            color: white;
+        }
+
+        .pad-btn-secondary:hover:not(:disabled) {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .pad-btn-outline {
+            background: transparent;
+            color: var(--pad-primary);
+            border: 2px solid var(--pad-primary);
+        }
+
+        .pad-btn-outline:hover:not(:disabled) {
+            background: var(--pad-primary);
+            color: white;
+        }
+
+        .pad-audit-table-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .pad-audit-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .pad-audit-table th,
+        .pad-audit-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--pad-border);
+        }
+
+        .pad-audit-table th {
+            background: var(--pad-light);
+            font-weight: 600;
+            color: var(--pad-dark);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .pad-audit-table tr:hover {
+            background: var(--pad-light);
+        }
+
+        .pad-audit-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .pad-event-type {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .pad-event-type.poll_created {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--pad-success);
+        }
+
+        .pad-event-type.poll_deleted {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--pad-error);
+        }
+
+        .pad-event-type.vote_cast {
+            background: rgba(11, 110, 253, 0.1);
+            color: var(--pad-primary);
+        }
+
+        .pad-event-type.voter_registered {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--pad-success);
+        }
+
+        .pad-event-type.voter_deleted {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--pad-error);
+        }
+
+        .pad-event-type.voter_login {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--pad-warning);
+        }
+
+        .pad-event-type.admin_login {
+            background: rgba(139, 92, 246, 0.1);
+            color: #8b5cf6;
+        }
+
+        .pad-timestamp {
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            color: var(--pad-text-light);
+        }
+
+        .pad-details {
+            max-width: 300px;
+            word-wrap: break-word;
+        }
+
+        .pad-user {
+            font-weight: 500;
+            color: var(--pad-dark);
+        }
+
+        .pad-pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .pad-pagination-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--pad-border);
+            background: white;
+            color: var(--pad-text);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pad-pagination-btn:hover:not(:disabled) {
+            background: var(--pad-light);
+            border-color: var(--pad-primary);
+        }
+
+        .pad-pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pad-pagination-info {
+            color: var(--pad-text-light);
+            font-size: 0.875rem;
+        }
+
+        .pad-export-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .pad-export-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 1rem;
+        }
+
+        .pad-export-description {
+            color: var(--pad-text-light);
+            margin-bottom: 2rem;
+        }
+
+        .pad-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .pad-stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .pad-stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--pad-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-stat-label {
+            color: var(--pad-text-light);
+            font-size: 0.875rem;
+        }
+
+        .pad-empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--pad-text-light);
+        }
+
+        .pad-empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .pad-empty-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-empty-description {
+            margin-bottom: 1.5rem;
+        }
+
+        .pad-alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .pad-alert.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--pad-success);
+            color: #065f46;
+        }
+
+        .pad-alert.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--pad-error);
+            color: #991b1b;
+        }
+
+        .pad-alert.show {
+            display: block;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .pad-container {
+                padding: 1rem 0.5rem;
+            }
+
+            .pad-page-header {
+                padding: 1.5rem;
+            }
+
+            .pad-page-title {
+                font-size: 1.5rem;
+            }
+
+            .pad-filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .pad-filter-group {
+                width: 100%;
+            }
+
+            .pad-audit-table {
+                font-size: 0.875rem;
+            }
+
+            .pad-audit-table th,
+            .pad-audit-table td {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .pad-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .pad-stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pad-audit-table th,
+            .pad-audit-table td {
+                padding: 0.5rem 0.25rem;
+            }
+
+            .pad-details {
+                max-width: 200px;
+            }
+            
+            .pad-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.875rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .pad-container {
+                padding: 0.5rem;
+            }
+            
+            .pad-audit-card {
+                padding: 1rem;
+            }
+            
+            .pad-audit-table {
+                font-size: 0.8rem;
+            }
+            
+            .pad-audit-table th,
+            .pad-audit-table td {
+                padding: 0.25rem;
+            }
+            
+            .pad-details {
+                max-width: 150px;
+                font-size: 0.75rem;
+            }
+            
+            .pad-form-input {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="pad-header">
+        <div class="pad-container">
+            <div class="pad-header-content">
+                <a href="index.html" class="pad-logo">
+                    <div class="pad-logo-icon">PAD</div>
+                    <div class="pad-logo-text">Prince Alex Digital</div>
+                </a>
+                <a href="dashboard_voter.html" class="pad-back-btn">← Back to Dashboard</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pad-container">
+        <div class="pad-alert" id="alertMessage"></div>
+
+        <div class="pad-page-header">
+            <h1 class="pad-page-title">Audit Logs</h1>
+            <p class="pad-page-subtitle">Complete audit trail of all system activities and events</p>
+            
+            <div class="pad-filters">
+                <div class="pad-filter-group">
+                    <label class="pad-filter-label">Event Type</label>
+                    <select class="pad-filter-input" id="eventTypeFilter">
+                        <option value="">All Events</option>
+                        <option value="poll_created">Poll Created</option>
+                        <option value="poll_deleted">Poll Deleted</option>
+                        <option value="vote_cast">Vote Cast</option>
+                        <option value="voter_registered">Voter Registered</option>
+                        <option value="voter_deleted">Voter Deleted</option>
+                        <option value="voter_login">Voter Login</option>
+                        <option value="admin_login">Admin Login</option>
+                    </select>
+                </div>
+                <div class="pad-filter-group">
+                    <label class="pad-filter-label">Date From</label>
+                    <input type="date" class="pad-filter-input" id="dateFromFilter">
+                </div>
+                <div class="pad-filter-group">
+                    <label class="pad-filter-label">Date To</label>
+                    <input type="date" class="pad-filter-input" id="dateToFilter">
+                </div>
+                <div class="pad-filter-group">
+                    <label class="pad-filter-label">Search</label>
+                    <input type="text" class="pad-filter-input" id="searchFilter" placeholder="Search details...">
+                </div>
+                <div class="pad-filter-group">
+                    <label class="pad-filter-label">&nbsp;</label>
+                    <button class="pad-btn pad-btn-primary" onclick="applyFilters()">Filter</button>
+                </div>
+                <div class="pad-filter-group">
+                    <label class="pad-filter-label">&nbsp;</label>
+                    <button class="pad-btn pad-btn-outline" onclick="clearFilters()">Clear</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="pad-stats-grid" id="statsGrid">
+            <!-- Stats will be populated here -->
+        </div>
+
+        <div class="pad-audit-table-container">
+            <table class="pad-audit-table" id="auditTable">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Event Type</th>
+                        <th>Details</th>
+                        <th>User</th>
+                        <th>Poll ID</th>
+                    </tr>
+                </thead>
+                <tbody id="auditTableBody">
+                    <!-- Audit logs will be populated here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pad-pagination" id="pagination">
+            <!-- Pagination will be populated here -->
+        </div>
+
+        <div class="pad-export-section">
+            <h3 class="pad-export-title">Export Audit Logs</h3>
+            <p class="pad-export-description">Download audit logs for compliance and record keeping</p>
+            <button class="pad-btn pad-btn-primary" onclick="exportAuditLogs()">Export CSV</button>
+            <button class="pad-btn pad-btn-secondary" onclick="exportFilteredLogs()">Export Filtered</button>
+            <button class="pad-btn pad-btn-outline" onclick="printAuditLogs()">Print Logs</button>
+        </div>
+    </main>
+
+    <script>
+        let auditLogs = [];
+        let filteredLogs = [];
+        let currentPage = 1;
+        const itemsPerPage = 20;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAuditLogs();
+            applyFilters();
+            renderStats();
+            renderTable();
+        });
+
+        function loadAuditLogs() {
+            auditLogs = JSON.parse(localStorage.getItem('pad_audit') || '[]');
+            filteredLogs = [...auditLogs];
+        }
+
+        function applyFilters() {
+            const eventType = document.getElementById('eventTypeFilter').value;
+            const dateFrom = document.getElementById('dateFromFilter').value;
+            const dateTo = document.getElementById('dateToFilter').value;
+            const search = document.getElementById('searchFilter').value.toLowerCase();
+
+            filteredLogs = auditLogs.filter(log => {
+                // Event type filter
+                if (eventType && log.event !== eventType) {
+                    return false;
+                }
+
+                // Date range filter
+                const logDate = new Date(log.timestamp).toISOString().split('T')[0];
+                if (dateFrom && logDate < dateFrom) {
+                    return false;
+                }
+                if (dateTo && logDate > dateTo) {
+                    return false;
+                }
+
+                // Search filter
+                if (search && !log.details.toLowerCase().includes(search)) {
+                    return false;
+                }
+
+                return true;
+            });
+
+            currentPage = 1;
+            renderTable();
+            renderStats();
+        }
+
+        function clearFilters() {
+            document.getElementById('eventTypeFilter').value = '';
+            document.getElementById('dateFromFilter').value = '';
+            document.getElementById('dateToFilter').value = '';
+            document.getElementById('searchFilter').value = '';
+            applyFilters();
+        }
+
+        function renderStats() {
+            const totalLogs = auditLogs.length;
+            const filteredLogs = document.getElementById('eventTypeFilter').value ? 
+                auditLogs.filter(log => log.event === document.getElementById('eventTypeFilter').value).length : 
+                totalLogs;
+            
+            const today = new Date().toISOString().split('T')[0];
+            const todayLogs = auditLogs.filter(log => 
+                log.timestamp.startsWith(today)
+            ).length;
+
+            const voteLogs = auditLogs.filter(log => log.event === 'vote_cast').length;
+
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="pad-stat-card">
+                    <div class="pad-stat-number">${totalLogs}</div>
+                    <div class="pad-stat-label">Total Events</div>
+                </div>
+                <div class="pad-stat-card">
+                    <div class="pad-stat-number">${filteredLogs}</div>
+                    <div class="pad-stat-label">Filtered Events</div>
+                </div>
+                <div class="pad-stat-card">
+                    <div class="pad-stat-number">${todayLogs}</div>
+                    <div class="pad-stat-label">Today's Events</div>
+                </div>
+                <div class="pad-stat-card">
+                    <div class="pad-stat-number">${voteLogs}</div>
+                    <div class="pad-stat-label">Votes Cast</div>
+                </div>
+            `;
+        }
+
+        function renderTable() {
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageLogs = filteredLogs.slice(startIndex, endIndex);
+
+            if (pageLogs.length === 0) {
+                document.getElementById('auditTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="5" class="pad-empty-state">
+                            <div class="pad-empty-icon">📋</div>
+                            <div class="pad-empty-title">No audit logs found</div>
+                            <div class="pad-empty-description">No events match your current filters.</div>
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+
+            document.getElementById('auditTableBody').innerHTML = pageLogs.map(log => `
+                <tr>
+                    <td class="pad-timestamp">${new Date(log.timestamp).toLocaleString()}</td>
+                    <td><span class="pad-event-type ${log.event}">${log.event.replace('_', ' ').toUpperCase()}</span></td>
+                    <td class="pad-details">${log.details}</td>
+                    <td class="pad-user">${log.userId || 'System'}</td>
+                    <td>${log.pollId || '-'}</td>
+                </tr>
+            `).join('');
+
+            renderPagination();
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
+            
+            if (totalPages <= 1) {
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = `
+                <button class="pad-pagination-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    Previous
+                </button>
+                <span class="pad-pagination-info">
+                    Page ${currentPage} of ${totalPages} (${filteredLogs.length} events)
+                </span>
+                <button class="pad-pagination-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    Next
+                </button>
+            `;
+        }
+
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderTable();
+            }
+        }
+
+        function exportAuditLogs() {
+            const csv = 'Timestamp,Event Type,Details,User,Poll ID\n' + 
+                auditLogs.map(log => 
+                    `"${new Date(log.timestamp).toLocaleString()}","${log.event}","${log.details}","${log.userId || 'System'}","${log.pollId || ''}"`
+                ).join('\n');
+            
+            downloadCSV(csv, 'audit_logs.csv');
+        }
+
+        function exportFilteredLogs() {
+            const csv = 'Timestamp,Event Type,Details,User,Poll ID\n' + 
+                filteredLogs.map(log => 
+                    `"${new Date(log.timestamp).toLocaleString()}","${log.event}","${log.details}","${log.userId || 'System'}","${log.pollId || ''}"`
+                ).join('\n');
+            
+            downloadCSV(csv, 'filtered_audit_logs.csv');
+        }
+
+        function printAuditLogs() {
+            window.print();
+        }
+
+        function downloadCSV(csv, filename) {
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function showAlert(message, type) {
+            const alertEl = document.getElementById('alertMessage');
+            alertEl.textContent = message;
+            alertEl.className = `pad-alert ${type} show`;
+            
+            setTimeout(() => {
+                alertEl.classList.remove('show');
+            }, 5000);
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            loadAuditLogs();
+            applyFilters();
+            renderStats();
+        }, 30000);
+    </script>
+
+    <footer class="pad-footer">
+        <div class="pad-container">
+            <div class="pad-footer-content">
+                <div>
+                    <p>&copy; 2025 Prince Alex Digital. All rights reserved.</p>
+                </div>
+                <div class="pad-footer-links">
+                    <a href="index.html#contact" class="pad-footer-link">Contact Us</a>
+                    <a href="index.html#features" class="pad-footer-link">Features</a>
+                    <a href="tel:+254717384875" class="pad-footer-link">Call Now</a>
+                </div>
+            </div>
+            <div class="pad-footer-credit">
+                <p>Designed by <a href="https://www.princealex.pro" target="_blank" rel="noopener">Prince Alex Digital</a></p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

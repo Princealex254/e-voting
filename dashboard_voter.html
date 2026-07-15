@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter Dashboard - Prince Alex Digital E-voting system</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        :root {
+            --pad-primary: #0b6efd;
+            --pad-primary-dark: #0956c4;
+            --pad-primary-light: #3b8dff;
+            --pad-accent: #10b981;
+            --pad-accent-dark: #059669;
+            --pad-dark: #0f172a;
+            --pad-dark-2: #1e293b;
+            --pad-light: #f8fafc;
+            --pad-text: #374151;
+            --pad-text-light: #6b7280;
+            --pad-text-muted: #94a3b8;
+            --pad-border: rgba(229, 231, 235, 0.5);
+            --pad-success: #10b981;
+            --pad-warning: #f59e0b;
+            --pad-error: #ef4444;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+            --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.04);
+            --card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 12px 40px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0f5ff 0%, #faf5ff 50%, #ecfdf5 100%);
+            color: var(--pad-text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Animated background blobs */
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            z-index: -1;
+            pointer-events: none;
+        }
+        body::before {
+            width: 600px; height: 600px;
+            background: var(--pad-primary);
+            top: -200px; right: -200px;
+            animation: floatBlob 20s ease-in-out infinite;
+        }
+        body::after {
+            width: 500px; height: 500px;
+            background: var(--pad-accent);
+            bottom: -150px; left: -150px;
+            animation: floatBlob 25s ease-in-out infinite reverse;
+        }
+
+        @keyframes floatBlob {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(50px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 40px) scale(0.95); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .pad-container { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* ===== HEADER ===== */
+        .pad-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 0.75rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .pad-header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .pad-header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .pad-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--pad-dark);
+        }
+
+        .pad-logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--pad-primary) 0%, var(--pad-accent) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 8px rgba(11, 110, 253, 0.3);
+        }
+
+        .pad-logo-text {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            letter-spacing: -0.5px;
+        }
+
+        .pad-logo-text span {
+            background: linear-gradient(135deg, var(--pad-primary), var(--pad-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pad-header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .pad-user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            padding: 0.5rem 1rem 0.5rem 0.75rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+            cursor: default;
+        }
+
+        .pad-user-profile:hover {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .pad-user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--pad-primary), var(--pad-accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .pad-user-details {
+            text-align: left;
+            line-height: 1.3;
+        }
+
+        .pad-user-name {
+            font-weight: 600;
+            color: var(--pad-dark);
+            font-size: 0.9rem;
+        }
+
+        .pad-user-id {
+            font-size: 0.75rem;
+            color: var(--pad-text-muted);
+        }
+
+        .pad-session-status {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.7rem;
+            color: var(--pad-success);
+            margin-top: 0.1rem;
+        }
+
+        .pad-session-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--pad-success);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .pad-logout {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            background: rgba(239, 68, 68, 0.08);
+            color: var(--pad-error);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .pad-logout:hover {
+            background: var(--pad-error);
+            color: white;
+            border-color: var(--pad-error);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+        }
+
+        /* ===== MAIN ===== */
+        .pad-main {
+            padding: 2rem 0 3rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* ===== WELCOME SECTION ===== */
+        .pad-welcome {
+            background: linear-gradient(135deg, var(--pad-dark) 0%, #1a2a4a 50%, #0d3330 100%);
+            border-radius: 20px;
+            padding: 2.5rem 3rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .pad-welcome::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(11, 110, 253, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .pad-welcome::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: 10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .pad-welcome-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .pad-welcome-text h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .pad-welcome-text h1 span {
+            background: linear-gradient(135deg, #60a5fa, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pad-welcome-text p {
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+
+        .pad-welcome-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            flex-shrink: 0;
+        }
+
+        .pad-welcome-badge-icon {
+            font-size: 1.5rem;
+            width: 44px;
+            height: 44px;
+            background: rgba(16, 185, 129, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pad-welcome-badge-text {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .pad-welcome-badge-text strong {
+            display: block;
+            font-size: 1.25rem;
+            color: #34d399;
+        }
+
+        .pad-welcome-badge-text small {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* ===== STATS ===== */
+        .pad-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .pad-stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.5s ease-out;
+            animation-fill-mode: backwards;
+        }
+
+        .pad-stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .pad-stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .pad-stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .pad-stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .pad-stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .pad-stat-card:nth-child(1)::before { background: linear-gradient(90deg, var(--pad-primary), #7c3aed); }
+        .pad-stat-card:nth-child(2)::before { background: linear-gradient(90deg, var(--pad-accent), #06b6d4); }
+        .pad-stat-card:nth-child(3)::before { background: linear-gradient(90deg, #8b5cf6, #ec4899); }
+        .pad-stat-card:nth-child(4)::before { background: linear-gradient(90deg, #f59e0b, #ef4444); }
+
+        .pad-stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-hover-shadow);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .pad-stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .pad-stat-card:nth-child(1) .pad-stat-icon { background: rgba(11, 110, 253, 0.1); color: var(--pad-primary); }
+        .pad-stat-card:nth-child(2) .pad-stat-icon { background: rgba(16, 185, 129, 0.1); color: var(--pad-accent); }
+        .pad-stat-card:nth-child(3) .pad-stat-icon { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+        .pad-stat-card:nth-child(4) .pad-stat-icon { background: rgba(245, 158, 11, 0.1); color: var(--pad-warning); }
+
+        .pad-stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--pad-dark);
+            letter-spacing: -1px;
+            line-height: 1.1;
+            margin-bottom: 0.25rem;
+        }
+
+        .pad-stat-number.counting {
+            animation: countUp 0.4s ease-out;
+        }
+
+        .pad-stat-label {
+            color: var(--pad-text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* ===== POLLS SECTION ===== */
+        .pad-polls-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem 2.5rem;
+            box-shadow: var(--card-shadow);
+            animation: fadeInUp 0.6s ease-out 0.3s;
+            animation-fill-mode: backwards;
+        }
+
+        .pad-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .pad-section-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            letter-spacing: -0.3px;
+        }
+
+        .pad-section-title span {
+            background: linear-gradient(135deg, var(--pad-primary), var(--pad-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pad-filter-badges {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .pad-filter-badge {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid var(--pad-border);
+            background: transparent;
+            color: var(--pad-text-light);
+            font-family: inherit;
+        }
+
+        .pad-filter-badge:hover {
+            background: rgba(11, 110, 253, 0.06);
+            border-color: var(--pad-primary);
+            color: var(--pad-primary);
+        }
+
+        .pad-filter-badge.active {
+            background: var(--pad-primary);
+            border-color: var(--pad-primary);
+            color: white;
+        }
+
+        .pad-polls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 1.25rem;
+        }
+
+        /* ===== POLL CARD ===== */
+        .pad-poll-card {
+            background: white;
+            border: 1px solid var(--pad-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pad-poll-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--pad-primary), var(--pad-accent));
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .pad-poll-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-hover-shadow);
+            border-color: rgba(11, 110, 253, 0.15);
+        }
+
+        .pad-poll-card:hover::before {
+            opacity: 1;
+        }
+
+        .pad-poll-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .pad-poll-title-group {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .pad-poll-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            margin-bottom: 0.35rem;
+            letter-spacing: -0.2px;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .pad-poll-badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .pad-poll-status-badge {
+            padding: 0.2rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .pad-poll-status-badge.active {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--pad-accent-dark);
+        }
+
+        .pad-poll-status-badge.upcoming {
+            background: rgba(245, 158, 11, 0.12);
+            color: #b45309;
+        }
+
+        .pad-poll-status-badge.closed {
+            background: rgba(107, 114, 128, 0.1);
+            color: var(--pad-text-light);
+        }
+
+        .pad-poll-voted-badge {
+            padding: 0.2rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--pad-accent-dark);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .pad-poll-description {
+            color: var(--pad-text-light);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .pad-poll-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .pad-poll-type {
+            padding: 0.25rem 0.6rem;
+            background: var(--pad-light);
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--pad-text);
+        }
+
+        .pad-poll-timer {
+            font-size: 0.8rem;
+            color: var(--pad-text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .pad-poll-timer .timer-icon {
+            font-size: 0.9rem;
+        }
+
+        .pad-poll-timer.warning { color: var(--pad-warning); }
+        .pad-poll-timer.error { color: var(--pad-error); font-weight: 600; }
+
+        .pad-poll-progress {
+            margin-bottom: 1.25rem;
+        }
+
+        .pad-progress-track {
+            background: #f1f5f9;
+            border-radius: 6px;
+            height: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .pad-progress-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(90deg, var(--pad-primary), var(--pad-accent));
+            position: relative;
+        }
+
+        .pad-progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+
+        .pad-progress-text {
+            font-size: 0.75rem;
+            color: var(--pad-text-muted);
+            margin-top: 0.35rem;
+            font-weight: 500;
+        }
+
+        .pad-poll-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .pad-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.675rem 1.25rem;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            font-family: inherit;
+            flex: 1;
+        }
+
+        .pad-btn-primary {
+            background: var(--pad-primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(11, 110, 253, 0.25);
+        }
+
+        .pad-btn-primary:hover:not(:disabled) {
+            background: var(--pad-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(11, 110, 253, 0.35);
+        }
+
+        .pad-btn-primary:disabled {
+            background: var(--pad-text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .pad-btn-secondary {
+            background: var(--pad-accent);
+            color: white;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+        }
+
+        .pad-btn-secondary:hover {
+            background: var(--pad-accent-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+        }
+
+        .pad-btn-outline {
+            background: transparent;
+            color: var(--pad-primary);
+            border: 1.5px solid var(--pad-primary);
+        }
+
+        .pad-btn-outline:hover {
+            background: var(--pad-primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .pad-empty-state {
+            text-align: center;
+            padding: 4rem 1rem;
+        }
+
+        .pad-empty-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .pad-empty-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-empty-description {
+            color: var(--pad-text-light);
+            font-size: 0.9rem;
+            max-width: 400px;
+            margin: 0 auto 1.5rem;
+        }
+
+        /* ===== ALERT ===== */
+        .pad-alert {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        .pad-alert.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #065f46;
+        }
+
+        .pad-alert.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #991b1b;
+        }
+
+        .pad-alert.show {
+            display: block;
+        }
+
+        /* ===== FOOTER ===== */
+        .pad-footer {
+            background: var(--pad-dark);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .pad-footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .pad-footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .pad-footer-link {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.875rem;
+        }
+
+        .pad-footer-link:hover {
+            color: white;
+        }
+
+        .pad-footer-credit {
+            border-top: 1px solid #1e293b;
+            padding-top: 1.25rem;
+            margin-top: 1.25rem;
+        }
+
+        .pad-footer-credit p {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        .pad-footer-credit a {
+            color: var(--pad-primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .pad-footer-credit a:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .pad-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .pad-header-content {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .pad-header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .pad-user-profile {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .pad-welcome-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .pad-welcome {
+                padding: 2rem 1.5rem;
+            }
+
+            .pad-welcome-text h1 {
+                font-size: 1.4rem;
+            }
+
+            .pad-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+
+            .pad-stat-card {
+                padding: 1.25rem;
+            }
+
+            .pad-stat-number {
+                font-size: 1.5rem;
+            }
+
+            .pad-polls-section {
+                padding: 1.5rem;
+            }
+
+            .pad-polls-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pad-section-header {
+                flex-direction: column;
+                gap: 0.75rem;
+                align-items: flex-start;
+            }
+
+            .pad-footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .pad-footer-links {
+                gap: 1rem;
+            }
+
+            .pad-welcome-badge {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .pad-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .pad-header-right {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .pad-user-profile {
+                padding: 0.5rem 0.75rem;
+            }
+
+            .pad-logout {
+                justify-content: center;
+            }
+
+            .pad-polls-section {
+                padding: 1.25rem;
+                border-radius: 16px;
+            }
+
+            .pad-poll-card {
+                padding: 1.25rem;
+            }
+
+            .pad-poll-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="pad-header">
+        <div class="pad-container">
+            <div class="pad-header-content">
+                <div class="pad-header-left">
+                    <a href="index.html" class="pad-logo">
+                        <div class="pad-logo-icon">PAD</div>
+                        <div class="pad-logo-text">Prince Alex Digital <span>E-Voting</span></div>
+                    </a>
+                </div>
+                <div class="pad-header-right">
+                    <div class="pad-user-profile">
+                        <div class="pad-user-avatar" id="userAvatar">JD</div>
+                        <div class="pad-user-details">
+                            <div class="pad-user-name" id="userName">John Doe</div>
+                            <div class="pad-user-id" id="userId">voter_001</div>
+                            <div class="pad-session-status">
+                                <span class="pad-session-dot"></span>
+                                <span>Session Active</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="pad-logout" onclick="logout()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></svg>path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="pad-main">
+        <div class="pad-container">
+            <div class="pad-alert" id="alertMessage"></div>
+
+            <div class="pad-welcome">
+                <div class="pad-welcome-content">
+                    <div class="pad-welcome-text">
+                <h1>Welcome back, <span id="welcomeName">Voter</span>!</h1>
+                        <p>Here are the polls you can participate in</p>
+                    </div>
+                    <div class="pad-welcome-badge">
+                <div class="pad-welcome-badge-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+                </div>
+                        <div class="pad-welcome-badge-text">
+                            <strong id="orgNameBadge">Organization</strong>
+                            <small>Member since registration</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pad-stats">
+                <div class="pad-stat-card">
+                <div class="pad-stat-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                </div>
+                    <div class="pad-stat-number" id="totalPolls">0</div>
+                    <div class="pad-stat-label">Total Polls</div>
+                </div>
+                <div class="pad-stat-card">
+                <div class="pad-stat-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                    <div class="pad-stat-number" id="activePolls">0</div>
+                    <div class="pad-stat-label">Active Polls</div>
+                </div>
+                <div class="pad-stat-card">
+                <div class="pad-stat-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="10.21 13.89 7 21 12 17 17 21 13.79 13.88"></polyline></svg>
+                </div>
+                    <div class="pad-stat-number" id="votedPolls">0</div>
+                    <div class="pad-stat-label">Votes Cast</div>
+                </div>
+                <div class="pad-stat-card">
+                <div class="pad-stat-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                </div>
+                    <div class="pad-stat-number" id="upcomingPolls">0</div>
+                    <div class="pad-stat-label">Upcoming</div>
+                </div>
+            </div>
+
+            <div class="pad-polls-section">
+                <div class="pad-section-header">
+                    <h2 class="pad-section-title">Available <span>Polls</span></h2>
+                    <div class="pad-filter-badges">
+                        <button class="pad-filter-badge active" onclick="filterPolls('all', this)">All</button>
+                        <button class="pad-filter-badge" onclick="filterPolls('active', this)">Active</button>
+                        <button class="pad-filter-badge" onclick="filterPolls('upcoming', this)">Upcoming</button>
+                        <button class="pad-filter-badge" onclick="filterPolls('closed', this)">Closed</button>
+                    </div>
+                </div>
+                <div class="pad-polls-grid" id="pollsGrid">
+                    <!-- Polls populated via JS -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="pad-footer">
+        <div class="pad-container">
+            <div class="pad-footer-content">
+                <div><p>&copy; 2025 Prince Alex Digital. All rights reserved.</p></div>
+                <div class="pad-footer-links">
+                    <a href="index.html#contact" class="pad-footer-link">Contact Us</a>
+                    <a href="index.html#features" class="pad-footer-link">Features</a>
+                    <a href="tel:+254717384875" class="pad-footer-link">Call Now</a>
+                </div>
+            </div>
+            <div class="pad-footer-credit">
+                <p>Designed by <a href="https://www.princealex.pro" target="_blank" rel="noopener">Prince Alex Digital</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, where, getDocs, orderBy, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGErPBeQ1Fdx9EHPXOHepoEoOx7P2f57o",
+            authDomain: "princealextravel.firebaseapp.com",
+            projectId: "princealextravel",
+            storageBucket: "princealextravel.firebasestorage.app",
+            messagingSenderId: "947577729462",
+            appId: "1:947577729462:web:dd4b4c7cb4a984c5e3d117"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDB = db;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.signOut = signOut;
+        window.doc = doc;
+        window.getDoc = getDoc;
+        window.collection = collection;
+        window.query = query;
+        window.where = where;
+        window.getDocs = getDocs;
+        window.orderBy = orderBy;
+        window.onSnapshot = onSnapshot;
+        window.addDoc = addDoc;
+        window.serverTimestamp = serverTimestamp;
+    </script>
+
+    <script>
+        let currentUser = null;
+        let polls = [];
+        let votes = [];
+        let userOrganizationId = null;
+        let currentFilter = 'all';
+        let dataLoaded = false;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show loading state immediately
+            document.getElementById('pollsGrid').innerHTML = `
+                <div style="grid-column: 1 / -1;">
+                    <div class="pad-empty-state">
+                        <div class="pad-spinner" style="width:32px;height:32px;border-width:3px;border-color:#e5e7eb;border-top-color:#0b6efd;margin:0 auto 1rem;"></div>
+                        <div class="pad-empty-title">Loading your polls...</div>
+                    </div>
+                </div>
+            `;
+            checkAuth();
+        });
+
+        function checkAuth() {
+            window.onAuthStateChanged(window.firebaseAuth, (user) => {
+                if (user) loadUserData(user);
+                else window.location.href = 'login.html';
+            });
+        }
+
+        async function loadUserData(firebaseUser) {
+            try {
+                let votersQuery = firebaseUser.isAnonymous
+                    ? window.query(window.collection(window.firebaseDB, 'voters'), where('firebaseUid', '==', firebaseUser.uid))
+                    : window.query(window.collection(window.firebaseDB, 'voters'), where('email', '==', firebaseUser.email));
+
+                const votersSnapshot = await window.getDocs(votersQuery);
+                if (votersSnapshot.empty) throw new Error("Voter document not found");
+
+                const userDoc = votersSnapshot.docs[0];
+                const finalUid = userDoc.id;
+                const voterData = userDoc.data();
+
+                currentUser = { uid: finalUid, ...voterData };
+                userOrganizationId = currentUser.organizationId;
+
+                // Update header immediately — no wait
+                document.getElementById('userName').textContent = currentUser.name;
+                document.getElementById('userId').textContent = currentUser.identity || currentUser.voterId;
+                document.getElementById('userAvatar').textContent = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                document.getElementById('welcomeName').textContent = currentUser.name.split(' ')[0];
+                document.getElementById('orgNameBadge').textContent = currentUser.organizationName || 'Your Organization';
+
+                // Fire polls + votes queries in PARALLEL for instant results
+                const pollsPromise = (async () => {
+                    const q = window.query(window.collection(window.firebaseDB, 'polls'),
+                        where('organizationId', '==', userOrganizationId),
+                        where('status', 'in', ['active', 'closed']));
+                    const snap = await getDocs(q);
+                    polls = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    polls.sort((a, b) => {
+                        const da = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+                        const db = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+                        return db - da;
+                    });
+                })();
+
+                const votesPromise = (async () => {
+                    const q = window.query(window.collection(window.firebaseDB, 'votes'),
+                        where('voterId', '==', currentUser.uid));
+                    const snap = await getDocs(q);
+                    votes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                })();
+
+                // Render polls as soon as they arrive (even before votes finish)
+                pollsPromise.then(() => {
+                    if (dataLoaded) return;
+                    updateStats();
+                    renderPolls();
+                });
+
+                await Promise.all([pollsPromise, votesPromise]);
+                dataLoaded = true;
+                updateUI();
+                startRealTimeUpdates();
+
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                window.location.href = 'login.html';
+            }
+        }
+
+        async function loadData() {
+            // Used by popstate — can be lighter since onSnapshot keeps things fresh
+            try {
+                const [pollsSnap, votesSnap] = await Promise.all([
+                    getDocs(window.query(window.collection(window.firebaseDB, 'polls'),
+                        where('organizationId', '==', userOrganizationId),
+                        where('status', 'in', ['active', 'closed']))),
+                    getDocs(window.query(window.collection(window.firebaseDB, 'votes'),
+                        where('voterId', '==', currentUser.uid)))
+                ]);
+                polls = pollsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+                polls.sort((a, b) => {
+                    const da = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+                    const db = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+                    return db - da;
+                });
+                votes = votesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+            } catch (e) { console.error('Error loading data:', e); }
+        }
+
+        function updateUI() {
+            updateStats();
+            renderPolls();
+        }
+
+        function updateStats() {
+            const now = new Date();
+            const totalPolls = polls.length;
+            const activePolls = polls.filter(p => {
+                const start = new Date(p.startAt);
+                const end = new Date(p.endAt);
+                return p.status === 'active' && start <= now && now <= end;
+            }).length;
+            const upcomingPolls = polls.filter(p => {
+                const start = new Date(p.startAt);
+                return p.status === 'active' && start > now;
+            }).length;
+            const votedPolls = votes.filter(v => v.voterId === currentUser.uid).length;
+
+            animateNumber('totalPolls', totalPolls);
+            animateNumber('activePolls', activePolls);
+            animateNumber('votedPolls', votedPolls);
+            animateNumber('upcomingPolls', upcomingPolls);
+        }
+
+        function animateNumber(elementId, target) {
+            const el = document.getElementById(elementId);
+            const current = parseInt(el.textContent) || 0;
+            if (current === target) return;
+            el.textContent = target;
+            el.classList.remove('counting');
+            void el.offsetWidth;
+            el.classList.add('counting');
+        }
+
+        function filterPolls(filter, btn) {
+            currentFilter = filter;
+            document.querySelectorAll('.pad-filter-badge').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderPolls();
+        }
+
+        function renderPolls() {
+            const grid = document.getElementById('pollsGrid');
+            const now = new Date();
+
+            let filtered = polls;
+            if (currentFilter === 'active') {
+                filtered = polls.filter(p => {
+                    const start = new Date(p.startAt);
+                    const end = new Date(p.endAt);
+                    return p.status === 'active' && start <= now && now <= end;
+                });
+            } else if (currentFilter === 'upcoming') {
+                filtered = polls.filter(p => {
+                    const start = new Date(p.startAt);
+                    return p.status === 'active' && start > now;
+                });
+            } else if (currentFilter === 'closed') {
+                filtered = polls.filter(p => p.status === 'closed' || new Date(p.endAt) < now);
+            }
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1;">
+                        <div class="pad-empty-state">
+                        <span class="pad-empty-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--pad-text-muted);"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+                        </span>
+                            <div class="pad-empty-title">No polls ${currentFilter !== 'all' ? currentFilter : ''}</div>
+                            <div class="pad-empty-description">There are currently no ${currentFilter !== 'all' ? currentFilter + ' ' : ''}polls available for you to participate in.</div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(poll => {
+                const start = new Date(poll.startAt);
+                const end = new Date(poll.endAt);
+                const hasVoted = votes.some(v => v.pollId === poll.id && v.voterId === currentUser.uid);
+
+                let status = 'draft', statusText = 'Draft', statusClass = 'draft';
+                if (poll.status === 'active') {
+                    if (start <= now && now <= end) { status = 'active'; statusText = 'Active'; statusClass = 'active'; }
+                    else if (start > now) { status = 'upcoming'; statusText = 'Upcoming'; statusClass = 'upcoming'; }
+                    else { status = 'closed'; statusText = 'Closed'; statusClass = 'closed'; }
+                } else if (poll.status === 'closed') {
+                    status = 'closed'; statusText = 'Closed'; statusClass = 'closed';
+                }
+
+                const timeLeft = getTimeLeft(end, now);
+                const progress = getPollProgress(poll);
+
+                let btnClass = hasVoted ? 'pad-btn-outline' : status === 'active' ? 'pad-btn-primary' : 'pad-btn-secondary';
+                let btnText = hasVoted ? (status === 'closed' ? 'View Results' : 'View Receipt') :
+                             status === 'active' ? 'Cast Vote' :
+                             status === 'upcoming' ? 'Starts Soon' : 'View Results';
+                let btnDisabled = status === 'upcoming' ? 'disabled' : '';
+
+                return `
+                    <div class="pad-poll-card" onclick="viewPoll('${poll.id}')" style="animation: fadeInUp 0.4s ease-out;">
+                        <div class="pad-poll-header">
+                            <div class="pad-poll-title-group">
+                                <h3 class="pad-poll-title">${poll.title}</h3>
+                                <div class="pad-poll-badges">
+                                    <span class="pad-poll-status-badge ${statusClass}">${statusText}</span>
+                                    ${hasVoted ? '<span class="pad-poll-voted-badge">Voted</span>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <p class="pad-poll-description">${poll.description || 'No description provided.'}</p>
+                        <div class="pad-poll-meta">
+                            <span class="pad-poll-type">${poll.type === 'single' ? 'Single Choice' : poll.type === 'multi' ? 'Multiple Choice' : 'Ranked Choice'}</span>
+                            <span class="pad-poll-timer ${timeLeft.warning ? 'warning' : timeLeft.error ? 'error' : ''}">
+                                ${timeLeft.text}
+                            </span>
+                        </div>
+                        ${status === 'active' ? `
+                            <div class="pad-poll-progress">
+                                <div class="pad-progress-track">
+                                    <div class="pad-progress-fill" style="width: ${progress.percentage}%"></div>
+                                </div>
+                                <div class="pad-progress-text">${progress.text}</div>
+                            </div>
+                        ` : ''}
+                        <div class="pad-poll-actions">
+                            <button class="pad-btn ${btnClass}" ${btnDisabled}>
+                                ${btnText}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getTimeLeft(end, now) {
+            const diff = end - now;
+            if (diff <= 0) return { text: 'Ended', warning: false, error: true };
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            if (days > 0) return { text: `${days}d ${hours}h remaining`, warning: false, error: false };
+            if (hours > 0) return { text: `${hours}h ${minutes}m remaining`, warning: true, error: false };
+            return { text: `${minutes}m remaining`, warning: false, error: true };
+        }
+
+        function getPollProgress(poll) {
+            const pollVotes = votes.filter(v => v.pollId === poll.id);
+            const total = pollVotes.length;
+            const pct = Math.min((total / (poll.options?.length * 10 || 1)) * 100, 100);
+            return { percentage: Math.round(pct), text: total === 0 ? 'No votes yet' : `${total} vote${total !== 1 ? 's' : ''} cast` };
+        }
+
+        function viewPoll(pollId) {
+            window.location.href = `poll_view.html?id=${pollId}`;
+        }
+
+        async function logout() {
+            try {
+                await window.signOut(window.firebaseAuth);
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+                window.location.href = 'login.html';
+            }
+        }
+
+        function startRealTimeUpdates() {
+            const pollsQuery = window.query(
+                window.collection(window.firebaseDB, 'polls'),
+                where('organizationId', '==', userOrganizationId),
+                where('status', 'in', ['active', 'closed'])
+            );
+            onSnapshot(pollsQuery, (snapshot) => {
+                polls = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                polls.sort((a, b) => {
+                    const da = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+                    const db = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+                    return db - da;
+                });
+                updateUI();
+            });
+            const votesQuery = window.query(
+                window.collection(window.firebaseDB, 'votes'),
+                where('voterId', '==', currentUser.uid)
+            );
+            onSnapshot(votesQuery, (snapshot) => {
+                votes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                updateUI();
+            });
+        }
+
+        function showAlert(message, type) {
+            const el = document.getElementById('alertMessage');
+            el.textContent = message;
+            el.className = `pad-alert ${type} show`;
+            setTimeout(() => el.classList.remove('show'), 5000);
+        }
+
+        window.addEventListener('popstate', function() {
+            loadData();
+            updateUI();
+        });
+    </script>
+</body>
+</html>

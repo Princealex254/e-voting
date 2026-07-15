@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Prince Alex Digital E-voting system</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        :root {
+            --pad-primary: #0b6efd;
+            --pad-primary-dark: #0956c4;
+            --pad-primary-light: #3b8dff;
+            --pad-accent: #10b981;
+            --pad-accent-dark: #059669;
+            --pad-dark: #0f172a;
+            --pad-dark-2: #1e293b;
+            --pad-light: #f8fafc;
+            --pad-text: #374151;
+            --pad-text-light: #6b7280;
+            --pad-text-muted: #94a3b8;
+            --pad-border: rgba(229, 231, 235, 0.5);
+            --pad-success: #10b981;
+            --pad-warning: #f59e0b;
+            --pad-error: #ef4444;
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.25);
+            --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.04);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0f5ff 0%, #faf5ff 50%, #ecfdf5 100%);
+            color: var(--pad-text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.12;
+            z-index: -1;
+            pointer-events: none;
+        }
+        body::before {
+            width: 500px; height: 500px;
+            background: var(--pad-primary);
+            top: -150px; right: -150px;
+            animation: floatBlob 20s ease-in-out infinite;
+        }
+        body::after {
+            width: 400px; height: 400px;
+            background: var(--pad-accent);
+            bottom: -100px; left: -100px;
+            animation: floatBlob 25s ease-in-out infinite reverse;
+        }
+
+        @keyframes floatBlob {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(50px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 40px) scale(0.95); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .pad-container {
+            max-width: 440px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            width: 100%;
+        }
+
+        /* ===== HEADER ===== */
+        .pad-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 0.75rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .pad-header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .pad-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--pad-dark);
+        }
+
+        .pad-logo-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--pad-primary) 0%, var(--pad-accent) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 1rem;
+            box-shadow: 0 2px 8px rgba(11, 110, 253, 0.3);
+        }
+
+        .pad-logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            letter-spacing: -0.5px;
+        }
+
+        .pad-logo-text span {
+            background: linear-gradient(135deg, var(--pad-primary), var(--pad-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pad-back-btn {
+            position: absolute;
+            left: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 1rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--pad-text);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .pad-back-btn:hover {
+            background: white;
+            border-color: var(--pad-primary);
+            color: var(--pad-primary);
+            transform: translateX(-2px);
+        }
+
+        /* ===== MAIN ===== */
+        .pad-main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .pad-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+            animation: fadeInUp 0.6s ease-out;
+            width: 100%;
+        }
+
+        .pad-card-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .pad-card-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, rgba(11, 110, 253, 0.1), rgba(16, 185, 129, 0.1));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.75rem;
+        }
+
+        .pad-card-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--pad-dark);
+            letter-spacing: -0.3px;
+        }
+
+        .pad-card-subtitle {
+            color: var(--pad-text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .pad-instructions {
+            background: rgba(11, 110, 253, 0.06);
+            border: 1px solid rgba(11, 110, 253, 0.1);
+            border-radius: 10px;
+            padding: 0.875rem 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .pad-instructions p {
+            color: var(--pad-text);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .pad-instructions a {
+            color: var(--pad-primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .pad-instructions a:hover { text-decoration: underline; }
+
+        .pad-instructions-divider {
+            border-top: 1px solid rgba(11, 110, 253, 0.1);
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        .pad-form-group { margin-bottom: 1rem; }
+
+        .pad-label {
+            display: block;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 0.4rem;
+            font-size: 0.85rem;
+        }
+
+        .pad-input-wrapper {
+            position: relative;
+        }
+
+        .pad-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--pad-border);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            background: white;
+            font-family: inherit;
+            color: var(--pad-dark);
+        }
+
+        .pad-input:focus {
+            outline: none;
+            border-color: var(--pad-primary);
+            box-shadow: 0 0 0 3px rgba(11, 110, 253, 0.1);
+        }
+
+        .pad-input.error {
+            border-color: var(--pad-error);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .pad-input-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--pad-text-muted);
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+
+        .pad-input-icon:hover {
+            color: var(--pad-dark);
+        }
+
+        .pad-error-message {
+            color: var(--pad-error);
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+
+        .pad-success-message {
+            color: var(--pad-accent-dark);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            border-radius: 10px;
+            display: none;
+            line-height: 1.4;
+            position: relative;
+        }
+
+        .pad-success-close {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 1.25rem;
+            font-weight: bold;
+            line-height: 1;
+            color: var(--pad-text-muted);
+        }
+
+        /* Login Method Selector */
+        .pad-methods {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .pad-method-btn {
+            flex: 1;
+            padding: 0.6rem 1rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid var(--pad-border);
+            background: white;
+            color: var(--pad-text-light);
+            font-family: inherit;
+            text-align: center;
+        }
+
+        .pad-method-btn:hover {
+            border-color: rgba(11, 110, 253, 0.3);
+            color: var(--pad-primary);
+        }
+
+        .pad-method-btn.active {
+            border-color: var(--pad-primary);
+            background: rgba(11, 110, 253, 0.06);
+            color: var(--pad-primary);
+            font-weight: 600;
+        }
+
+        .pad-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        .pad-btn-primary {
+            background: linear-gradient(135deg, var(--pad-primary), var(--pad-primary-light));
+            color: white;
+            box-shadow: 0 2px 8px rgba(11, 110, 253, 0.25);
+        }
+
+        .pad-btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(11, 110, 253, 0.35);
+        }
+
+        .pad-btn-primary:disabled {
+            background: var(--pad-text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .pad-loading {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pad-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .pad-link {
+            color: var(--pad-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .pad-link:hover { text-decoration: underline; }
+
+        .pad-text-center { text-align: center; }
+        .pad-mt-2 { margin-top: 1rem; }
+
+        /* OTP Timer */
+        .pad-otp-timer {
+            color: var(--pad-text-muted);
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .pad-otp-timer.warning { color: var(--pad-warning); }
+        .pad-otp-timer.error { color: var(--pad-error); font-weight: 600; }
+
+        .pad-resend-btn {
+            background: none;
+            border: none;
+            color: var(--pad-primary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            font-family: inherit;
+            padding: 0;
+            transition: var(--transition);
+        }
+
+        .pad-resend-btn:hover { text-decoration: underline; }
+        .pad-resend-btn:disabled { color: var(--pad-text-muted); cursor: not-allowed; text-decoration: none; }
+
+        /* Alert */
+        .pad-alert {
+            padding: 0.85rem 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            animation: slideInRight 0.3s ease-out;
+        }
+        .pad-alert.success { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #065f46; }
+        .pad-alert.error { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #991b1b; }
+        .pad-alert.show { display: block; }
+
+        /* Footer */
+        .pad-footer {
+            background: var(--pad-dark);
+            color: white;
+            padding: 1.5rem 0;
+            text-align: center;
+        }
+
+        .pad-footer p {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        .pad-footer a {
+            color: var(--pad-primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .pad-footer a:hover { text-decoration: underline; }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .pad-card {
+                padding: 1.75rem;
+                border-radius: 20px;
+            }
+
+            .pad-card-title {
+                font-size: 1.3rem;
+            }
+
+            .pad-container {
+                padding: 0 1rem;
+            }
+
+            .pad-back-btn span.back-text {
+                display: none;
+            }
+
+            .pad-methods {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="pad-header">
+        <div class="pad-container" style="position: relative;">
+            <a href="index.html" class="pad-back-btn">
+                ← <span class="back-text">Home</span>
+            </a>
+            <div class="pad-header-content">
+                <a href="index.html" class="pad-logo">
+                    <div class="pad-logo-icon">PAD</div>
+                    <div class="pad-logo-text">Prince Alex Digital <span>E-Voting</span></div>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pad-main">
+        <div class="pad-container">
+            <div class="pad-alert" id="alertMessage"></div>
+
+            <div class="pad-card">
+                <div class="pad-card-header">
+                <div class="pad-card-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                </div>
+                <h1 class="pad-card-title">Voter Login</h1>
+                    <p class="pad-card-subtitle">Access your voting account</p>
+                </div>
+
+                <div class="pad-instructions">
+                    <p>Enter your email or ID number below to get started.</p>
+                    <div class="pad-instructions-divider">
+                        New user? <a href="voter_register.html">Register here</a>
+                    </div>
+                </div>
+
+                <form id="voterLoginForm">
+                    <div class="pad-form-group">
+                        <label class="pad-label" for="voterId">Email Address or Identity Number</label>
+                        <div class="pad-input-wrapper">
+                            <input type="text" id="voterId" name="voterId" class="pad-input" placeholder="e.g., voter@email.com or M/123456" required>
+                        </div>
+                        <div class="pad-error-message" id="voterIdError"></div>
+                    </div>
+
+                    <div class="pad-form-group">
+                        <label class="pad-label">Login Method</label>
+                        <div class="pad-methods">
+                            <button type="button" class="pad-method-btn active" data-value="otp" onclick="selectLoginMethod('otp', this)">OTP (Email)</button>
+                            <button type="button" class="pad-method-btn" data-value="password" onclick="selectLoginMethod('password', this)">Password</button>
+                        </div>
+                    </div>
+
+                    <div class="pad-form-group" id="passwordGroup" style="display: none;">
+                        <label class="pad-label" for="password">Password</label>
+                        <div class="pad-input-wrapper">
+                            <input type="password" id="password" name="password" class="pad-input" placeholder="Enter your password">
+                            <span class="pad-input-icon" onclick="togglePassword('password')">👁️</span>
+                        </div>
+                        <div class="pad-error-message" id="passwordError"></div>
+                    </div>
+
+                    <button type="button" class="pad-btn pad-btn-primary" onclick="handleVoterLogin()" id="voterLoginBtn">
+                        <span id="voterLoginText">Send OTP</span>
+                        <span id="voterLoginLoading" class="pad-loading" style="display: none;">
+                            <div class="pad-spinner"></div>
+                            <span>Sending...</span>
+                        </span>
+                    </button>
+
+                    <div class="pad-error-message" id="voterLoginError" style="display: none;"></div>
+                    <div class="pad-success-message" id="voterLoginSuccess" style="display: none;"></div>
+                </form>
+
+                <div class="pad-text-center pad-mt-2">
+                    <p style="color: var(--pad-text-muted); font-size: 0.85rem;">
+                        Don't have an account? <a href="voter_register.html" class="pad-link">Register here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="pad-footer">
+        <div class="pad-container">
+            <p>&copy; 2025 Prince Alex Digital. All rights reserved. | Designed by <a href="https://www.princealex.pro" target="_blank" rel="noopener">Prince Alex Digital</a></p>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, serverTimestamp, collection, addDoc, setDoc, getDocs, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const app = initializeApp(PAD_CONFIG.firebase);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDB = db;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.signOut = signOut;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.signInWithCustomToken = signInWithCustomToken;
+        window.signInAnonymously = signInAnonymously;
+        window.doc = doc;
+        window.getDoc = getDoc;
+        window.updateDoc = updateDoc;
+        window.serverTimestamp = serverTimestamp;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.setDoc = setDoc;
+        window.getDocs = getDocs;
+        window.query = query;
+        window.where = where;
+        window.orderBy = orderBy;
+        window.limit = limit;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    let votersQuery = user.isAnonymous
+                        ? query(collection(db, 'voters'), where('firebaseUid', '==', user.uid))
+                        : query(collection(db, 'voters'), where('email', '==', user.email));
+                    const snapshot = await getDocs(votersQuery);
+                    if (!snapshot.empty) window.location.href = 'dashboard_voter.html';
+                    else await signOut(auth);
+                } catch (e) { console.error(e); await signOut(auth); }
+            }
+        });
+    </script>
+    <script src="config.js"></script>
+    <script src="email-templates.js"></script>
+    <script src="login.js"></script>
+</body>
+</html>

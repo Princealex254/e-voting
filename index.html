@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prince Alex Digital E-voting system</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        :root {
+            --pad-primary: #0b6efd;
+            --pad-primary-dark: #0956c4;
+            --pad-primary-light: #3b8dff;
+            --pad-accent: #10b981;
+            --pad-accent-dark: #059669;
+            --pad-dark: #0f172a;
+            --pad-dark-2: #1e293b;
+            --pad-light: #f8fafc;
+            --pad-text: #374151;
+            --pad-text-light: #6b7280;
+            --pad-text-muted: #94a3b8;
+            --pad-border: rgba(229, 231, 235, 0.5);
+            --pad-success: #10b981;
+            --pad-warning: #f59e0b;
+            --pad-error: #ef4444;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+            --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.04);
+            --card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 12px 40px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0f5ff 0%, #faf5ff 50%, #ecfdf5 100%);
+            color: var(--pad-text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Animated background blobs */
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            z-index: -1;
+            pointer-events: none;
+        }
+        body::before {
+            width: 600px; height: 600px;
+            background: var(--pad-primary);
+            top: -200px; right: -200px;
+            animation: floatBlob 20s ease-in-out infinite;
+        }
+        body::after {
+            width: 500px; height: 500px;
+            background: var(--pad-accent);
+            bottom: -150px; left: -150px;
+            animation: floatBlob 25s ease-in-out infinite reverse;
+        }
+
+        @keyframes floatBlob {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(50px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 40px) scale(0.95); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .pad-container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* ===== HEADER ===== */
+        .pad-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .pad-header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .pad-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--pad-dark);
+        }
+
+        .pad-logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--pad-primary) 0%, var(--pad-accent) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 8px rgba(11, 110, 253, 0.3);
+        }
+
+        .pad-logo-text {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            letter-spacing: -0.5px;
+        }
+
+        .pad-logo-text span {
+            background: linear-gradient(135deg, var(--pad-primary), var(--pad-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pad-nav {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .pad-nav-link {
+            color: var(--pad-text);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: var(--transition);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .pad-nav-link:hover {
+            background: rgba(11, 110, 253, 0.08);
+            color: var(--pad-primary);
+        }
+
+        /* ===== MAIN ===== */
+        .pad-main {
+            padding: 4rem 0;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .pad-hero {
+            text-align: center;
+            padding: 5rem 0;
+            margin-bottom: 4rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .pad-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(11, 110, 253, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .pad-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: 10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .pad-hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .pad-hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--pad-dark);
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, var(--pad-primary) 0%, var(--pad-accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pad-hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--pad-text-light);
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.6;
+        }
+
+        .pad-hero-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .pad-btn-large {
+            padding: 1rem 2.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            border-radius: 12px;
+            min-width: 160px;
+        }
+
+        .pad-btn-outline {
+            background: transparent;
+            color: var(--pad-primary);
+            border: 2px solid var(--pad-primary);
+        }
+
+        .pad-btn-outline:hover {
+            background: var(--pad-primary);
+            color: white;
+        }
+
+        /* ===== CTA SECTION ===== */
+        .pad-cta-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .pad-cta-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pad-cta-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--pad-primary), var(--pad-accent));
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .pad-cta-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-hover-shadow);
+            border-color: rgba(11, 110, 253, 0.15);
+        }
+
+        .pad-cta-card:hover::before {
+            opacity: 1;
+        }
+
+        .pad-cta-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, rgba(11, 110, 253, 0.1), rgba(16, 185, 129, 0.1));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--pad-primary);
+        }
+
+        .pad-cta-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            margin-bottom: 1rem;
+            letter-spacing: -0.3px;
+        }
+
+        .pad-cta-description {
+            color: var(--pad-text-light);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        /* ===== FEATURES SECTION ===== */
+        .pad-features {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 4rem;
+        }
+
+        .pad-features-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            margin-bottom: 2rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--pad-primary), var(--pad-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pad-features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .pad-feature {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 16px;
+            transition: var(--transition);
+        }
+
+        .pad-feature:hover {
+            background: rgba(11, 110, 253, 0.05);
+        }
+
+        .pad-feature-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, rgba(11, 110, 253, 0.1), rgba(16, 185, 129, 0.1));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--pad-primary);
+        }
+
+        .pad-feature-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .pad-feature-description {
+            color: var(--pad-text-light);
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        /* ===== CONTACT SECTION ===== */
+        .pad-contact {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 4rem;
+        }
+
+        .pad-contact-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        .pad-contact-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--pad-dark);
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--pad-primary) 0%, var(--pad-accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pad-contact-subtitle {
+            font-size: 1.125rem;
+            color: var(--pad-text-light);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .pad-contact-details {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .pad-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+        }
+
+        .pad-contact-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--card-hover-shadow);
+        }
+
+        .pad-contact-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--pad-primary), var(--pad-accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: white;
+        }
+
+        .pad-contact-text h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .pad-contact-text p {
+            color: var(--pad-text-light);
+            margin: 0;
+        }
+
+        .pad-contact-text a {
+            color: var(--pad-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .pad-contact-text a:hover {
+            text-decoration: underline;
+        }
+
+        .pad-contact-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .pad-form-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--pad-dark);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .pad-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .pad-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .pad-form-label {
+            font-weight: 500;
+            color: var(--pad-dark);
+            font-size: 0.875rem;
+        }
+
+        .pad-form-input,
+        .pad-form-select,
+        .pad-form-textarea {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--pad-border);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: var(--transition);
+            font-family: inherit;
+            background: white;
+        }
+
+        .pad-form-input:focus,
+        .pad-form-select:focus,
+        .pad-form-textarea:focus {
+            outline: none;
+            border-color: var(--pad-primary);
+            box-shadow: 0 0 0 3px rgba(11, 110, 253, 0.1);
+        }
+
+        .pad-form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .pad-form-actions {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .pad-btn-loading {
+            display: none;
+        }
+
+        .pad-btn:disabled .pad-btn-text {
+            display: none;
+        }
+
+        .pad-btn:disabled .pad-btn-loading {
+            display: inline;
+        }
+
+        .pad-form-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #065f46;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 500;
+            margin-top: 1rem;
+        }
+
+        .pad-form-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 500;
+            margin-top: 1rem;
+        }
+
+        /* ===== FOOTER ===== */
+        .pad-footer {
+            background: var(--pad-dark);
+            color: white;
+            padding: 1.5rem 0;
+            text-align: center;
+        }
+
+        .pad-footer p {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        .pad-footer a {
+            color: var(--pad-primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .pad-footer a:hover { text-decoration: underline; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .pad-hero {
+                padding: 4rem 0;
+                margin-bottom: 3rem;
+            }
+
+            .pad-hero-title {
+                font-size: 2.5rem;
+            }
+
+            .pad-hero-subtitle {
+                font-size: 1.125rem;
+            }
+
+            .pad-hero-actions {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.75rem;
+            }
+
+            .pad-btn-large {
+                width: 100%;
+                max-width: 280px;
+            }
+
+            .pad-cta-section {
+                grid-template-columns: 1fr;
+            }
+
+            .pad-features {
+                padding: 2rem 1.5rem;
+            }
+
+            .pad-nav {
+                display: none;
+            }
+
+            .pad-contact-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .pad-contact {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .pad-hero-title {
+                font-size: 2rem;
+            }
+
+            .pad-hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .pad-contact-title {
+                font-size: 2rem;
+            }
+
+            .pad-contact-form {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="pad-header">
+        <div class="pad-container">
+            <div class="pad-header-content">
+                <a href="index.html" class="pad-logo">
+                    <div class="pad-logo-icon">PAD</div>
+                    <div class="pad-logo-text">Prince Alex <span>Digital</span></div>
+                </a>
+                <nav class="pad-nav">
+                    <a href="#features" class="pad-nav-link">Features</a>
+                    <a href="#contact" class="pad-nav-link">Contact</a>
+                    <a href="voter_register.html" class="pad-nav-link">Get Started</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="pad-main">
+        <div class="pad-container">
+            <section class="pad-hero">
+                <div class="pad-hero-content">
+                    <h1 class="pad-hero-title">Secure voting made simple</h1>
+                    <p class="pad-hero-subtitle">Prince Alex Digital E-voting system provides secure, transparent, and easy voting for organizations and communities.</p>
+                    <div class="pad-hero-actions">
+                        <a href="voter_register.html" class="pad-btn pad-btn-primary pad-btn-large">Get Started</a>
+                        <a href="#contact" class="pad-btn pad-btn-outline pad-btn-large">Contact Us</a>
+                        <a href="#features" class="pad-btn pad-btn-outline pad-btn-large">Learn More</a>
+                    </div>
+                </div>
+            </section>
+
+            <section class="pad-cta-section">
+                <div class="pad-cta-card">
+                    <div class="pad-cta-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </div>
+                    <h2 class="pad-cta-title">Already Registered?</h2>
+                    <p class="pad-cta-description">Access your voting dashboard to participate in active polls and view results.</p>
+                    <a href="login.html" class="pad-btn pad-btn-primary">Voter Login</a>
+                </div>
+            </section>
+
+            <section class="pad-features" id="features">
+                <h2 class="pad-features-title">Why Choose Prince Alex Digital E-voting system?</h2>
+                <div class="pad-features-grid">
+                    <div class="pad-feature">
+                        <div class="pad-feature-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        </div>
+                        <h3 class="pad-feature-title">Secure & Transparent</h3>
+                        <p class="pad-feature-description">End-to-end encryption with tamper-proof audit logs and vote receipts.</p>
+                    </div>
+                    <div class="pad-feature">
+                        <div class="pad-feature-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                        </div>
+                        <h3 class="pad-feature-title">Mobile-First Design</h3>
+                        <p class="pad-feature-description">Accessible on any device with responsive design and touch-friendly interface.</p>
+                    </div>
+                    <div class="pad-feature">
+                        <div class="pad-feature-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                        </div>
+                        <h3 class="pad-feature-title">Real-Time Results</h3>
+                        <p class="pad-feature-description">Live updates and instant results with comprehensive analytics and reporting.</p>
+                    </div>
+                    <div class="pad-feature">
+                        <div class="pad-feature-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg>
+                        </div>
+                        <h3 class="pad-feature-title">Accessible</h3>
+                        <p class="pad-feature-description">WCAG compliant with keyboard navigation and screen reader support.</p>
+                    </div>
+                    <div class="pad-feature">
+                        <div class="pad-feature-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        </div>
+                        <h3 class="pad-feature-title">Audit Trail</h3>
+                        <p class="pad-feature-description">Complete audit logs for transparency and compliance with election regulations.</p>
+                    </div>
+                    <div class="pad-feature">
+                        <div class="pad-feature-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        </div>
+                        <h3 class="pad-feature-title">Self-Hosted</h3>
+                        <p class="pad-feature-description">Deploy on your own infrastructure with full control over data and security.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="pad-contact" id="contact">
+                <div class="pad-contact-content">
+                    <div class="pad-contact-info">
+                        <h2 class="pad-contact-title">Get In Touch</h2>
+                        <p class="pad-contact-subtitle">Ready to implement Prince Alex Digital E-voting system for your organization? Contact us today for a consultation and custom solution.</p>
+                        
+                        <div class="pad-contact-details">
+                            <div class="pad-contact-item">
+                                <div class="pad-contact-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                </div>
+                                <div class="pad-contact-text">
+                                    <h3>Phone</h3>
+                                    <p><a href="tel:+254717384875">+254 717 384 875</a></p>
+                                </div>
+                            </div>
+                            
+                            <div class="pad-contact-item">
+                                <div class="pad-contact-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                </div>
+                                <div class="pad-contact-text">
+                                    <h3>Email</h3>
+                                    <p><a href="mailto:princealexdigital@gmail.com">princealexdigital@gmail.com</a></p>
+                                </div>
+                            </div>
+                            
+                            <div class="pad-contact-item">
+                                <div class="pad-contact-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                </div>
+                                <div class="pad-contact-text">
+                                    <h3>Response Time</h3>
+                                    <p>Within 24 hours</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pad-contact-form">
+                        <h3 class="pad-form-title">Send us a Message</h3>
+                        <form id="contactForm" class="pad-form">
+                            <div class="pad-form-group">
+                                <label for="contactName" class="pad-form-label">Full Name *</label>
+                                <input type="text" id="contactName" name="name" class="pad-form-input" required>
+                            </div>
+                            
+                            <div class="pad-form-group">
+                                <label for="contactEmail" class="pad-form-label">Email Address *</label>
+                                <input type="email" id="contactEmail" name="email" class="pad-form-input" required>
+                            </div>
+                            
+                            <div class="pad-form-group">
+                                <label for="contactPhone" class="pad-form-label">Phone Number</label>
+                                <input type="tel" id="contactPhone" name="phone" class="pad-form-input">
+                            </div>
+                            
+                            <div class="pad-form-group">
+                                <label for="contactOrganization" class="pad-form-label">Organization</label>
+                                <input type="text" id="contactOrganization" name="organization" class="pad-form-input">
+                            </div>
+                            
+                            <div class="pad-form-group">
+                                <label for="contactSubject" class="pad-form-label">Subject *</label>
+                                <select id="contactSubject" name="subject" class="pad-form-select" required>
+                                    <option value="">Select a subject</option>
+                                    <option value="general">General Inquiry</option>
+                                    <option value="demo">Request Demo</option>
+                                    <option value="pricing">Pricing Information</option>
+                                    <option value="custom">Custom Solution</option>
+                                    <option value="support">Technical Support</option>
+                                    <option value="partnership">Partnership</option>
+                                </select>
+                            </div>
+                            
+                            <div class="pad-form-group">
+                                <label for="contactMessage" class="pad-form-label">Message *</label>
+                                <textarea id="contactMessage" name="message" class="pad-form-textarea" rows="5" placeholder="Tell us about your voting needs, organization size, timeline, and any specific requirements..." required></textarea>
+                            </div>
+                            
+                            <div class="pad-form-actions">
+                                <button type="submit" class="pad-btn pad-btn-primary pad-btn-large">
+                                    <span class="pad-btn-text">Send Message</span>
+                                    <span class="pad-btn-loading" style="display: none;">Sending...</span>
+                                </button>
+                            </div>
+                            
+                            <div id="contactSuccess" class="pad-form-success" style="display: none;">
+                                Thank you! Your message has been sent successfully. We'll get back to you within 24 hours.
+                            </div>
+                            
+                            <div id="contactError" class="pad-form-error" style="display: none;">
+                                Sorry, there was an error sending your message. Please try again or contact us directly.
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="pad-footer">
+        <div class="pad-container">
+            <p>&copy; 2025 Prince Alex Digital. All rights reserved. | Designed by <a href="https://www.princealex.pro" target="_blank" rel="noopener">Prince Alex Digital</a></p>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGErPBeQ1Fdx9EHPXOHepoEoOx7P2f57o",
+            authDomain: "princealextravel.firebaseapp.com",
+            projectId: "princealextravel",
+            storageBucket: "princealextravel.firebasestorage.app",
+            messagingSenderId: "947577729462",
+            appId: "1:947577729462:web:dd4b4c7cb4a984c5e3d117"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Make Firebase available globally
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDB = db;
+        window.addDoc = addDoc;
+        window.collection = collection;
+        window.signOut = signOut;
+
+        // Check authentication state
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User is signed in
+                console.log('User is signed in:', user.uid);
+                // Redirect based on user type
+                checkUserTypeAndRedirect(user.uid);
+            } else {
+                // User is signed out
+                console.log('User is signed out');
+            }
+        });
+
+        async function checkUserTypeAndRedirect(uid) {
+            try {
+                // Only check if user is voter (main page is for voters only)
+                const voterDoc = await getDoc(doc(db, 'voters', uid));
+                if (voterDoc.exists()) {
+                    window.location.href = 'dashboard_voter.html';
+                    return;
+                }
+
+                // If user exists but is not a voter, sign them out
+                await signOut(auth);
+            } catch (error) {
+                console.error('Error checking user type:', error);
+                await signOut(auth);
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // Contact form handling
+            const contactForm = document.getElementById('contactForm');
+            if (contactForm) {
+                contactForm.addEventListener('submit', handleContactForm);
+            }
+        });
+
+        async function handleContactForm(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const btnText = submitBtn.querySelector('.pad-btn-text');
+            const btnLoading = submitBtn.querySelector('.pad-btn-loading');
+            const successDiv = document.getElementById('contactSuccess');
+            const errorDiv = document.getElementById('contactError');
+            
+            // Hide previous messages
+            successDiv.style.display = 'none';
+            errorDiv.style.display = 'none';
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'inline';
+            
+            try {
+                // Get form data
+                const formData = new FormData(form);
+                const contactData = {
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    phone: formData.get('phone'),
+                    organization: formData.get('organization'),
+                    subject: formData.get('subject'),
+                    message: formData.get('message'),
+                    timestamp: new Date().toISOString(),
+                    source: 'website_contact_form'
+                };
+                
+                // Save to Firestore
+                await addDoc(collection(window.firebaseDB, 'contactMessages'), contactData);
+                
+                // Show success message
+                successDiv.style.display = 'block';
+                form.reset();
+                
+                // Scroll to success message
+                successDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+            } catch (error) {
+                console.error('Error submitting contact form:', error);
+                errorDiv.style.display = 'block';
+                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } finally {
+                // Reset button state
+                submitBtn.disabled = false;
+                btnText.style.display = 'inline';
+                btnLoading.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
